@@ -1,0 +1,1448 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>门禁分级授权 PC 原型</title>
+  <style>
+    :root {
+      --primary: #4165ec;
+      --primary-dark: #3554d8;
+      --sidebar: #031b2f;
+      --sidebar-2: #0a2740;
+      --page: #f3f5f8;
+      --card: #ffffff;
+      --soft: #f7f7fa;
+      --line: #e7e9ef;
+      --border: #d8d8d8;
+      --text: #36373b;
+      --muted: #8f9098;
+      --danger: #f05b5b;
+      --success: #26a66a;
+      --warning: #fa8c16;
+      --shadow: 0 8px 24px rgba(30, 43, 80, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: #e9edf4;
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+      font-size: 14px;
+    }
+
+    button,
+    input,
+    textarea,
+    select {
+      font: inherit;
+    }
+
+    button {
+      border: 0;
+      cursor: pointer;
+    }
+
+    .desktop {
+      width: 1366px;
+      height: 768px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 190px 1fr;
+      overflow: hidden;
+      background: var(--page);
+    }
+
+    .sidebar {
+      background: var(--sidebar);
+      color: #b7c7d8;
+      overflow: hidden;
+    }
+
+    .brand {
+      height: 56px;
+      display: flex;
+      align-items: center;
+      padding: 0 18px;
+      color: #fff;
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .nav-item,
+    .sub-item {
+      height: 44px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 20px;
+      color: #b7c7d8;
+      background: transparent;
+      width: 100%;
+      text-align: left;
+    }
+
+    .nav-item {
+      margin-top: 4px;
+    }
+
+    .nav-item.active {
+      color: #fff;
+      background: var(--sidebar-2);
+    }
+
+    .sub-item {
+      padding-left: 42px;
+      color: #a9bdd1;
+    }
+
+    .sub-item.active {
+      color: #fff;
+      background: var(--primary);
+    }
+
+    .main {
+      min-width: 0;
+      display: grid;
+      grid-template-rows: 56px 38px 1fr;
+      overflow: hidden;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 18px;
+      background: #fff;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .crumb {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text);
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .user {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--muted);
+    }
+
+    .avatar {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #79a7ff, #f2b28f);
+    }
+
+    .tabs {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding-left: 18px;
+      background: #fff;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .tab {
+      height: 30px;
+      padding: 0 18px;
+      border: 1px solid var(--line);
+      border-bottom: 0;
+      background: #fff;
+      color: var(--text);
+      border-radius: 3px 3px 0 0;
+    }
+
+    .tab.active {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+    }
+
+    .workbench {
+      padding: 16px;
+      overflow: hidden;
+    }
+
+    .page {
+      display: none;
+      height: 100%;
+    }
+
+    .page.active {
+      display: block;
+    }
+
+    .group-layout {
+      height: 100%;
+      display: grid;
+      grid-template-columns: 430px 1fr;
+      gap: 12px;
+    }
+
+    .panel {
+      min-width: 0;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .panel-head {
+      height: 54px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .panel-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .btn {
+      height: 34px;
+      padding: 0 14px;
+      border-radius: 4px;
+      background: var(--soft);
+      color: var(--text);
+      border: 1px solid transparent;
+    }
+
+    .btn.primary {
+      color: #fff;
+      background: var(--primary);
+    }
+
+    .btn.primary:hover {
+      background: var(--primary-dark);
+    }
+
+    .btn.danger {
+      color: var(--danger);
+      background: #fff;
+      border-color: #ffd4d4;
+    }
+
+    .btn.text {
+      height: auto;
+      padding: 0;
+      color: var(--primary);
+      background: transparent;
+    }
+
+    .btn.text.danger {
+      color: var(--danger);
+      border: 0;
+    }
+
+    .group-list {
+      padding: 12px 14px;
+      height: calc(100% - 54px);
+      overflow-y: auto;
+    }
+
+    .group-card {
+      position: relative;
+      padding: 12px 54px 12px 14px;
+      border-left: 3px solid transparent;
+      border-radius: 4px;
+      margin-bottom: 8px;
+      background: #fff;
+    }
+
+    .group-card.active {
+      border-left-color: var(--primary);
+      background: #eef5ff;
+    }
+
+    .group-name {
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    .group-manager {
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .group-actions {
+      position: absolute;
+      right: 12px;
+      top: 14px;
+      display: flex;
+      gap: 8px;
+    }
+
+    .tree-node {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--line);
+      background: #fff;
+    }
+
+    .tree-node.active {
+      background: #eef5ff;
+    }
+
+    .tree-node.level-1 {
+      padding-left: 22px;
+    }
+
+    .tree-node.level-2 {
+      padding-left: 38px;
+    }
+
+    .tree-node.level-3 {
+      padding-left: 54px;
+    }
+
+    .tree-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+      color: var(--text);
+      font-weight: 700;
+      line-height: 1.5;
+    }
+
+    .tree-caret {
+      width: 16px;
+      color: var(--primary);
+      text-align: center;
+    }
+
+    .tree-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-left: 24px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .tree-admin {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .filters {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .field-inline {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .input,
+    .select,
+    textarea {
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      background: var(--soft);
+      color: var(--text);
+      outline: none;
+    }
+
+    .input,
+    .select {
+      height: 34px;
+      padding: 0 10px;
+    }
+
+    .input:focus,
+    .select:focus,
+    textarea:focus {
+      border-color: var(--primary);
+      background: #fff;
+    }
+
+    textarea {
+      width: 100%;
+      height: 92px;
+      padding: 10px;
+      resize: none;
+      line-height: 1.6;
+    }
+
+    .table-wrap {
+      padding: 12px 16px 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+    }
+
+    th {
+      height: 42px;
+      background: #f4f6fa;
+      color: var(--text);
+      font-weight: 700;
+      text-align: left;
+    }
+
+    td {
+      height: 44px;
+      border-bottom: 1px solid var(--line);
+      color: #51535a;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    th,
+    td {
+      padding: 0 12px;
+    }
+
+    .status {
+      display: inline-flex;
+      align-items: center;
+      height: 24px;
+      padding: 0 8px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .status.pending {
+      color: var(--warning);
+      background: #fff1df;
+    }
+
+    .status.approved {
+      color: var(--success);
+      background: #e1f6eb;
+    }
+
+    .status.rejected {
+      color: var(--danger);
+      background: #ffe8e8;
+    }
+
+    .status.cancelled {
+      color: #7f8798;
+      background: #eef0f5;
+    }
+
+    .pager {
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 12px;
+      color: var(--muted);
+      padding: 0 16px;
+    }
+
+    .approval-layout {
+      height: 100%;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .apply-layout {
+      height: 100%;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .reason-cell {
+      color: #51535a;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .detail-block {
+      margin-bottom: 16px;
+    }
+
+    .detail-title {
+      margin-bottom: 10px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .toolbar {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .toolbar-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .modal-mask {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0, 0, 0, 0.42);
+      z-index: 20;
+    }
+
+    .modal-mask.show {
+      display: flex;
+    }
+
+    .modal {
+      width: 560px;
+      background: #fff;
+      border-radius: 6px;
+      box-shadow: 0 18px 44px rgba(0, 0, 0, 0.22);
+      overflow: hidden;
+    }
+
+    .modal.wide {
+      width: 760px;
+    }
+
+    .modal-head {
+      height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .modal-title {
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .close {
+      width: 34px;
+      height: 34px;
+      background: transparent;
+      color: var(--muted);
+      font-size: 22px;
+    }
+
+    .modal-body {
+      padding: 20px;
+      max-height: 560px;
+      overflow-y: auto;
+    }
+
+    .modal-footer {
+      height: 58px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 10px;
+      padding: 0 20px;
+      border-top: 1px solid var(--line);
+    }
+
+    .form-grid {
+      display: grid;
+      gap: 16px;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 106px 1fr;
+      align-items: start;
+      gap: 10px;
+    }
+
+    .form-label {
+      padding-top: 8px;
+      color: var(--text);
+      text-align: right;
+    }
+
+    .required {
+      color: var(--danger);
+      margin-right: 4px;
+    }
+
+    .chips-input {
+      min-height: 34px;
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 6px;
+      padding: 4px 8px;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      background: var(--soft);
+      position: relative;
+    }
+
+    .chip {
+      height: 24px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 0 8px;
+      border-radius: 12px;
+      color: var(--primary);
+      background: #edf2ff;
+      font-size: 12px;
+    }
+
+    .chip button {
+      background: transparent;
+      color: var(--primary);
+    }
+
+    .chips-input input {
+      min-width: 160px;
+      flex: 1;
+      height: 24px;
+      padding: 0;
+      border: 0;
+      outline: 0;
+      background: transparent;
+    }
+
+    .person-dropdown {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 38px;
+      display: none;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      box-shadow: var(--shadow);
+      z-index: 3;
+      overflow: hidden;
+    }
+
+    .person-dropdown.show {
+      display: block;
+    }
+
+    .person-option {
+      height: 38px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 12px;
+      background: #fff;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .person-option:hover {
+      background: #f7f8fc;
+    }
+
+    .approval-info {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px 28px;
+      padding: 14px 16px;
+      background: #fafbfe;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      margin-bottom: 16px;
+    }
+
+    .info-item {
+      display: grid;
+      grid-template-columns: 84px 1fr;
+      gap: 8px;
+      line-height: 1.6;
+    }
+
+    .info-label {
+      color: var(--muted);
+    }
+
+    .reason-box {
+      padding: 12px;
+      line-height: 1.7;
+      background: #fafbfe;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      margin-bottom: 16px;
+    }
+
+    .permission-list {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    .check-card {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      height: 42px;
+      padding: 0 12px;
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      background: #fff;
+    }
+
+    .check-card input {
+      width: 16px;
+      height: 16px;
+      accent-color: var(--primary);
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 36px;
+      transform: translateX(-50%) translateY(10px);
+      padding: 10px 16px;
+      border-radius: 18px;
+      background: rgba(32, 36, 48, 0.92);
+      color: #fff;
+      opacity: 0;
+      transition: 0.2s ease;
+      z-index: 30;
+      pointer-events: none;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+  </style>
+</head>
+<body>
+  <div class="desktop">
+    <aside class="sidebar">
+      <div class="brand">智慧园区</div>
+      <button class="nav-item">首页</button>
+      <button class="nav-item">智慧安防</button>
+      <button class="nav-item">园区人员</button>
+      <button class="nav-item active">人员通行</button>
+      <button class="sub-item" data-page="applyPage" onclick="showPage('applyPage')">门禁申请</button>
+      <button class="sub-item" data-page="groupPage" onclick="showPage('groupPage')">通行区域</button>
+      <button class="sub-item active" data-page="approvalPage" onclick="showPage('approvalPage')">门禁授权审批</button>
+      <button class="sub-item">通行记录</button>
+      <button class="sub-item">通行设置</button>
+      <button class="sub-item">通行设备</button>
+      <button class="sub-item">设备地图</button>
+      <button class="sub-item">通行权限</button>
+      <button class="nav-item">车辆通行</button>
+      <button class="nav-item">设施管理</button>
+      <button class="nav-item">工单管理</button>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div class="crumb">人员通行 / <span id="crumbTitle">门禁授权审批</span></div>
+        <div class="user">
+          <span>下载中维插件</span>
+          <span>铃</span>
+          <span class="avatar"></span>
+          <span>admin</span>
+        </div>
+      </header>
+
+      <nav class="tabs">
+        <button class="tab">首页</button>
+        <button class="tab">预约审批</button>
+        <button class="tab">通行设置</button>
+        <button class="tab" id="tabApply" onclick="showPage('applyPage')">门禁申请</button>
+        <button class="tab" id="tabGroup" onclick="showPage('groupPage')">通行区域</button>
+        <button class="tab active" id="tabApproval" onclick="showPage('approvalPage')">门禁授权审批</button>
+      </nav>
+
+      <section class="workbench">
+        <div id="applyPage" class="page">
+          <section class="apply-layout">
+            <div class="toolbar">
+              <div class="toolbar-left">
+                <div class="field-inline">
+                  <span>申请区域</span>
+                  <input class="input" placeholder="楼栋/楼层/房间" />
+                </div>
+                <div class="field-inline">
+                  <span>状态</span>
+                  <select class="select">
+                    <option>全部</option>
+                    <option>待审批</option>
+                    <option>已通过</option>
+                    <option>已拒绝</option>
+                    <option>已取消</option>
+                  </select>
+                </div>
+                <div class="field-inline">
+                  <span>提交时间</span>
+                  <input class="input" value="2026-07-01" />
+                  <span>-</span>
+                  <input class="input" value="2026-07-22" />
+                </div>
+              </div>
+              <div>
+                <button class="btn primary" onclick="openApplyModal()">新增申请</button>
+                <button class="btn primary">搜索</button>
+                <button class="btn">重置</button>
+              </div>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <colgroup>
+                  <col style="width:70px" />
+                  <col style="width:130px" />
+                  <col style="width:220px" />
+                  <col />
+                  <col style="width:230px" />
+                  <col style="width:110px" />
+                  <col style="width:160px" />
+                  <col style="width:130px" />
+                </colgroup>
+                <thead>
+                  <tr>
+                    <th>序号</th>
+                    <th>申请人员</th>
+                    <th>申请区域</th>
+                    <th>申请原因</th>
+                    <th>授权期限</th>
+                    <th>状态</th>
+                    <th>提交时间</th>
+                    <th>操作</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>1</td>
+                    <td>admin</td>
+                    <td>综合楼 / 3层 / 联调实验室 301、综合楼 / 3层 / 设备间</td>
+                    <td><span class="reason-cell">参与综合楼实验室项目联调，需要进入相关区域处理设备调试。</span></td>
+                    <td>2026-07-23 09:00 - 2026-07-30 18:00</td>
+                    <td><span class="status pending">待审批</span></td>
+                    <td>2026-07-22 14:20</td>
+                    <td><button class="btn text" onclick="openApplyDetail('pending')">查看</button>　<button class="btn text danger" onclick="openCancelModal()">取消</button></td>
+                  </tr>
+                  <tr>
+                    <td>2</td>
+                    <td>admin</td>
+                    <td>综合楼 / 2层 / 仪器共享区、综合楼 / 2层 / 样品间</td>
+                    <td><span class="reason-cell">项目验收资料补录，需要短期进入综合楼区域。</span></td>
+                    <td>2026-07-19 08:30 - 2026-07-25 18:00</td>
+                    <td><span class="status approved">已通过</span></td>
+                    <td>2026-07-18 10:12</td>
+                    <td><button class="btn text" onclick="openApplyDetail('approved')">查看</button></td>
+                  </tr>
+                  <tr>
+                    <td>3</td>
+                    <td>admin</td>
+                    <td>研发楼 / 1层 / 公共实验区、研发楼 / 1层 / 临时实验间</td>
+                    <td><span class="reason-cell">申请进入公共实验区域处理临时事务。</span></td>
+                    <td>2026-07-13 09:00 - 2026-07-15 18:00</td>
+                    <td><span class="status rejected">已拒绝</span></td>
+                    <td>2026-07-12 16:35</td>
+                    <td><button class="btn text" onclick="openApplyDetail('rejected')">查看</button></td>
+                  </tr>
+                  <tr>
+                    <td>4</td>
+                    <td>admin</td>
+                    <td>综合楼 / 1层 / 档案室、综合楼 / 1层 / 查阅室</td>
+                    <td><span class="reason-cell">临时进入综合楼办理资料。</span></td>
+                    <td>2026-07-10 09:00 - 2026-07-10 18:00</td>
+                    <td><span class="status cancelled">已取消</span></td>
+                    <td>2026-07-08 09:26</td>
+                    <td><button class="btn text" onclick="openApplyDetail('cancelled')">查看</button>　<button class="btn text" onclick="refillPcApply()">重新发起</button></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="pager">共 12 条　10条/页　&lt;　1　2　&gt;</div>
+          </section>
+        </div>
+
+        <div id="groupPage" class="page">
+          <div class="group-layout">
+            <section class="panel">
+              <div class="panel-head">
+                <div class="panel-title">通行区域展示</div>
+                <span class="group-manager">数据来源：门禁系统同步</span>
+              </div>
+              <div class="group-list">
+                <div class="tree-node level-0">
+                  <div class="tree-title"><span class="tree-caret">▾</span><span>苏州实验室园区</span></div>
+                  <div class="tree-meta">
+                    <span class="tree-admin">区域管理员：赵老师 00621；同步时间：2026-07-23 09:10</span>
+                    <button class="btn text" onclick="openAdminModal('苏州实验室园区', '赵老师 00621')">配置</button>
+                  </div>
+                </div>
+                <div class="tree-node level-1">
+                  <div class="tree-title"><span class="tree-caret">▾</span><span>综合楼</span></div>
+                  <div class="tree-meta">
+                    <span class="tree-admin">区域管理员：张老师 00126；同步时间：2026-07-23 09:10</span>
+                    <button class="btn text" onclick="openAdminModal('综合楼', '张老师 00126')">配置</button>
+                  </div>
+                </div>
+                <div class="tree-node level-2">
+                  <div class="tree-title"><span class="tree-caret">▾</span><span>3层</span></div>
+                  <div class="tree-meta">
+                    <span class="tree-admin">区域管理员：未配置；同步时间：2026-07-23 09:10</span>
+                    <button class="btn text" onclick="openAdminModal('综合楼 / 3层', '')">配置</button>
+                  </div>
+                </div>
+                <div class="tree-node level-3 active">
+                  <div class="tree-title"><span class="tree-caret">•</span><span>联调实验室 301</span></div>
+                  <div class="tree-meta">
+                    <span class="tree-admin">区域管理员：李老师 00218；同步时间：2026-07-23 09:10</span>
+                    <button class="btn text" onclick="openAdminModal('综合楼 / 3层 / 联调实验室 301', '李老师 00218')">配置</button>
+                  </div>
+                </div>
+                <div class="tree-node level-3">
+                  <div class="tree-title"><span class="tree-caret">•</span><span>302 实验室</span></div>
+                  <div class="tree-meta">
+                    <span class="tree-admin">区域管理员：未配置；同步时间：2026-07-23 09:10</span>
+                    <button class="btn text" onclick="openAdminModal('综合楼 / 3层 / 302 实验室', '')">配置</button>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <section class="panel">
+              <div class="panel-head">
+                <div class="panel-title">区域信息</div>
+                <span class="group-manager">仅展示区域和管理员</span>
+              </div>
+              <div class="approval-info">
+                <div class="info-item"><span class="info-label">当前区域</span><span>综合楼 / 3层 / 联调实验室 301</span></div>
+                <div class="info-item"><span class="info-label">上级区域</span><span>综合楼 / 3层</span></div>
+                <div class="info-item"><span class="info-label">区域管理员</span><span>李老师 00218</span></div>
+                <div class="info-item"><span class="info-label">同步来源</span><span>门禁系统</span></div>
+                <div class="info-item"><span class="info-label">同步时间</span><span>2026-07-23 09:10</span></div>
+              </div>
+              <div class="reason-box">通行区域数据由门禁系统同步。本系统只配置区域管理员，不维护区域层级。</div>
+            </section>
+          </div>
+        </div>
+
+        <div id="approvalPage" class="page active">
+          <section class="approval-layout">
+            <div class="toolbar">
+              <div class="toolbar-left">
+                <div class="field-inline">
+                  <span>申请区域</span>
+                  <input class="input" placeholder="楼栋/楼层/房间" />
+                </div>
+                <div class="field-inline">
+                  <span>状态</span>
+                  <select class="select">
+                    <option>全部</option>
+                    <option>待审批</option>
+                    <option>已通过</option>
+                    <option>已拒绝</option>
+                    <option>已取消</option>
+                  </select>
+                </div>
+                <div class="field-inline">
+                  <span>提交时间</span>
+                  <input class="input" value="2026-07-01" />
+                  <span>-</span>
+                  <input class="input" value="2026-07-22" />
+                </div>
+              </div>
+              <div>
+                <button class="btn primary">搜索</button>
+                <button class="btn">重置</button>
+              </div>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <colgroup>
+                  <col style="width:70px" />
+                  <col style="width:130px" />
+                  <col style="width:220px" />
+                  <col />
+                  <col style="width:230px" />
+                  <col style="width:110px" />
+                  <col style="width:160px" />
+                  <col style="width:130px" />
+                </colgroup>
+                <thead>
+                  <tr>
+                    <th>序号</th>
+                    <th>申请人员</th>
+                    <th>申请区域</th>
+                    <th>申请原因</th>
+                    <th>授权期限</th>
+                    <th>状态</th>
+                    <th>提交时间</th>
+                    <th>操作</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>1</td>
+                    <td>admin</td>
+                    <td>综合楼 / 3层 / 联调实验室 301、综合楼 / 3层 / 设备间</td>
+                    <td>参与综合楼实验室项目联调，需要进入相关区域处理设备调试。</td>
+                    <td>2026-07-23 09:00 - 2026-07-30 18:00</td>
+                    <td><span class="status pending">待审批</span></td>
+                    <td>2026-07-22 14:20</td>
+                    <td><button class="btn text" onclick="openApprovalModal('pending')">审批</button></td>
+                  </tr>
+                  <tr>
+                    <td>2</td>
+                    <td>chenqm</td>
+                    <td>综合楼 / 2层 / 仪器共享区、综合楼 / 2层 / 样品间</td>
+                    <td>项目验收资料补录，需要短期进入综合楼区域。</td>
+                    <td>2026-07-19 08:30 - 2026-07-25 18:00</td>
+                    <td><span class="status approved">已通过</span></td>
+                    <td>2026-07-18 10:12</td>
+                    <td><button class="btn text" onclick="openApprovalModal('viewApproved')">查看</button></td>
+                  </tr>
+                  <tr>
+                    <td>3</td>
+                    <td>test01</td>
+                    <td>研发楼 / 1层 / 公共实验区、研发楼 / 1层 / 临时实验间</td>
+                    <td>申请进入公共实验区域。</td>
+                    <td>2026-07-13 09:00 - 2026-07-15 18:00</td>
+                    <td><span class="status rejected">已拒绝</span></td>
+                    <td>2026-07-12 16:35</td>
+                    <td><button class="btn text" onclick="openApprovalModal('viewRejected')">查看</button></td>
+                  </tr>
+                  <tr>
+                    <td>4</td>
+                    <td>admin</td>
+                    <td>综合楼 / 1层 / 档案室、综合楼 / 1层 / 查阅室</td>
+                    <td>临时进入综合楼办理资料。</td>
+                    <td>2026-07-10 09:00 - 2026-07-10 18:00</td>
+                    <td><span class="status cancelled">已取消</span></td>
+                    <td>2026-07-08 09:26</td>
+                    <td><button class="btn text" onclick="openApprovalModal('viewCancelled')">查看</button></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="pager">共 26 条　10条/页　&lt;　1　2　3　&gt;</div>
+          </section>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div id="applyModal" class="modal-mask">
+    <div class="modal">
+      <div class="modal-head">
+        <div class="modal-title">新增门禁申请</div>
+        <button class="close" onclick="closeModal('applyModal')">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-grid">
+          <div class="form-row">
+            <div class="form-label"><span class="required">*</span>申请区域</div>
+            <div class="chips-input">
+              <input id="applySpaceSearch" placeholder="可多选，同一申请需为同一管理员" onfocus="showApplySpaceDropdown()" oninput="showApplySpaceDropdown()" />
+              <div id="applySpaceDropdown" class="person-dropdown">
+                <button class="person-option" onclick="selectApplySpace('综合楼 / 3层 / 联调实验室 301')"><span>联调实验室 301</span><span>区域管理员：李老师</span></button>
+                <button class="person-option" onclick="selectApplySpace('综合楼 / 3层 / 设备间')"><span>设备间</span><span>区域管理员：李老师</span></button>
+              </div>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-label"><span class="required">*</span>申请原因</div>
+            <textarea id="applyReason" placeholder="请填写申请门禁权限的原因"></textarea>
+          </div>
+          <div class="form-row">
+            <div class="form-label"><span class="required">*</span>授权期限</div>
+            <div class="field-inline">
+              <input id="applyStart" class="input" value="2026-07-23 09:00" />
+              <span>-</span>
+              <input id="applyEnd" class="input" value="2026-07-30 18:00" />
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" onclick="closeModal('applyModal')">取消</button>
+        <button class="btn primary" onclick="submitPcApply()">提交</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="applyDetailModal" class="modal-mask">
+    <div class="modal">
+      <div class="modal-head">
+        <div class="modal-title">门禁申请详情</div>
+        <button class="close" onclick="closeModal('applyDetailModal')">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="approval-info">
+          <div class="info-item"><span class="info-label">申请人员</span><span>admin</span></div>
+          <div class="info-item"><span class="info-label">申请区域</span><span>综合楼 / 3层 / 联调实验室 301</span></div>
+          <div class="info-item"><span class="info-label">提交时间</span><span>2026-07-22 14:20</span></div>
+          <div class="info-item"><span class="info-label">申请状态</span><span id="applyDetailStatus"><span class="status pending">待审批</span></span></div>
+          <div class="info-item"><span class="info-label">授权期限</span><span>2026-07-23 09:00 - 2026-07-30 18:00</span></div>
+        </div>
+        <div class="detail-block">
+          <div class="detail-title">申请原因</div>
+          <div class="reason-box">参与综合楼实验室项目联调，需要在工作时间段进入相关区域处理设备调试事项。</div>
+        </div>
+        <div id="applyResultBlock" class="detail-block" style="display:none;">
+          <div class="detail-title">审批结果</div>
+          <div class="reason-box" id="applyResultText">授权区域：综合楼 / 3层 / 联调实验室 301、综合楼 / 3层 / 设备间</div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn primary" onclick="closeModal('applyDetailModal')">关闭</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="cancelApplyModal" class="modal-mask">
+    <div class="modal" style="width:420px;">
+      <div class="modal-head">
+        <div class="modal-title">取消申请</div>
+        <button class="close" onclick="closeModal('cancelApplyModal')">×</button>
+      </div>
+      <div class="modal-body">
+        确认取消当前门禁申请吗？仅待审批状态支持取消，取消后状态变为已取消。
+      </div>
+      <div class="modal-footer">
+        <button class="btn" onclick="closeModal('cancelApplyModal')">再想想</button>
+        <button class="btn danger" onclick="cancelPcApply()">确认取消</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="adminModal" class="modal-mask">
+    <div class="modal" style="width:520px;">
+      <div class="modal-head">
+        <div class="modal-title">配置区域管理员</div>
+        <button class="close" onclick="closeModal('adminModal')">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-grid">
+          <div class="form-row">
+            <div class="form-label">区域节点</div>
+            <input id="adminSpaceName" class="input" value="综合楼 / 3层 / 联调实验室 301" readonly />
+          </div>
+          <div class="form-row">
+            <div class="form-label">当前区域管理员</div>
+            <input id="adminCurrent" class="input" value="李老师 00218" readonly />
+          </div>
+          <div class="form-row">
+            <div class="form-label"><span class="required">*</span>选择区域管理员</div>
+            <div class="chips-input">
+              <input id="adminSearch" placeholder="姓名/工号模糊搜索" onfocus="showAdminModalDropdown()" oninput="showAdminModalDropdown()" />
+              <div id="adminDropdown" class="person-dropdown">
+                <button class="person-option" onclick="selectAdmin('张老师 00126')"><span>张老师</span><span>工号 00126</span></button>
+                <button class="person-option" onclick="selectAdmin('李老师 00218')"><span>李老师</span><span>工号 00218</span></button>
+                <button class="person-option" onclick="selectAdmin('王老师 00309')"><span>王老师</span><span>工号 00309</span></button>
+                <button class="person-option" onclick="selectAdmin('赵老师 00621')"><span>赵老师</span><span>工号 00621</span></button>
+              </div>
+            </div>
+          </div>
+          <div class="reason-box">每个区域节点最多配置 1 名区域管理员；申请和审批只读取区域节点直接配置的管理员。</div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" onclick="closeModal('adminModal')">取消</button>
+        <button class="btn primary" onclick="saveAdmin()">确定</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="approvalModal" class="modal-mask">
+    <div class="modal wide">
+      <div class="modal-head">
+        <div class="modal-title">门禁授权审批</div>
+        <button class="close" onclick="closeModal('approvalModal')">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="approval-info">
+          <div class="info-item"><span class="info-label">申请人员</span><span>admin</span></div>
+          <div class="info-item"><span class="info-label">申请区域</span><span>综合楼 / 3层 / 联调实验室 301</span></div>
+          <div class="info-item"><span class="info-label">区域管理员</span><span>李老师 00218</span></div>
+          <div class="info-item"><span class="info-label">提交时间</span><span>2026-07-22 14:20</span></div>
+          <div class="info-item"><span class="info-label">申请状态</span><span id="approvalStatus"><span class="status pending">待审批</span></span></div>
+          <div class="info-item"><span class="info-label">授权期限</span><span>2026-07-23 09:00 - 2026-07-30 18:00</span></div>
+        </div>
+        <div class="reason-box">
+          <strong>申请原因：</strong>参与综合楼实验室项目联调，需要在工作时间段进入相关区域处理设备调试事项。
+        </div>
+
+        <div id="approvalActionArea">
+          <div class="form-grid">
+            <div class="form-row">
+              <div class="form-label"><span class="required">*</span>授权区域</div>
+              <div>
+                <div class="permission-list">
+                  <label class="check-card"><input type="checkbox" checked /> 综合楼 / 3层 / 联调实验室 301</label>
+                  <label class="check-card"><input type="checkbox" checked /> 综合楼 / 3层 / 设备间</label>
+                  <label class="check-card"><input type="checkbox" /> 综合楼 / 3层 / 样品间</label>
+                  <label class="check-card"><input type="checkbox" /> 综合楼 / 3层 / 公共准备区</label>
+                </div>
+                <div class="group-manager">默认勾选本次申请区域；支持多选。勾选区域仅代表该节点本身，不自动包含下级区域。</div>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-label"><span class="required">*</span>授权期限</div>
+              <div class="field-inline">
+                <input class="input" value="2026-07-23 09:00" />
+                <span>-</span>
+                <input class="input" value="2026-07-30 18:00" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer" id="approvalFooter">
+        <button class="btn" onclick="closeModal('approvalModal')">取消</button>
+        <button class="btn danger" onclick="showRejectModal()">拒绝</button>
+        <button class="btn primary" onclick="approveApply()">通过并授权</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="rejectModal" class="modal-mask">
+    <div class="modal" style="width:420px;">
+      <div class="modal-head">
+        <div class="modal-title">填写拒绝原因</div>
+        <button class="close" onclick="closeModal('rejectModal')">×</button>
+      </div>
+      <div class="modal-body">
+        <textarea id="rejectReasonInput" placeholder="请输入拒绝原因"></textarea>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" onclick="closeModal('rejectModal')">取消</button>
+        <button class="btn danger" onclick="rejectApply()">确认拒绝</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast">已保存</div>
+
+  <script>
+    const pages = document.querySelectorAll(".page");
+    const tabApply = document.getElementById("tabApply");
+    const tabGroup = document.getElementById("tabGroup");
+    const tabApproval = document.getElementById("tabApproval");
+    const crumbTitle = document.getElementById("crumbTitle");
+    const toast = document.getElementById("toast");
+
+    function showPage(id) {
+      pages.forEach((page) => page.classList.toggle("active", page.id === id));
+      tabApply.classList.toggle("active", id === "applyPage");
+      tabGroup.classList.toggle("active", id === "groupPage");
+      tabApproval.classList.toggle("active", id === "approvalPage");
+      const titles = {
+        applyPage: "门禁申请",
+        groupPage: "通行区域",
+        approvalPage: "门禁授权审批"
+      };
+      crumbTitle.textContent = titles[id] || "门禁授权审批";
+      document.querySelectorAll(".sub-item").forEach((item) => item.classList.remove("active"));
+      document.querySelector(`.sub-item[data-page="${id}"]`)?.classList.add("active");
+    }
+
+    function openApplyModal() {
+      document.getElementById("applyModal").classList.add("show");
+    }
+
+    function openApplyDetail(type) {
+      const status = document.getElementById("applyDetailStatus");
+      const resultBlock = document.getElementById("applyResultBlock");
+      const resultText = document.getElementById("applyResultText");
+      if (type === "approved") {
+        status.innerHTML = '<span class="status approved">已通过</span>';
+        resultBlock.style.display = "block";
+        resultText.textContent = "授权区域：综合楼 / 3层 / 联调实验室 301、综合楼 / 3层 / 设备间";
+      } else if (type === "rejected") {
+        status.innerHTML = '<span class="status rejected">已拒绝</span>';
+        resultBlock.style.display = "block";
+        resultText.textContent = "拒绝原因：申请原因与当前工作安排不匹配，暂不开放该时段门禁权限。";
+      } else if (type === "cancelled") {
+        status.innerHTML = '<span class="status cancelled">已取消</span>';
+        resultBlock.style.display = "none";
+      } else {
+        status.innerHTML = '<span class="status pending">待审批</span>';
+        resultBlock.style.display = "none";
+      }
+      document.getElementById("applyDetailModal").classList.add("show");
+    }
+
+    function openCancelModal() {
+      document.getElementById("cancelApplyModal").classList.add("show");
+    }
+
+    function openApprovalModal(type) {
+      const status = document.getElementById("approvalStatus");
+      const actionArea = document.getElementById("approvalActionArea");
+      const footer = document.getElementById("approvalFooter");
+      actionArea.style.display = type === "pending" ? "block" : "none";
+      footer.style.display = type === "pending" ? "flex" : "flex";
+      footer.innerHTML = type === "pending"
+        ? `<button class="btn" onclick="closeModal('approvalModal')">取消</button><button class="btn danger" onclick="showRejectModal()">拒绝</button><button class="btn primary" onclick="approveApply()">通过并授权</button>`
+        : `<button class="btn primary" onclick="closeModal('approvalModal')">关闭</button>`;
+      if (type === "viewApproved") status.innerHTML = '<span class="status approved">已通过</span>';
+      else if (type === "viewRejected") status.innerHTML = '<span class="status rejected">已拒绝</span>';
+      else if (type === "viewCancelled") status.innerHTML = '<span class="status cancelled">已取消</span>';
+      else status.innerHTML = '<span class="status pending">待审批</span>';
+      document.getElementById("approvalModal").classList.add("show");
+    }
+
+    function showRejectModal() {
+      document.getElementById("rejectModal").classList.add("show");
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).classList.remove("show");
+      const applyDropdown = document.getElementById("applySpaceDropdown");
+      if (applyDropdown) applyDropdown.classList.remove("show");
+      const adminDropdown = document.getElementById("adminDropdown");
+      if (adminDropdown) adminDropdown.classList.remove("show");
+    }
+
+    function showToast(text) {
+      toast.textContent = text;
+      toast.classList.add("show");
+      window.setTimeout(() => toast.classList.remove("show"), 1400);
+    }
+
+    function refillPcApply() {
+      openApplyModal();
+      window.setTimeout(() => {
+        document.getElementById("applySpaceSearch").value = "综合楼 / 1层 / 档案室、综合楼 / 1层 / 查阅室";
+        document.getElementById("applyReason").value = "临时进入综合楼办理资料。";
+        showToast("已带出最近申请信息");
+      }, 50);
+    }
+
+    function submitPcApply() {
+      const space = document.getElementById("applySpaceSearch").value.trim();
+      const reason = document.getElementById("applyReason").value.trim();
+      const start = document.getElementById("applyStart").value.trim();
+      const end = document.getElementById("applyEnd").value.trim();
+      if (space.includes("研发楼")) {
+        showToast("所选区域管理员不一致");
+        return;
+      }
+      if (!space || !reason || !start || !end) {
+        showToast("请完善必填信息");
+        return;
+      }
+      closeModal("applyModal");
+      showToast("门禁申请已提交");
+    }
+
+    function cancelPcApply() {
+      closeModal("cancelApplyModal");
+      showToast("申请已取消");
+    }
+
+    function approveApply() {
+      closeModal("approvalModal");
+      showToast("已通过并授权");
+    }
+
+    function rejectApply() {
+      const reason = document.getElementById("rejectReasonInput").value.trim();
+      if (!reason) {
+        showToast("请填写拒绝原因");
+        return;
+      }
+      closeModal("rejectModal");
+      closeModal("approvalModal");
+      showToast("已拒绝申请");
+    }
+
+    function showApplySpaceDropdown() {
+      document.getElementById("applySpaceDropdown").classList.add("show");
+    }
+
+    function selectApplySpace(name) {
+      const input = document.getElementById("applySpaceSearch");
+      const current = input.value.trim();
+      const values = current ? current.split("、") : [];
+      if (!values.includes(name)) values.push(name);
+      input.value = values.join("、");
+      document.getElementById("applySpaceDropdown").classList.remove("show");
+    }
+
+    function openAdminModal(spaceName, currentAdmin) {
+      document.getElementById("adminSpaceName").value = spaceName;
+      document.getElementById("adminCurrent").value = currentAdmin || "未配置";
+      document.getElementById("adminSearch").value = currentAdmin || "";
+      document.getElementById("adminModal").classList.add("show");
+    }
+
+    function showAdminModalDropdown() {
+      document.getElementById("adminDropdown").classList.add("show");
+    }
+
+    function selectAdmin(name) {
+      document.getElementById("adminSearch").value = name;
+      document.getElementById("adminDropdown").classList.remove("show");
+    }
+
+    function saveAdmin() {
+      const admin = document.getElementById("adminSearch").value.trim();
+      if (!admin) {
+        showToast("请选择区域管理员");
+        return;
+      }
+      closeModal("adminModal");
+      showToast("区域管理员已配置");
+    }
+
+  </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
