@@ -1,0 +1,120 @@
+﻿<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>工单详情-协助人原型</title>
+  <style>
+    :root{--primary:#4165ec;--bg:#f4f5f7;--surface:#fff;--line:#e9edf4;--text:#2b2f36;--muted:#8d93a0;--nav:#061b2d;--nav2:#102b43;--shadow:0 1px 2px rgba(19,33,68,.04)}*{box-sizing:border-box}body{margin:0;font:14px -apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif;color:var(--text);background:var(--bg)}.app{min-height:100vh;display:grid;grid-template-columns:190px 1fr}.sidebar{background:var(--nav);color:#c6d4e2;padding-top:16px}.brand{height:36px;padding:0 18px;display:flex;align-items:center;color:#fff;font-weight:700;font-size:18px}.nav-item{height:42px;display:flex;align-items:center;gap:10px;padding:0 18px;color:#b7c9db}.nav-item .chev{margin-left:auto;color:#7e95aa}.nav-item.open{color:#fff}.sub{background:var(--nav2)}.sub-item{height:42px;display:flex;align-items:center;padding-left:38px;color:#b7c9db}.sub-item.active{background:var(--primary);color:#fff}.main{min-width:0}.topbar{height:48px;background:#fff;border-bottom:1px solid #e8e8ec;display:flex;align-items:center;padding:0 16px;gap:14px}.menu-icon{width:28px;height:28px;border:0;background:transparent;font-size:22px;cursor:pointer}.crumb{font-size:16px;font-weight:700}.crumb span{color:var(--muted);font-weight:400;margin-left:8px}.top-actions{margin-left:auto;display:flex;align-items:center;gap:18px;color:var(--primary)}.avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#ffd9a1,#86a7ff);border:2px solid #fff;box-shadow:0 0 0 1px #dfe3ee}.tabs{height:42px;background:#fff;border-bottom:1px solid #e8e8ec;display:flex;align-items:center;gap:4px;padding:0 18px}.tab{min-width:82px;height:30px;border:1px solid #e1e3ea;border-radius:3px;color:#555;background:#fff;display:flex;align-items:center;justify-content:center}.tab.active{color:#fff;background:var(--primary);border-color:var(--primary)}.page{padding:18px 20px 24px}.page-head{height:68px;background:#fff;border-radius:8px;box-shadow:var(--shadow);display:flex;align-items:center;justify-content:space-between;padding:0 24px;margin-bottom:20px}.page-title{font-size:16px}.btn{height:42px;min-width:72px;padding:0 16px;border:1px solid #dfe3ee;background:#fff;border-radius:4px;color:#394050}.content{display:grid;grid-template-columns:1fr 354px;gap:18px}.panel{background:#fff;border-radius:8px;box-shadow:var(--shadow);min-height:680px}.panel-body{padding:22px 24px}.section{display:flex;align-items:center;gap:8px;font-weight:700;margin-bottom:18px}.section:before{content:"▣";color:#6c7a90;font-size:12px}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px 36px}.field{display:flex;gap:8px;align-items:flex-start;min-height:24px;line-height:1.7}.label{white-space:nowrap;color:#303746;font-weight:700}.value{color:#222;word-break:break-word}.value.muted{color:var(--muted)}.divider{height:1px;background:var(--line);margin:20px 0}.attachment{display:flex;align-items:flex-start;gap:12px}.thumb{width:96px;height:108px;background:linear-gradient(160deg,#d6dde9 0,#f8fafc 52%,#9db2d3 53%,#7d95be 100%);border-radius:3px;box-shadow:var(--shadow)}.right-panel{padding:18px 18px 16px}.timeline-title{display:flex;align-items:center;gap:8px;font-weight:700;margin-bottom:18px}.timeline-title:before{content:"▣";color:#6c7a90;font-size:12px}.timeline-meta{margin-bottom:14px;line-height:1.9}.timeline-meta .row{display:block}.timeline-meta .label{font-weight:700}.timeline-step{position:relative;padding-left:22px;margin-top:14px}.timeline-step:before{content:"";position:absolute;left:4px;top:4px;width:12px;height:12px;border-radius:50%;background:#d9dee8}.timeline-time{color:#9aa1af;margin-bottom:10px}.timeline-card{background:#fff;border-radius:8px;box-shadow:var(--shadow);border:1px solid #eef1f6;padding:16px 18px}.timeline-card strong{font-weight:700}.assist-badge{display:inline-flex;align-items:center;height:22px;padding:0 8px;border-radius:11px;background:#eef3ff;color:#4165ec;font-size:12px;font-weight:700;margin-left:6px}.editable{display:inline-flex;align-items:center;gap:8px}.edit-link{color:var(--primary);font-size:12px;cursor:pointer}.small{font-size:12px;color:var(--muted)}
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">智慧园区</div>
+      <div class="nav-item">园区人员 <span class="chev">⌄</span></div>
+      <div class="nav-item">人员通行 <span class="chev">⌄</span></div>
+      <div class="nav-item">车辆通行 <span class="chev">⌄</span></div>
+      <div class="nav-item">设施管理 <span class="chev">⌄</span></div>
+      <div class="nav-item open">☑ 工单管理 <span class="chev">⌃</span></div>
+      <div class="sub">
+        <div class="sub-item active">所有工单</div>
+        <div class="sub-item">与我相关</div>
+        <div class="sub-item">工单模板</div>
+        <div class="sub-item">工单类型</div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <button class="menu-icon">≡</button>
+        <div class="crumb">☑ 工单管理 <span>/ 所有工单</span></div>
+        <div class="top-actions">
+          <span>下载中维插件</span>
+          <span>🔔</span>
+          <div class="avatar"></div>
+        </div>
+      </header>
+
+      <div class="tabs">
+        <div class="tab">首页</div>
+        <div class="tab">与我相关</div>
+        <div class="tab">工单模板</div>
+        <div class="tab">工单类型</div>
+        <div class="tab active">所有工单</div>
+      </div>
+
+      <section class="page">
+        <div class="page-head">
+          <div class="page-title">工单详情</div>
+          <button class="btn">返回</button>
+        </div>
+
+        <div class="content">
+          <div class="panel">
+            <div class="panel-body">
+              <div class="section">基本信息</div>
+              <div class="grid">
+                <div class="field"><div class="label">工单标题：</div><div class="value">T 报修072314</div></div>
+                <div class="field"><div class="label">工单编号：</div><div class="value">SBBX_202607230558</div></div>
+                <div class="field"><div class="label">工单来源：</div><div class="value">工单管理</div></div>
+
+                <div class="field"><div class="label">工单类型：</div><div class="value">设备报修</div></div>
+                <div class="field"><div class="label">工单模板：</div><div class="value">综合楼-一键报修</div></div>
+                <div class="field"><div class="label">工单状态：</div><div class="value">处理中</div></div>
+
+                <div class="field"><div class="label">工单级别：</div><div class="value">一般</div></div>
+                <div class="field"><div class="label">发生时间：</div><div class="value">2026-07-23 20:52:37</div></div>
+                <div class="field"><div class="label">发生位置：</div><div class="value">苏州实验室-综合楼-综合行政楼-B1F</div></div>
+
+                <div class="field"><div class="label">专业类别：</div><div class="value muted">--</div></div>
+                <div class="field"><div class="label">专业描述：</div><div class="value muted">--</div></div>
+                <div class="field"><div class="label">指派人：</div><div class="value">陆兵</div></div>
+
+                <div class="field"><div class="label">申请人：</div><div class="value">陆兵</div></div>
+                <div class="field"><div class="label">申请人联系方式：</div><div class="value">18762890419</div></div>
+                <div class="field"><div class="label">协助人：</div><div class="value editable"><span class="value muted">张三、李四</span><span class="assist-badge">可编辑</span></div></div>
+
+                <div class="field"><div class="label">报修编号：</div><div class="value">SBBX202607232052370002780006aff</div></div>
+                <div class="field"><div class="label">创建人：</div><div class="value">陆兵</div></div>
+                <div class="field"><div class="label">创建时间：</div><div class="value">2026-07-23 20:52:37</div></div>
+
+                <div class="field"><div class="label">结束时间：</div><div class="value muted">--</div></div>
+                <div class="field"><div class="label">当前处理人：</div><div class="value">bmct、张晨曦</div></div>
+                <div class="field"><div class="label">相关照片：</div><div class="value">2张</div></div>
+              </div>
+
+              <div class="divider"></div>
+
+              <div class="grid">
+                <div class="field"><div class="label">设备类型：</div><div class="value muted">--</div></div>
+                <div class="field"><div class="label">关联设备：</div><div class="value muted">--</div></div>
+                <div class="field"><div class="label">问题描述：</div><div class="value">陆兵账户提交</div></div>
+              </div>
+
+              <div class="field" style="margin-top:18px;align-items:flex-start">
+                <div class="label">附件信息：</div>
+                <div class="attachment"><div class="thumb"></div></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="right-panel">
+              <div class="timeline-title">流转记录</div>
+              <div class="timeline-meta">
+                <span class="row"><span class="label">当前处理节点：</span>综合楼负责人</span>
+                <span class="row"><span class="label">当前处理人：</span>bmct</span>
+              </div>
+              <div class="timeline-step">
+                <div class="timeline-time">2026-07-23 20:52:37</div>
+                <div class="timeline-card"><strong>陆兵(lub)</strong> 发起流程申请</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+</body>
+</html>

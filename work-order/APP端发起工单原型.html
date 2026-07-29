@@ -1,0 +1,298 @@
+﻿<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>APP端发起工单原型</title>
+  <style>
+    :root{
+      --bg:#f4f6fb;
+      --surface:#ffffff;
+      --line:#e7eaf2;
+      --text:#2b2f36;
+      --muted:#8a8f9d;
+      --primary:#4165ec;
+      --primary-soft:#eaf0ff;
+      --green:#2dbf69;
+      --orange:#f2994a;
+      --blue:#4f6ef7;
+      --shadow:0 10px 28px rgba(25,39,84,.08);
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+      color:var(--text);
+      background:linear-gradient(180deg,#eef2ff 0,#f6f7fb 35%,#f7f8fc 100%);
+    }
+    .wrap{padding:20px;display:flex;gap:20px;flex-wrap:wrap;align-items:flex-start;justify-content:center}
+    .phone{
+      width:390px;
+      height:844px;
+      background:#fff;
+      border-radius:34px;
+      box-shadow:0 18px 60px rgba(26,40,92,.18);
+      overflow:hidden;
+      border:1px solid rgba(0,0,0,.04);
+      position:relative;
+    }
+    .screen{display:none;height:100%;flex-direction:column;background:var(--bg)}
+    .screen.active{display:flex}
+    .statusbar{height:28px;padding:8px 16px 0;display:flex;align-items:center;justify-content:space-between;font-size:12px;color:#111}
+    .topbar{height:52px;display:flex;align-items:center;padding:0 16px;background:linear-gradient(180deg,#cfd8ff 0,#dfe6ff 100%);position:relative}
+    .back{font-size:28px;line-height:1;color:#2d2f39;cursor:pointer;width:32px}
+    .title{flex:1;text-align:center;font-size:18px;font-weight:700;letter-spacing:0;color:#20242d;margin-right:32px}
+    .top-action{position:absolute;right:16px;top:12px}
+    .ghost-btn{
+      height:30px;min-width:68px;padding:0 12px;border:0;border-radius:15px;
+      background:#fff;color:var(--primary);font-weight:700;box-shadow:0 2px 8px rgba(65,101,236,.12)
+    }
+    .content{flex:1;overflow:auto;padding:14px 14px 88px}
+    .hero{
+      height:128px;border-radius:20px;background:linear-gradient(135deg,#dfe8d8 0,#bfd2e6 55%,#bcc9f0 100%);
+      position:relative;overflow:hidden;box-shadow:var(--shadow)
+    }
+    .hero:before,.hero:after{content:"";position:absolute;border-radius:50%}
+    .hero:before{width:180px;height:180px;background:rgba(255,255,255,.18);top:-36px;right:-20px}
+    .hero:after{width:130px;height:130px;background:rgba(255,255,255,.16);bottom:-40px;left:-10px}
+    .hero-label{position:absolute;left:16px;bottom:14px;color:#fff;font-weight:700;font-size:18px;text-shadow:0 2px 8px rgba(0,0,0,.18)}
+    .card{
+      margin-top:14px;background:var(--surface);border-radius:18px;padding:16px;box-shadow:var(--shadow);border:1px solid rgba(0,0,0,.02)
+    }
+    .card-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+    .card-title{font-size:18px;font-weight:700}
+    .stats{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .stat{background:#fafbff;border-radius:14px;padding:14px;border:1px solid #f0f2f8}
+    .stat-value{font-size:34px;font-weight:800;color:var(--primary);line-height:1}
+    .stat-unit{font-size:16px;color:#9095a2;margin-left:4px}
+    .stat-label{margin-top:8px;color:#7b8190;font-size:15px}
+    .workbench{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+    .app-item{display:flex;flex-direction:column;align-items:center;gap:10px;padding:6px 0}
+    .icon{width:42px;height:42px;border-radius:14px;background:#eef2ff;display:flex;align-items:center;justify-content:center;font-size:22px;color:var(--primary)}
+    .app-name{font-size:13px;color:#273044;text-align:center;line-height:1.15}
+    .section-title{font-size:17px;font-weight:700;margin-bottom:12px}
+    .list-toolbar{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+    .seg{display:inline-flex;background:#eef1f8;border-radius:14px;padding:3px}
+    .seg button{border:0;background:transparent;padding:8px 13px;border-radius:11px;color:#6b7280;font-weight:700}
+    .seg button.active{background:#fff;color:var(--primary);box-shadow:0 2px 6px rgba(65,101,236,.08)}
+    .mini-btn{
+      margin-left:auto;border:0;background:var(--primary);color:#fff;border-radius:16px;padding:0 14px;height:32px;font-weight:700
+    }
+    .filter-row{display:flex;gap:8px;margin-bottom:12px;overflow:auto;padding-bottom:2px}
+    .filter-chip{
+      flex:0 0 auto;border:1px solid #dbe1ef;background:#fff;border-radius:15px;padding:7px 14px;color:#5d6473;font-weight:700
+    }
+    .filter-chip.active{background:var(--primary-soft);border-color:#c8d6ff;color:var(--primary)}
+    .order-card{background:#fff;border-radius:14px;padding:12px 12px 10px;margin-bottom:12px;box-shadow:var(--shadow);border:1px solid #f1f3f9}
+    .order-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+    .level{display:inline-flex;align-items:center;height:22px;padding:0 8px;border-radius:11px;background:#eef4ff;color:#4165ec;font-size:12px;font-weight:700}
+    .time{color:#a0a5b1;font-size:12px}
+    .field-row{display:grid;grid-template-columns:72px 1fr;gap:8px;line-height:1.5;margin-bottom:3px;font-size:14px}
+    .field-name{color:#7a808d}
+    .field-value{color:#222839}
+    .field-value.blue{color:var(--primary);font-weight:700}
+    .field-value.green{color:var(--green);font-weight:700}
+    .empty{color:#9aa0ad;text-align:center;padding:18px 0 6px;font-size:14px}
+    .bottom-nav{height:76px;background:#fff;border-top:1px solid var(--line);display:flex;align-items:center;justify-content:space-around;position:absolute;left:0;right:0;bottom:0}
+    .nav-item{display:flex;flex-direction:column;align-items:center;gap:6px;color:#7d8492;font-size:13px}
+    .nav-item.active{color:var(--primary);font-weight:700}
+    .nav-icon{font-size:24px;line-height:1}
+    .form-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+    .form-note{font-size:12px;color:#8b90a0}
+    .form{display:flex;flex-direction:column;gap:14px;padding-bottom:18px}
+    .field{background:#fff;border-radius:14px;padding:12px;border:1px solid #edf0f6;box-shadow:var(--shadow)}
+    .label{font-size:14px;color:#535a69;margin-bottom:8px}
+    .required:before{content:"* ";color:#ff5d61}
+    .input,.select,.textarea,.picker{
+      width:100%;border:1px solid #dbe1ee;border-radius:12px;background:#fdfdff;min-height:42px;padding:10px 12px;color:#2b2f36;font-size:14px
+    }
+    .textarea{min-height:84px;resize:none}
+    .picker{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+    .picker.placeholder{color:#a1a6b3}
+    .tag{display:inline-flex;align-items:center;gap:6px;padding:7px 10px;border-radius:12px;background:#eef2ff;color:#3350d6;font-weight:700}
+    .tag button{border:0;background:transparent;color:#6f7fb8;font-size:14px;padding:0}
+    .picker-row{display:flex;gap:10px;align-items:center}
+    .picker-row .input{flex:1}
+    .tiny-btn{border:0;background:#4165ec;color:#fff;border-radius:12px;padding:0 12px;height:34px;font-weight:700;white-space:nowrap}
+    .footer-actions{display:flex;gap:10px;padding-top:4px}
+    .btn{height:44px;border-radius:14px;border:1px solid #dbe1ee;background:#fff;color:#404655;font-weight:700;flex:1}
+    .btn.primary{background:var(--primary);border-color:var(--primary);color:#fff}
+    .step{display:flex;gap:6px;align-items:center;margin-bottom:12px;color:#8a90a0;font-size:12px}
+    .step .dot{width:18px;height:18px;border-radius:50%;background:#cfd7f5;color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:700}
+    .step .dot.active{background:var(--primary)}
+    .hint{font-size:12px;color:#8a90a0;margin-top:6px;line-height:1.4}
+    .screen-title{padding:14px 16px 2px;font-size:18px;font-weight:700;color:#20242d}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="phone">
+      <section class="screen active" data-screen="list">
+        <div class="statusbar"><span>10:39</span><span>●●● 5G</span></div>
+        <div class="topbar">
+          <div class="back">‹</div>
+          <div class="title">工单列表</div>
+          
+        </div>
+        <div class="content">
+          <div class="section-title">我的工单</div>
+          <div class="list-toolbar">
+            <div class="seg">
+              <button class="active">待处理</button>
+              <button>全部工单</button>
+            </div>
+            <button class="mini-btn" id="toForm2">发起工单</button>
+          </div>
+          <div class="filter-row" style="display:none" id="allFilters1">
+            <div class="filter-chip active">我发起的</div>
+            <div class="filter-chip">我处理的</div>
+          </div>
+          <div class="order-card">
+            <div class="order-top">
+              <span class="level">一般</span>
+              <span class="time">2026-07-29 10:43:42</span>
+            </div>
+            <div class="field-row"><div class="field-name">工单标题</div><div class="field-value">测试</div></div>
+            <div class="field-row"><div class="field-name">工单状态</div><div class="field-value blue">处理中</div></div>
+            <div class="field-row"><div class="field-name">工单类型</div><div class="field-value">设备报修</div></div>
+            <div class="field-row"><div class="field-name">发生地点</div><div class="field-value">苏州实验室/综合楼/户外</div></div>
+          </div>
+          <div class="empty">没有更多数据了</div>
+        </div>
+        <div class="bottom-nav">
+          <div class="nav-item active"><div class="nav-icon">⌂</div><div>首页</div></div>
+          <div class="nav-item"><div class="nav-icon">◫</div><div>我的</div></div>
+        </div>
+      </section>
+
+      <section class="screen" data-screen="all">
+        <div class="statusbar"><span>10:39</span><span>●●● 5G</span></div>
+        <div class="topbar">
+          <div class="back" data-back>‹</div>
+          <div class="title">工单列表</div>
+          
+        </div>
+        <div class="content">
+          <div class="section-title">全部工单</div>
+          <div class="list-toolbar">
+            <div class="seg">
+              <button>待处理</button>
+              <button class="active">全部工单</button>
+            </div>
+          </div>
+          <div class="filter-row">
+            <div class="filter-chip active">我发起的</div>
+            <div class="filter-chip">我处理的</div>
+          </div>
+          <div class="order-card">
+            <div class="order-top"><span class="level">一般</span><span class="time">2026-07-29 10:43:42</span></div>
+            <div class="field-row"><div class="field-name">工单标题</div><div class="field-value">测试</div></div>
+            <div class="field-row"><div class="field-name">工单状态</div><div class="field-value blue">处理中</div></div>
+            <div class="field-row"><div class="field-name">工单类型</div><div class="field-value">设备报修</div></div>
+            <div class="field-row"><div class="field-name">发生地点</div><div class="field-value">苏州实验室/综合楼/户外</div></div>
+          </div>
+          <div class="order-card">
+            <div class="order-top"><span class="level">一般</span><span class="time">2026-07-23 19:51:09</span></div>
+            <div class="field-row"><div class="field-name">工单标题</div><div class="field-value">T 观微院报修072307</div></div>
+            <div class="field-row"><div class="field-name">工单状态</div><div class="field-value green">已办结</div></div>
+            <div class="field-row"><div class="field-name">工单类型</div><div class="field-value">设备报修</div></div>
+            <div class="field-row"><div class="field-name">发生地点</div><div class="field-value">苏州实验室-观微院-户外</div></div>
+          </div>
+        </div>
+        <div class="bottom-nav">
+          <div class="nav-item active"><div class="nav-icon">⌂</div><div>首页</div></div>
+          <div class="nav-item"><div class="nav-icon">◫</div><div>我的</div></div>
+        </div>
+      </section>
+
+      <section class="screen" data-screen="form">
+        <div class="statusbar"><span>10:39</span><span>●●● 5G</span></div>
+        <div class="topbar">
+          <div class="back" data-back>‹</div>
+          <div class="title">发起工单</div>
+        </div>
+        <div class="content">
+          <div class="step"><span class="dot active">1</span><span>基础信息</span><span>→</span><span class="dot">2</span><span>流程配置</span></div>
+          <div class="form">
+            <div class="field">
+              <div class="label required">工单类型</div>
+              <div class="select">报修 / 设备报修</div>
+            </div>
+            <div class="field">
+              <div class="label required">工单模板</div>
+              <div class="select">测试维修2</div>
+            </div>
+            <div class="field">
+              <div class="label required">指派处理人</div>
+              <div class="picker"><span class="tag">潘鹏 <button>×</button></span><span class="tag">张晨曦 <button>×</button></span></div>
+              <div class="hint">默认带出模板配置人员，提交前可替换或多选。</div>
+            </div>
+            <div class="field">
+              <div class="label">协助人</div>
+              <div class="picker placeholder">请选择协助人</div>
+              
+            </div>
+            <div class="field">
+              <div class="label required">工单标题</div>
+              <div class="input">请输入工单标题</div>
+            </div>
+            <div class="field">
+              <div class="label">工单级别</div>
+              <div class="select">一般</div>
+            </div>
+            <div class="field">
+              <div class="label required">发生时间</div>
+              <div class="input">选择日期时间</div>
+            </div>
+            <div class="field">
+              <div class="label required">发生位置</div>
+              <div class="select">请选择位置</div>
+            </div>
+            <div class="field">
+              <div class="label">设备类型</div>
+              <div class="input">请输入内容</div>
+            </div>
+            <div class="field">
+              <div class="label">关联设备</div>
+              <div class="input">请输入内容</div>
+            </div>
+            <div class="field">
+              <div class="label">问题描述</div>
+              <div class="textarea"></div>
+            </div>
+            <div class="field">
+              <div class="label">上传图片</div>
+              <div class="picker placeholder" style="height:84px;justify-content:center">＋</div>
+            </div>
+            <div class="footer-actions">
+              <button class="btn">取消</button>
+              <button class="btn primary">确定</button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    const screens = Array.from(document.querySelectorAll('.screen'));
+    const show = (name) => {
+      screens.forEach(s => s.classList.toggle('active', s.dataset.screen === name));
+      document.querySelector('.phone').scrollTop = 0;
+    };
+document.getElementById('toForm2').onclick = () => show('form');
+document.querySelectorAll('[data-back]').forEach(btn => btn.onclick = () => show(btn.closest('.screen').dataset.screen === 'form' ? 'list' : 'list'));
+    document.querySelectorAll('.seg button').forEach(btn => btn.addEventListener('click', () => {
+      const parent = btn.parentElement;
+      parent.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const screen = btn.closest('.screen');
+      if (screen.dataset.screen === 'list') {
+        document.getElementById('allFilters1').style.display = btn.textContent.includes('全部工单') ? 'flex' : 'none';
+      }
+    }));
+  </script>
+</body>
+</html>
+
+

@@ -1,0 +1,151 @@
+﻿<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>工单处理-协助人可维护原型</title>
+  <style>
+    :root{--primary:#4165ec;--bg:#f4f5f7;--surface:#fff;--line:#e9edf4;--text:#2b2f36;--muted:#8d93a0;--nav:#061b2d;--nav2:#102b43;--shadow:0 1px 2px rgba(19,33,68,.04)}*{box-sizing:border-box}body{margin:0;font:14px -apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif;color:var(--text);background:var(--bg)}.app{min-height:100vh;display:grid;grid-template-columns:190px 1fr}.sidebar{background:var(--nav);color:#c6d4e2;padding-top:16px}.brand{height:36px;padding:0 18px;display:flex;align-items:center;color:#fff;font-weight:700;font-size:18px}.nav-item{height:42px;display:flex;align-items:center;gap:10px;padding:0 18px;color:#b7c9db}.nav-item .chev{margin-left:auto;color:#7e95aa}.nav-item.open{color:#fff}.sub{background:var(--nav2)}.sub-item{height:42px;display:flex;align-items:center;padding-left:38px;color:#b7c9db}.sub-item.active{background:var(--primary);color:#fff}.main{min-width:0}.topbar{height:48px;background:#fff;border-bottom:1px solid #e8e8ec;display:flex;align-items:center;padding:0 16px;gap:14px}.menu-icon{width:28px;height:28px;border:0;background:transparent;font-size:22px;cursor:pointer}.crumb{font-size:16px;font-weight:700}.crumb span{color:var(--muted);font-weight:400;margin-left:8px}.top-actions{margin-left:auto;display:flex;align-items:center;gap:18px;color:var(--primary)}.avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#ffd9a1,#86a7ff);border:2px solid #fff;box-shadow:0 0 0 1px #dfe3ee}.tabs{height:42px;background:#fff;border-bottom:1px solid #e8e8ec;display:flex;align-items:center;gap:4px;padding:0 18px}.tab{min-width:82px;height:30px;border:1px solid #e1e3ea;border-radius:3px;color:#555;background:#fff;display:flex;align-items:center;justify-content:center}.tab.active{color:#fff;background:var(--primary);border-color:var(--primary)}.page{padding:18px 20px 24px}.page-head{height:68px;background:#fff;border-radius:8px;box-shadow:var(--shadow);display:flex;align-items:center;justify-content:space-between;padding:0 24px;margin-bottom:20px}.page-title{font-size:16px}.head-actions{display:flex;gap:12px}.btn{height:42px;min-width:72px;padding:0 16px;border:1px solid #dfe3ee;background:#fff;border-radius:4px;color:#394050;cursor:pointer}.btn.primary{background:var(--primary);border-color:var(--primary);color:#fff}.content{display:grid;grid-template-columns:1fr 354px;gap:18px}.panel{background:#fff;border-radius:8px;box-shadow:var(--shadow);min-height:680px}.panel-body{padding:22px 24px}.section{display:flex;align-items:center;gap:8px;font-weight:700;margin-bottom:18px}.section:before{content:"▣";color:#6c7a90;font-size:12px}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px 36px}.field{display:flex;gap:8px;align-items:flex-start;min-height:24px;line-height:1.7}.label{white-space:nowrap;color:#303746;font-weight:700}.value{color:#222;word-break:break-word}.value.muted{color:var(--muted)}.divider{height:1px;background:var(--line);margin:20px 0}.attachment{display:flex;align-items:flex-start;gap:12px}.thumb{width:96px;height:108px;background:linear-gradient(160deg,#d6dde9 0,#f8fafc 52%,#9db2d3 53%,#7d95be 100%);border-radius:3px;box-shadow:var(--shadow)}.right-panel{padding:18px 18px 16px}.timeline-title{display:flex;align-items:center;gap:8px;font-weight:700;margin-bottom:18px}.timeline-title:before{content:"▣";color:#6c7a90;font-size:12px}.timeline-meta{margin-bottom:14px;line-height:1.9}.timeline-meta .row{display:block}.timeline-meta .label{font-weight:700}.timeline-step{position:relative;padding-left:22px;margin-top:14px}.timeline-step:before{content:"";position:absolute;left:4px;top:4px;width:12px;height:12px;border-radius:50%;background:#d9dee8}.timeline-time{color:#9aa1af;margin-bottom:10px}.timeline-card{background:#fff;border-radius:8px;box-shadow:var(--shadow);border:1px solid #eef1f6;padding:16px 18px}.timeline-card strong{font-weight:700}.assist-box{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.assist-chip{display:inline-flex;align-items:center;height:22px;padding:0 8px;border-radius:11px;background:#eef3ff;color:#4165ec;font-size:12px;font-weight:700}.edit-link{color:var(--primary);font-size:12px;cursor:pointer;font-weight:700}.small{font-size:12px;color:var(--muted)}.modal-mask{position:fixed;inset:0;background:rgba(15,22,36,.28);display:none;align-items:center;justify-content:center}.modal-mask.show{display:flex}.sheet{width:680px;max-height:76vh;background:#fff;border-radius:12px;box-shadow:0 18px 44px rgba(16,24,40,.18);display:flex;flex-direction:column;overflow:hidden}.sheet-head{height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;border-bottom:1px solid var(--line);font-size:16px;font-weight:700}.sheet-body{padding:12px 16px 16px;overflow:auto}.search{width:100%;height:38px;border:1px solid #dce3f2;border-radius:19px;padding:0 14px;outline:none;background:#fbfcff}.member-list{margin-top:12px;display:flex;flex-direction:column;gap:8px}.member-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid #edf1f7;border-radius:10px;background:#fff}.member-item input{width:16px;height:16px;margin:0}.member-main{font-weight:700}.member-sub{color:var(--muted);font-size:12px;margin-left:auto}.sheet-footer{padding:12px 16px 16px;display:flex;gap:10px;border-top:1px solid var(--line)}.sheet-footer .btn{flex:1}</style>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">智慧园区</div>
+      <div class="nav-item">园区人员 <span class="chev">⌄</span></div>
+      <div class="nav-item">人员通行 <span class="chev">⌄</span></div>
+      <div class="nav-item">车辆通行 <span class="chev">⌄</span></div>
+      <div class="nav-item">设施管理 <span class="chev">⌄</span></div>
+      <div class="nav-item open">☑ 工单管理 <span class="chev">⌃</span></div>
+      <div class="sub">
+        <div class="sub-item">所有工单</div>
+        <div class="sub-item active">与我相关</div>
+        <div class="sub-item">工单模板</div>
+        <div class="sub-item">工单类型</div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <button class="menu-icon">≡</button>
+        <div class="crumb">☑ 工单管理 <span>/ 与我相关</span></div>
+        <div class="top-actions"><span>下载中维插件</span><span>🔔</span><div class="avatar"></div></div>
+      </header>
+
+      <div class="tabs">
+        <div class="tab">首页</div>
+        <div class="tab active">与我相关</div>
+        <div class="tab">工单模板</div>
+        <div class="tab">工单类型</div>
+        <div class="tab">所有工单</div>
+      </div>
+
+      <section class="page">
+        <div class="page-head">
+          <div class="page-title">工单详情</div>
+          <div class="head-actions">
+            <button class="btn">返回</button>
+            <button class="btn primary">处理</button>
+            <button class="btn">转派</button>
+            <button class="btn">退回</button>
+          </div>
+        </div>
+
+        <div class="content">
+          <div class="panel">
+            <div class="panel-body">
+              <div class="section">基本信息</div>
+              <div class="grid">
+                <div class="field"><div class="label">工单标题：</div><div class="value">测试</div></div>
+                <div class="field"><div class="label">工单编号：</div><div class="value">SBBX_202607290562</div></div>
+                <div class="field"><div class="label">工单来源：</div><div class="value">工单管理</div></div>
+
+                <div class="field"><div class="label">工单类型：</div><div class="value">设备报修</div></div>
+                <div class="field"><div class="label">工单模板：</div><div class="value">测试维修2</div></div>
+                <div class="field"><div class="label">工单状态：</div><div class="value">处理中</div></div>
+
+                <div class="field"><div class="label">工单级别：</div><div class="value">一般</div></div>
+                <div class="field"><div class="label">发生时间：</div><div class="value">2026-07-29 11:23:13</div></div>
+                <div class="field"><div class="label">发生位置：</div><div class="value">苏州实验室/沁园/5栋/3F</div></div>
+
+                <div class="field"><div class="label">专业类别：</div><div class="value muted">--</div></div>
+                <div class="field"><div class="label">专业描述：</div><div class="value muted">--</div></div>
+                <div class="field"><div class="label">指派人：</div><div class="value muted">--</div></div>
+
+                <div class="field"><div class="label">申请人：</div><div class="value">admin</div></div>
+                <div class="field"><div class="label">申请人联系方式：</div><div class="value">15601691300</div></div>
+                <div class="field">
+                  <div class="label">协助人：</div>
+                  <div class="value assist-box"><span class="assist-chip">张晨曦</span><span class="assist-chip">李工</span></div>
+                  <div class="edit-link" id="openAssist">维护</div>
+                </div>
+
+                <div class="field"><div class="label">创建人：</div><div class="value">admin</div></div>
+                <div class="field"><div class="label">创建时间：</div><div class="value">2026-07-29 11:23:13</div></div>
+                <div class="field"><div class="label">结束时间：</div><div class="value muted">--</div></div>
+
+                <div class="field"><div class="label">当前处理人：</div><div class="value">admin</div></div>
+                <div class="field"><div class="label">相关照片：</div><div class="value">3张</div></div>
+                <div class="field"><div class="label">报修编号：</div><div class="value">SBBX20260723190901000777000c237</div></div>
+              </div>
+
+              <div class="divider"></div>
+
+              <div class="grid">
+                <div class="field"><div class="label">设备类型：</div><div class="value">西门子消防</div></div>
+                <div class="field"><div class="label">关联设备：</div><div class="value">地库防火分区一烟感1-1-41</div></div>
+                <div class="field"><div class="label">问题描述：</div><div class="value">测试</div></div>
+              </div>
+
+              <div class="field" style="margin-top:18px;align-items:flex-start">
+                <div class="label">附件信息：</div>
+                <div class="attachment"><div class="thumb"></div></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="right-panel">
+              <div class="timeline-title">流转记录</div>
+              <div class="timeline-meta">
+                <span class="row"><span class="label">当前处理节点：</span>审批</span>
+                <span class="row"><span class="label">当前处理人：</span>admin</span>
+              </div>
+              <div class="timeline-step">
+                <div class="timeline-time">2026-07-29 11:23:13</div>
+                <div class="timeline-card"><strong>admin(admin)</strong> 发起流程申请</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="modal-mask" id="assistModal">
+    <div class="sheet">
+      <div class="sheet-head"><span>维护协助人</span><span style="color:#96a0b3;font-size:22px;line-height:1;cursor:pointer" id="closeAssist">×</span></div>
+      <div class="sheet-body">
+        <input class="search" placeholder="请输入姓名/部门搜索" />
+        <div class="member-list">
+          <label class="member-item"><input type="checkbox" checked /><span class="member-main">张晨曦</span><span class="member-sub">工程运维部</span></label>
+          <label class="member-item"><input type="checkbox" checked /><span class="member-main">李工</span><span class="member-sub">综合管理部</span></label>
+          <label class="member-item"><input type="checkbox" /><span class="member-main">王宁</span><span class="member-sub">物业服务部</span></label>
+          <label class="member-item"><input type="checkbox" /><span class="member-main">陈晓</span><span class="member-sub">工程运维部</span></label>
+        </div>
+      </div>
+      <div class="sheet-footer">
+        <button class="btn" id="cancelAssist">取消</button>
+        <button class="btn primary" id="saveAssist">确定</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const modal = document.getElementById('assistModal');
+    document.getElementById('openAssist').onclick = () => modal.classList.add('show');
+    document.getElementById('closeAssist').onclick = () => modal.classList.remove('show');
+    document.getElementById('cancelAssist').onclick = () => modal.classList.remove('show');
+    document.getElementById('saveAssist').onclick = () => modal.classList.remove('show');
+  </script>
+</body>
+</html>
