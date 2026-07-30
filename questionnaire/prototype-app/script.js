@@ -23,8 +23,8 @@ const taskConfig = {
     scoreMax: 5,
     instruction: "请根据近期物业服务体验完成本问卷评分，各维度均需选择分值后提交。",
     textQuestions: [
-      { enabled: true, position: "first", title: "请填写您最希望改善的一项物业服务", required: true },
-      { enabled: true, position: "second", title: "请填写其他补充信息", required: false }
+      { enabled: true, position: "before", title: "请填写您最希望改善的一项物业服务", required: true },
+      { enabled: true, position: "after", title: "请填写其他补充信息", required: false }
     ],
     objects: [
       { name: "明德物业", status: "todo", desc: "安保服务、保洁服务、会议服务等 5 项" },
@@ -38,8 +38,8 @@ const taskConfig = {
     scoreMax: 10,
     instruction: "请结合本月就餐体验完成评分，评分仅用于服务改进。",
     textQuestions: [
-      { enabled: true, position: "first", title: "请填写您本次主要评价的就餐时段", required: true },
-      { enabled: true, position: "last", title: "请填写您最希望餐厅改进的一项内容", required: false }
+      { enabled: true, position: "before", title: "请填写您本次主要评价的就餐时段", required: true },
+      { enabled: true, position: "after", title: "请填写您最希望餐厅改进的一项内容", required: false }
     ],
     objects: [
       { name: "一号餐厅", status: "todo", desc: "环境卫生、菜品质量、菜品口味等 5 项" },
@@ -129,9 +129,8 @@ function renderTextQuestion(question, index) {
 function renderDimensions() {
   const config = taskConfig[currentTask];
   const textQuestions = (config.textQuestions || []).filter((question) => question.enabled && question.title);
-  const firstQuestions = textQuestions.filter((question) => question.position === "first");
-  const secondQuestions = textQuestions.filter((question) => question.position === "second");
-  const lastQuestions = textQuestions.filter((question) => question.position === "last");
+  const beforeQuestions = textQuestions.filter((question) => question.position === "before");
+  const afterQuestions = textQuestions.filter((question) => question.position === "after");
   const dimensionHtml = config.dimensions.map((dimension, index) => `
     <div class="score-item" data-score-item>
       <div><strong>${dimension.name}</strong><span id="scoreLabel${index}">${dimension.min}-${dimension.max}分</span></div>
@@ -139,10 +138,9 @@ function renderDimensions() {
     </div>
   `).join("");
   scoreList.innerHTML = [
-    ...firstQuestions.map(renderTextQuestion),
-    ...secondQuestions.map(renderTextQuestion),
+    ...beforeQuestions.map(renderTextQuestion),
     dimensionHtml,
-    ...lastQuestions.map(renderTextQuestion)
+    ...afterQuestions.map(renderTextQuestion)
   ].join("");
 }
 
@@ -196,6 +194,7 @@ document.addEventListener("click", (event) => {
 
 submitBtn.addEventListener("click", submitForm);
 renderScoreOptions();
+
 
 
 
