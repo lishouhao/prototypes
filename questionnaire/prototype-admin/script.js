@@ -23,7 +23,6 @@ let pendingConfirmMessage = "操作成功";
 
 const pageMeta = {
   tasks: ["问卷任务", "配置问卷对象、评价维度、开放周期和评价人范围。"],
-  objects: ["评价对象", "维护可被问卷调查的服务对象。"],
   dimensions: ["评价维度", "统一维护默认评价维度，新建问卷任务时自动带入。"]
 };
 
@@ -32,7 +31,6 @@ const confirmCopy = {
   publishTask: ["发布问卷任务", "发布后符合范围的用户将在移动端看到问卷入口。", "问卷任务已发布"],
   deleteDraft: ["删除草稿", "删除后该未发布任务不会进入移动端，也不会保留配置内容。", "草稿已删除"],
   copyTask: ["复制问卷任务", "复制后生成一条未发布任务，可继续调整开放时间、评价对象和维度。", "问卷任务已复制"],
-  disableObject: ["停用评价对象", "停用后新建任务不可再选择该对象，历史评价与提交明细不受影响。", "评价对象已停用"],
   disableDimension: ["停用评价维度", "停用后新建任务默认不再带入该维度，历史数据不受影响。", "评价维度已停用"]
 };
 
@@ -77,14 +75,14 @@ function validateTask() {
   const instruction = document.getElementById("taskInstruction").value.trim();
   const extraQuestionEnabled = document.getElementById("extraQuestionEnabled").checked;
   const extraQuestionTitle = document.getElementById("extraQuestionTitle").value.trim();
-  const checkedObjects = drawer.querySelectorAll("[data-object-options] input[type='radio']:checked").length;
+  const checkedObjects = drawer.querySelectorAll("[data-object-options] input[type='checkbox']:checked").length;
   const checkedScopes = drawer.querySelectorAll("[data-user-scope] input[type='checkbox']:checked").length;
   const dimensionRows = [...drawer.querySelectorAll(".dimension-rule")];
   if (!document.getElementById("taskName").value.trim()) return "请输入任务名称";
   if (!startDate || !endDate || startDate > endDate) return "结束时间不能早于开始时间";
   if (instruction.length > 300) return "填写说明不能超过 300 字";
   if (extraQuestionEnabled && !extraQuestionTitle) return "请输入附加文本问题标题";
-  if (checkedObjects === 0) return "请选择一个评价对象";
+  if (checkedObjects === 0) return "请至少选择一个评价对象";
   if (dimensionRows.length === 0) return "请至少保留一个评价维度";
   if (checkedScopes === 0) return "请选择评价人范围";
   const invalidDimension = dimensionRows.some((row) => {
@@ -98,16 +96,8 @@ function validateTask() {
 }
 
 function openFormModal(entity, mode) {
-  const isObject = entity === "object";
-  formModalTitle.textContent = `${mode === "create" ? "新增" : "编辑"}${isObject ? "评价对象" : "评价维度"}`;
-  formModalBody.innerHTML = isObject ? `
-    <div class="modal-form">
-      <label>对象名称<input value="${mode === "edit" ? "明德物业" : ""}" placeholder="请输入对象名称"></label>
-      <label>对象类型<select><option>物业</option><option>餐饮</option></select></label>
-      <label>启用状态<select><option>启用</option><option>停用</option></select></label>
-    </div>
-    <p class="help">对象停用后不影响历史问卷结果和导出数据。</p>
-  ` : `
+  formModalTitle.textContent = `${mode === "create" ? "新增" : "编辑"}评价维度`;
+  formModalBody.innerHTML = `
     <div class="modal-form">
       <label>维度名称<input value="${mode === "edit" ? "服务态度" : ""}" placeholder="请输入维度名称"></label>
       <label>排序<input type="number" value="1"></label>
@@ -119,7 +109,6 @@ function openFormModal(entity, mode) {
   formModal.classList.add("open");
   formModal.setAttribute("aria-hidden", "false");
 }
-
 function openConfirm(type) {
   const copy = confirmCopy[type];
   confirmTitle.textContent = copy[0];
@@ -206,6 +195,8 @@ closeDrawer.addEventListener("click", hideDrawer);
 cancelDrawer.addEventListener("click", hideDrawer);
 drawerMask.addEventListener("click", hideDrawer);
 modalMask.addEventListener("click", closeModals);
+
+
 
 
 
