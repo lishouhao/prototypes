@@ -24,7 +24,8 @@ const taskConfig = {
     instruction: "请根据近期物业服务体验完成本问卷评分，各维度均需选择分值后提交。",
     textQuestion: { enabled: true, position: "first", title: "请填写您最希望改善的一项物业服务" },
     objects: [
-      { name: "明德物业", status: "todo", desc: "安保服务、保洁服务、会议服务等 5 项" }
+      { name: "明德物业", status: "todo", desc: "安保服务、保洁服务、会议服务等 5 项" },
+      { name: "启新物业", status: "todo", desc: "安保服务、保洁服务、会议服务等 5 项" }
     ],
     dimensions: [{ name: "安保服务", min: 1, max: 5 }, { name: "保洁服务", min: 1, max: 5 }, { name: "会议服务", min: 1, max: 10 }, { name: "物业管理", min: 1, max: 5 }, { name: "服务态度", min: 1, max: 5 }]
   },
@@ -35,7 +36,9 @@ const taskConfig = {
     instruction: "请结合本月就餐体验完成评分，评分仅用于服务改进。",
     textQuestion: { enabled: true, position: "last", title: "请填写您最希望餐厅改进的一项内容" },
     objects: [
-      { name: "一号餐厅", status: "todo", desc: "环境卫生、菜品质量、菜品口味等 5 项" }
+      { name: "一号餐厅", status: "todo", desc: "环境卫生、菜品质量、菜品口味等 5 项" },
+      { name: "二号餐厅", status: "todo", desc: "环境卫生、菜品质量、菜品口味等 5 项" },
+      { name: "咖啡吧", status: "done", desc: "已于 2026-07-20 10:08 提交" }
     ],
     dimensions: [{ name: "环境卫生", min: 1, max: 5 }, { name: "菜品质量", min: 1, max: 10 }, { name: "菜品口味", min: 1, max: 10 }, { name: "售价感知度", min: 1, max: 5 }, { name: "服务态度", min: 1, max: 5 }]
   }
@@ -131,16 +134,15 @@ function renderDimensions() {
     : dimensionHtml + textQuestionHtml;
 }
 
-function openTask(task) {
+function openTask(task, objectName, status = "todo") {
   currentTask = task;
   const config = taskConfig[currentTask];
-  const object = config.objects[0];
   scoreMax = config.scoreMax;
-  if (!object || object.status === "done") {
+  if (status === "done") {
     showToast("该问卷已提交，不能重复填写");
     return;
   }
-  openForm(object.name);
+  openForm(objectName || config.objects[0]?.name);
 }
 
 function openForm(objectName) {
@@ -170,20 +172,15 @@ document.addEventListener("click", (event) => {
   const target = event.target.closest("button");
   if (!target) return;
   if (target.dataset.back !== undefined) goBack();
-  if (target.dataset.task) openTask(target.dataset.task);
+  if (target.dataset.task) openTask(target.dataset.task, target.dataset.object, target.dataset.status);
   if (target.dataset.page && !target.dataset.task) switchScreen(target.dataset.page);
   if (target.dataset.action === "placeholder") showToast("功能建设中");
-  if (target.dataset.object) {
-    if (target.dataset.status === "done") {
-      showToast("该对象已提交，不能重复评价");
-      return;
-    }
-    openForm(target.dataset.object);
-  }
 });
 
 submitBtn.addEventListener("click", submitForm);
 renderScoreOptions();
+
+
 
 
 
