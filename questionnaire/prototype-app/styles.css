@@ -251,3 +251,10 @@ button { color: inherit; cursor: pointer; }
   border-color: #4c7ae8;
   background: #fff;
 }
+
+.text-question label span {
+  margin-left: 6px;
+  color: #d14343;
+  font-size: 12px;
+  font-weight: 400;
+}
