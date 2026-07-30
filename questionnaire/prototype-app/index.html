@@ -70,46 +70,46 @@
         <section class="card">
           <div class="section-head">
             <h3>待填写问卷</h3>
-            <span>2 项进行中</span>
+            <span>4 项进行中</span>
           </div>
-          <button class="task-row" data-task="property">
+          <button class="task-row" data-task="property" data-object="明德物业" data-status="todo">
             <div class="task-mark">物</div>
             <div class="task-info">
-              <strong>2026年7月物业服务调查问卷</strong>
+              <strong>2026年7月物业服务调查问卷 - 明德物业</strong>
               <p>2026-07-20 至 2026-07-31</p>
               <em>按维度设置分值</em>
             </div>
             <span class="tag running">进行中</span>
           </button>
-          <button class="task-row" data-task="canteen">
+          <button class="task-row" data-task="property" data-object="启新物业" data-status="todo">
+            <div class="task-mark">物</div>
+            <div class="task-info">
+              <strong>2026年7月物业服务调查问卷 - 启新物业</strong>
+              <p>2026-07-20 至 2026-07-31</p>
+              <em>按维度设置分值</em>
+            </div>
+            <span class="tag running">进行中</span>
+          </button>
+          <button class="task-row" data-task="canteen" data-object="一号餐厅" data-status="todo">
             <div class="task-mark">餐</div>
             <div class="task-info">
-              <strong>2026年7月餐厅服务调查问卷</strong>
+              <strong>2026年7月餐厅服务调查问卷 - 一号餐厅</strong>
               <p>2026-07-20 至 2026-07-31</p>
               <em>按维度设置分值</em>
             </div>
             <span class="tag running">进行中</span>
           </button>
-        </section>
-        <section class="card empty-state" hidden>暂无待填写问卷</section>
+          <button class="task-row" data-task="canteen" data-object="二号餐厅" data-status="todo">
+            <div class="task-mark">餐</div>
+            <div class="task-info">
+              <strong>2026年7月餐厅服务调查问卷 - 二号餐厅</strong>
+              <p>2026-07-20 至 2026-07-31</p>
+              <em>按维度设置分值</em>
+            </div>
+            <span class="tag running">进行中</span>
+          </button>
+        </section>        <section class="card empty-state" hidden>暂无待填写问卷</section>
       </div>
-
-      <div class="screen" id="objectsScreen">
-        <section class="card sub-card">
-          <span id="taskType">问卷调查</span>
-          <h2 id="taskName">2026年7月餐厅服务调查问卷</h2>
-          <p id="taskRule">每个对象仅可提交一次，提交后不可修改。</p>
-        </section>
-
-        <section class="card">
-          <div class="section-head">
-            <h3>问卷对象</h3>
-            <span id="objectCount">3 个对象</span>
-          </div>
-          <div id="objectList"></div>
-        </section>
-      </div>
-
       <div class="screen" id="formScreen">
         <section class="card sub-card">
           <span id="formTask">问卷调查</span>
@@ -145,6 +145,8 @@
   <script src="./script.js"></script>
 </body>
 </html>
+
+
 
 
 
