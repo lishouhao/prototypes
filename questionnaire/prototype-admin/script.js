@@ -73,15 +73,15 @@ function validateTask() {
   const startDate = document.getElementById("startDate").value;
   const endDate = document.getElementById("endDate").value;
   const instruction = document.getElementById("taskInstruction").value.trim();
-  const extraQuestionEnabled = document.getElementById("extraQuestionEnabled").checked;
-  const extraQuestionTitle = document.getElementById("extraQuestionTitle").value.trim();
+  const extraQuestionRows = [...drawer.querySelectorAll("[data-extra-question]")];
   const checkedObjects = drawer.querySelectorAll("[data-object-options] input[type='checkbox']:checked").length;
   const checkedScopes = drawer.querySelectorAll("[data-user-scope] input[type='checkbox']:checked").length;
   const dimensionRows = [...drawer.querySelectorAll(".dimension-rule")];
   if (!document.getElementById("taskName").value.trim()) return "请输入任务名称";
   if (!startDate || !endDate || startDate > endDate) return "结束时间不能早于开始时间";
   if (instruction.length > 300) return "填写说明不能超过 300 字";
-  if (extraQuestionEnabled && !extraQuestionTitle) return "请输入附加文本问题标题";
+  const invalidExtraQuestion = extraQuestionRows.some((row) => row.querySelector("[data-extra-enabled]").checked && !row.querySelector("[data-extra-title]").value.trim());
+  if (invalidExtraQuestion) return "请输入已启用的附加文本问题标题";
   if (checkedObjects === 0) return "请至少选择一个评价对象";
   if (dimensionRows.length === 0) return "请至少保留一个评价维度";
   if (checkedScopes === 0) return "请选择评价人范围";
@@ -195,6 +195,7 @@ closeDrawer.addEventListener("click", hideDrawer);
 cancelDrawer.addEventListener("click", hideDrawer);
 drawerMask.addEventListener("click", hideDrawer);
 modalMask.addEventListener("click", closeModals);
+
 
 
 
