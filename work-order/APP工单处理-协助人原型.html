@@ -1,4 +1,4 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="zh-CN">
 <head>
   <meta charset="utf-8" />
@@ -349,7 +349,7 @@
           </div>
         </div>
         <div class="sheet-footer">
-          <button class="btn" id="cancelAssist">取消</button>
+          <button class="btn" id="cancelAssist">取消</button><button class="btn" id="clearAssist">清空</button>
           <button class="btn primary" id="saveAssist">确定</button>
         </div>
       </div>
@@ -361,10 +361,14 @@
     document.getElementById('openAssist').onclick = () => sheet.classList.add('show');
     document.getElementById('closeAssist').onclick = () => sheet.classList.remove('show');
     document.getElementById('cancelAssist').onclick = () => sheet.classList.remove('show');
+    document.getElementById('clearAssist').onclick = () => {
+      sheet.querySelectorAll('.dept-item input').forEach(input => input.checked = false);
+    };
     document.getElementById('saveAssist').onclick = () => {
       sheet.classList.remove('show');
       const chips = document.getElementById('assistChips');
-      chips.innerHTML = '<span class="chip">张晨曦 <button>×</button></span><span class="chip">李工 <button>×</button></span>';
+      const names = Array.from(sheet.querySelectorAll('.dept-item input:checked')).map(input => input.parentElement.querySelector('.dept-main').textContent.trim());
+      chips.innerHTML = names.length ? names.map(name => `<span class="chip">${name} <button>×</button></span>`).join('') : '<span class="value muted">--</span>';
     };
   </script>
 </body>
