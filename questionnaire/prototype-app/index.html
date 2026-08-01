@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8" />
@@ -59,67 +59,100 @@
         </section>
       </div>
       <div class="screen" id="homeScreen">
-        <section class="card top-card">
-          <div class="title-row">
-            <div>
-              <h2>本期问卷任务</h2>
-            </div>
-          </div>
-        </section>
-
         <section class="card">
           <div class="section-head">
             <h3>待填写问卷</h3>
-            <span>4 项进行中</span>
           </div>
           <button class="task-row" data-task="property" data-object="明德物业" data-status="todo">
-            <div class="task-mark">物</div>
             <div class="task-info">
-              <strong>2026年7月物业服务调查问卷 - 明德物业</strong>
+              <strong>2026年7月物业服务调查问卷</strong>
               <p>2026-07-20 至 2026-07-31</p>
-              <em>按维度设置分值</em>
             </div>
             <span class="tag running">进行中</span>
           </button>
           <button class="task-row" data-task="property" data-object="启新物业" data-status="todo">
-            <div class="task-mark">物</div>
             <div class="task-info">
-              <strong>2026年7月物业服务调查问卷 - 启新物业</strong>
+              <strong>2026年7月物业服务调查问卷</strong>
               <p>2026-07-20 至 2026-07-31</p>
-              <em>按维度设置分值</em>
             </div>
             <span class="tag running">进行中</span>
           </button>
           <button class="task-row" data-task="canteen" data-object="一号餐厅" data-status="todo">
-            <div class="task-mark">餐</div>
             <div class="task-info">
-              <strong>2026年7月餐厅服务调查问卷 - 一号餐厅</strong>
+              <strong>2026年7月餐厅服务调查问卷</strong>
               <p>2026-07-20 至 2026-07-31</p>
-              <em>按维度设置分值</em>
             </div>
             <span class="tag running">进行中</span>
           </button>
           <button class="task-row" data-task="canteen" data-object="二号餐厅" data-status="todo">
-            <div class="task-mark">餐</div>
             <div class="task-info">
-              <strong>2026年7月餐厅服务调查问卷 - 二号餐厅</strong>
+              <strong>2026年7月餐厅服务调查问卷</strong>
               <p>2026-07-20 至 2026-07-31</p>
-              <em>按维度设置分值</em>
             </div>
             <span class="tag running">进行中</span>
+          </button>
+        </section>
+        <section class="card status-demo-card">
+          <div class="section-head">
+            <h3>状态示例</h3>
+            <span>研发验收口径</span>
+          </div>
+          <button class="task-row" data-state="submitted">
+            <div class="task-mark muted-mark">已</div>
+            <div class="task-info">
+              <strong>2026年7月餐厅服务调查问卷</strong>
+              <p>已于 2026-07-20 10:08 提交</p>
+              <em>提交后不可修改，不再进入填写页</em>
+            </div>
+            <span class="tag done">已提交</span>
+          </button>
+          <button class="task-row" data-state="notStarted">
+            <div class="task-mark muted-mark">待</div>
+            <div class="task-info">
+              <strong>2026年8月服务调查问卷</strong>
+              <p>2026-08-10 09:00 开始</p>
+              <em>未到开始时间，暂不可提交</em>
+            </div>
+            <span class="tag upcoming">未开始</span>
+          </button>
+          <button class="task-row" data-state="expired">
+            <div class="task-mark muted-mark">止</div>
+            <div class="task-info">
+              <strong>2026年6月服务调查问卷</strong>
+              <p>已于 2026-06-15 18:00 结束</p>
+              <em>超过结束时间，不允许提交</em>
+            </div>
+            <span class="tag expired">已结束</span>
+          </button>
+          <button class="task-row" data-state="empty">
+            <div class="task-mark muted-mark">空</div>
+            <div class="task-info">
+              <strong>暂无可填写问卷</strong>
+              <p>当前账号无符合范围且进行中的问卷</p>
+              <em>展示空状态，不展示提交按钮</em>
+            </div>
+            <span class="tag done">空</span>
           </button>
         </section>        <section class="card empty-state" hidden>暂无待填写问卷</section>
       </div>
       <div class="screen" id="formScreen">
         <section class="card sub-card">
-          <span id="formTask">问卷调查</span>
-          <h2 id="formObject">一号餐厅</h2>
+          <h2 id="formObject">2026年7月餐厅服务调查问卷</h2>
           <p id="formInstruction">请按每个维度的分值范围完成评分。</p>
         </section>
         <section class="card" id="scoreList"></section>
         <p class="form-error" id="formError"></p>
       </div>
 
+
+      <div class="screen" id="stateScreen">
+        <section class="state-card">
+          <div class="state-icon" id="stateIcon">!</div>
+          <h2 id="stateTitle">暂不可填写</h2>
+          <p id="stateDesc">当前问卷暂不支持填写。</p>
+          <button class="btn primary" data-page="home">返回问卷列表</button>
+        </section>
+      </div>
       <div class="screen" id="successScreen">
         <section class="success-card">
           <div class="success-icon">✓</div>
@@ -145,6 +178,9 @@
   <script src="./script.js"></script>
 </body>
 </html>
+
+
+
 
 
 
