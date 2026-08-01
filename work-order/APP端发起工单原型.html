@@ -1,4 +1,4 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="zh-CN">
 <head>
   <meta charset="utf-8" />
@@ -122,6 +122,8 @@
     .step .dot.active{background:var(--primary)}
     .hint{font-size:12px;color:#8a90a0;margin-top:6px;line-height:1.4}
     .screen-title{padding:14px 16px 2px;font-size:18px;font-weight:700;color:#20242d}
+    .card-action{display:flex;justify-content:flex-end;margin-top:10px}
+    .link-btn{border:1px solid #d7e1ff;background:#f6f8ff;color:var(--primary);border-radius:14px;height:30px;padding:0 12px;font-weight:700;font-size:12px}
   </style>
 </head>
 <body>
@@ -146,6 +148,7 @@
           <div class="filter-row" style="display:none" id="allFilters1">
             <div class="filter-chip active">我发起的</div>
             <div class="filter-chip">我处理的</div>
+            <div class="filter-chip">我协助的</div>
           </div>
           <div class="order-card">
             <div class="order-top">
@@ -183,6 +186,7 @@
           <div class="filter-row">
             <div class="filter-chip active">我发起的</div>
             <div class="filter-chip">我处理的</div>
+            <div class="filter-chip">我协助的</div>
           </div>
           <div class="order-card">
             <div class="order-top"><span class="level">一般</span><span class="time">2026-07-29 10:43:42</span></div>
@@ -197,6 +201,14 @@
             <div class="field-row"><div class="field-name">工单状态</div><div class="field-value green">已办结</div></div>
             <div class="field-row"><div class="field-name">工单类型</div><div class="field-value">设备报修</div></div>
             <div class="field-row"><div class="field-name">发生地点</div><div class="field-value">苏州实验室-观微院-户外</div></div>
+          </div>
+          <div class="order-card">
+            <div class="order-top"><span class="level">协助</span><span class="time">2026-07-22 16:18:24</span></div>
+            <div class="field-row"><div class="field-name">工单标题</div><div class="field-value">综合楼空调异常协助</div></div>
+            <div class="field-row"><div class="field-name">工单状态</div><div class="field-value blue">处理中</div></div>
+            <div class="field-row"><div class="field-name">协助人</div><div class="field-value">我、张晨曦</div></div>
+            <div class="field-row"><div class="field-name">当前处理人</div><div class="field-value">陆兵</div></div>
+            <div class="card-action"><button class="link-btn">查看详情</button></div>
           </div>
         </div>
         <div class="bottom-nav">
