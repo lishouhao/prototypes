@@ -195,10 +195,3 @@ closeDrawer.addEventListener("click", hideDrawer);
 cancelDrawer.addEventListener("click", hideDrawer);
 drawerMask.addEventListener("click", hideDrawer);
 modalMask.addEventListener("click", closeModals);
-
-
-
-
-
-
-
