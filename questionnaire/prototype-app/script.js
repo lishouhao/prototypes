@@ -1,4 +1,4 @@
-﻿const screens = document.querySelectorAll(".screen");
+const screens = document.querySelectorAll(".screen");
 const pageTitle = document.getElementById("pageTitle");
 const bottomBar = document.getElementById("bottomBar");
 const submitBtn = document.getElementById("submitBtn");
@@ -7,8 +7,10 @@ const successObject = document.getElementById("successObject");
 const formError = document.getElementById("formError");
 const formInstruction = document.getElementById("formInstruction");
 const toast = document.getElementById("toast");
-const objectList = document.getElementById("objectList");
 const scoreList = document.getElementById("scoreList");
+const stateIcon = document.getElementById("stateIcon");
+const stateTitle = document.getElementById("stateTitle");
+const stateDesc = document.getElementById("stateDesc");
 
 let currentScreen = "portal";
 let historyStack = ["portal"];
@@ -53,9 +55,16 @@ const taskConfig = {
 const titles = {
   portal: "苏实 e站",
   home: "问卷调查",
-  objects: "问卷对象",
   form: "填写问卷",
+  state: "问卷状态",
   success: "提交成功"
+};
+
+const stateCopy = {
+  submitted: ["✓", "已提交", "该问卷已完成提交。按照提交规则，同一评价人对同一任务下同一评价对象仅可提交一次，提交后不可修改。"],
+  notStarted: ["!", "未到开始时间", "问卷尚未开放，请在开始时间后进入填写。未到开始时间时不展示提交入口。"],
+  expired: ["!", "问卷已结束", "当前时间已超过任务结束时间，系统不允许继续填写或提交。"],
+  empty: ["空", "暂无待填写问卷", "当前账号没有符合评价人范围且处于开放时间内的问卷任务。"]
 };
 
 function showToast(message) {
@@ -95,25 +104,12 @@ function renderScoreOptions() {
       button.className = scores[index] === value ? "active" : "";
       button.addEventListener("click", () => {
         scores[index] = value;
-        document.getElementById(`scoreLabel${index}`).textContent = `${value}分`;
+        document.getElementById(`scoreLabel${index}`).textContent = `已选 ${value} 分`;
         renderScoreOptions();
       });
       options.appendChild(button);
     });
   });
-}
-
-function renderObjects() {
-  const config = taskConfig[currentTask];
-  objectList.innerHTML = config.objects.map((object) => `
-    <button class="task-row object-row" data-object="${object.name}" data-status="${object.status}">
-      <div>
-        <strong>${object.name}</strong>
-        <p>${object.desc}</p>
-      </div>
-      <span class="tag ${object.status === "done" ? "done" : "running"}">${object.status === "done" ? "已提交" : "待填写"}</span>
-    </button>
-  `).join("");
 }
 
 function renderTextQuestion(question, index) {
@@ -133,7 +129,7 @@ function renderDimensions() {
   const afterQuestions = textQuestions.filter((question) => question.position === "after");
   const dimensionHtml = config.dimensions.map((dimension, index) => `
     <div class="score-item" data-score-item>
-      <div><strong>${dimension.name}</strong><span id="scoreLabel${index}">${dimension.min}-${dimension.max}分</span></div>
+      <div><strong>${dimension.name}</strong><span id="scoreLabel${index}">${dimension.min}-${dimension.max} 分</span></div>
       <div class="score-options"></div>
     </div>
   `).join("");
@@ -149,16 +145,23 @@ function openTask(task, objectName, status = "todo") {
   const config = taskConfig[currentTask];
   scoreMax = config.scoreMax;
   if (status === "done") {
-    showToast("该问卷已提交，不能重复填写");
+    openState("submitted");
     return;
   }
   openForm(objectName || config.objects[0]?.name);
 }
 
+function openState(type) {
+  const copy = stateCopy[type] || stateCopy.expired;
+  stateIcon.textContent = copy[0];
+  stateTitle.textContent = copy[1];
+  stateDesc.textContent = copy[2];
+  switchScreen("state");
+}
+
 function openForm(objectName) {
-  formObject.textContent = objectName;
+  formObject.textContent = taskConfig[currentTask].name;
   successObject.textContent = objectName;
-  document.getElementById("formTask").textContent = taskConfig[currentTask].type;
   formInstruction.textContent = taskConfig[currentTask].instruction || "";
   formInstruction.hidden = !taskConfig[currentTask].instruction;
   scores = Array(taskConfig[currentTask].dimensions.length).fill(null);
@@ -188,32 +191,10 @@ document.addEventListener("click", (event) => {
   if (!target) return;
   if (target.dataset.back !== undefined) goBack();
   if (target.dataset.task) openTask(target.dataset.task, target.dataset.object, target.dataset.status);
+  if (target.dataset.state) openState(target.dataset.state);
   if (target.dataset.page && !target.dataset.task) switchScreen(target.dataset.page);
   if (target.dataset.action === "placeholder") showToast("功能建设中");
 });
 
 submitBtn.addEventListener("click", submitForm);
 renderScoreOptions();
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
