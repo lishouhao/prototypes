@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8" />
@@ -44,24 +44,24 @@
           <table class="table">
             <thead>
               <tr>
-                <th>任务名称</th><th>开放周期</th><th>评价对象</th><th>参与范围</th><th>评分规则</th><th>状态</th><th>提交进度</th><th>操作</th>
+                <th>任务名称</th><th>开放周期</th><th>评价对象</th><th>参与范围</th><th>状态</th><th>提交进度</th><th>操作</th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td>2026年7月物业服务调查问卷</td><td>2026-07-20 09:00 至 2026-07-31 18:00</td><td>明德物业、启新物业</td><td>学生、员工</td><td>各维度独立设置</td><td><span class="tag running">进行中</span></td><td>312/460</td>
+                <td>2026年7月物业服务调查问卷</td><td>2026-07-20 09:00 至 2026-07-31 18:00</td><td>明德物业、启新物业</td><td>学生、员工</td><td><span class="tag running">进行中</span></td><td>312/460</td>
                 <td><button class="link" data-task-mode="view">查看</button><button class="link" data-submissions>提交明细</button><button class="link" data-confirm="copyTask">复制</button><button class="link danger" data-confirm="closeTask">结束任务</button></td>
               </tr>
               <tr>
-                <td>2026年7月餐厅服务调查问卷</td><td>2026-07-20 09:00 至 2026-07-31 18:00</td><td>一号餐厅、咖啡吧</td><td>学生、员工</td><td>各维度独立设置</td><td><span class="tag running">进行中</span></td><td>286/520</td>
+                <td>2026年7月餐厅服务调查问卷</td><td>2026-07-20 09:00 至 2026-07-31 18:00</td><td>一号餐厅、咖啡吧</td><td>学生、员工</td><td><span class="tag running">进行中</span></td><td>286/520</td>
                 <td><button class="link" data-task-mode="view">查看</button><button class="link" data-submissions>提交明细</button><button class="link" data-confirm="copyTask">复制</button><button class="link danger" data-confirm="closeTask">结束任务</button></td>
               </tr>
               <tr>
-                <td>2026年第二季度服务调查问卷</td><td>2026-06-01 09:00 至 2026-06-15 18:00</td><td>明德物业、一号餐厅</td><td>员工</td><td>各维度独立设置</td><td><span class="tag ended">已结束</span></td><td>498/520</td>
+                <td>2026年第二季度服务调查问卷</td><td>2026-06-01 09:00 至 2026-06-15 18:00</td><td>明德物业、一号餐厅</td><td>员工</td><td><span class="tag ended">已结束</span></td><td>498/520</td>
                 <td><button class="link" data-submissions>提交明细</button><button class="link" data-confirm="copyTask">复制</button></td>
               </tr>
               <tr>
-                <td>8月服务调查问卷</td><td>2026-08-01 09:00 至 2026-08-10 18:00</td><td>一号餐厅、二号餐厅</td><td>学生</td><td>各维度独立设置</td><td><span class="tag draft">未发布</span></td><td>-</td>
+                <td>8月服务调查问卷</td><td>2026-08-01 09:00 至 2026-08-10 18:00</td><td>一号餐厅、二号餐厅</td><td>学生</td><td><span class="tag draft">未发布</span></td><td>-</td>
                 <td><button class="link" data-task-mode="edit">编辑</button><button class="link" data-confirm="publishTask">发布</button><button class="link" data-confirm="copyTask">复制</button><button class="link danger" data-confirm="deleteDraft">删除</button></td>
               </tr>
             </tbody>
@@ -69,6 +69,7 @@
           <div class="pagination"><button data-action="prevPage">上一页</button><span>1 / 3</span><button data-action="nextPage">下一页</button></div>
         </div>
       </section>
+
       <section class="page" id="dimensionsPage">
         <div class="panel">
           <div class="section-head"><div><h2>默认评价维度</h2><p>新建问卷任务默认带入，可在任务内调整。</p></div><button class="btn primary" data-entity="dimension" data-mode="create">新增维度</button></div>
@@ -106,6 +107,14 @@
         </div>
       </div>
       <div class="block">
+        <h3>评价维度与评分规则</h3>
+        <div class="dimension-rules" data-dimension-options>
+          <div class="dimension-rule"><span>环境卫生</span><label>最低分<input type="number" value="1" /></label><label>最高分<input type="number" value="5" /></label></div>
+          <div class="dimension-rule"><span>服务态度</span><label>最低分<input type="number" value="1" /></label><label>最高分<input type="number" value="5" /></label></div>
+          <div class="dimension-rule"><span>服务质量</span><label>最低分<input type="number" value="1" /></label><label>最高分<input type="number" value="10" /></label></div>
+        </div>
+      </div>
+      <div class="block">
         <h3>附加文本问题</h3>
         <div class="extra-question-list" data-extra-questions>
           <div class="extra-question" data-extra-question>
@@ -123,21 +132,13 @@
         </div>
       </div>
       <div class="block">
-        <h3>评价维度与评分规则</h3>
-        <div class="dimension-rules" data-dimension-options>
-          <div class="dimension-rule"><span>环境卫生</span><label>最低分<input type="number" value="1" /></label><label>最高分<input type="number" value="5" /></label></div>
-          <div class="dimension-rule"><span>服务态度</span><label>最低分<input type="number" value="1" /></label><label>最高分<input type="number" value="5" /></label></div>
-          <div class="dimension-rule"><span>服务质量</span><label>最低分<input type="number" value="1" /></label><label>最高分<input type="number" value="10" /></label></div>
-          <button class="chip-add" data-entity="dimension" data-mode="create">新增维度</button>
-        </div>
-      </div>
-      <div class="block">
         <h3>评价人范围</h3>
         <div class="check-grid" data-user-scope>
           <label><input type="checkbox" checked /> 学生</label><label><input type="checkbox" checked /> 员工</label>
         </div>
+        <p class="scope-help">学生按工号首字母 S 识别，其他工号默认归为员工。</p>
       </div>
-      <div class="tip"><strong>提交规则</strong><span>每个对象仅可提交一次，提交后不可修改。</span></div>
+      <div class="tip"><strong>提交规则</strong><span>每个对象仅可提交一次，提交后不可修改。</span></div><div class="tip rule-tip"><strong>状态与编辑规则</strong><span>草稿可编辑、可发布、可删除；进行中仅可查看、复制、结束任务；已结束仅可查看提交明细和复制，复制后生成未发布任务并重新设置开放时间。</span></div>
     </div>
     <div class="drawer-foot">
       <button class="btn secondary" id="cancelDrawer">取消</button>
@@ -182,14 +183,14 @@
       <table class="table sub-table">
         <thead>
           <tr>
-            <th>评价人</th><th>工号</th><th>人员类型</th><th>评价对象</th><th>环境卫生</th><th>服务态度</th><th>服务质量</th><th>平均分</th><th>提交时间</th>
+            <th>评价人</th><th>工号</th><th>人员类型</th><th>评价对象</th><th>环境卫生</th><th>服务态度</th><th>服务质量</th><th>平均分</th><th>文本答案1</th><th>文本答案2</th><th>提交时间</th>
           </tr>
         </thead>
         <tbody>
-          <tr><td>陈一</td><td>SL00231</td><td>员工</td><td>一号餐厅</td><td>5</td><td>4</td><td>8</td><td>5.7</td><td>2026-07-20 09:21</td></tr>
-          <tr><td>李二</td><td>SL00416</td><td>员工</td><td>二号餐厅</td><td>4</td><td>4</td><td>7</td><td>5.0</td><td>2026-07-20 10:08</td></tr>
-          <tr><td>王三</td><td>SL00577</td><td>学生</td><td>明德物业</td><td>5</td><td>5</td><td>9</td><td>6.3</td><td>2026-07-20 11:46</td></tr>
-          <tr class="muted"><td>赵四</td><td>SL00602</td><td>学生</td><td>一号餐厅</td><td>-</td><td>-</td><td>-</td><td>-</td><td>未提交</td></tr>
+          <tr><td>陈一</td><td>SL00231</td><td>员工</td><td>一号餐厅</td><td>5</td><td>4</td><td>8</td><td>5.7</td><td class="answer-cell">午餐</td><td class="answer-cell">希望增加低脂菜品</td><td>2026-07-20 09:21</td></tr>
+          <tr><td>李二</td><td>SL00416</td><td>员工</td><td>二号餐厅</td><td>4</td><td>4</td><td>7</td><td>5.0</td><td class="answer-cell">早餐</td><td class="answer-cell">取餐排队时间偏长</td><td>2026-07-20 10:08</td></tr>
+          <tr><td>王三</td><td>SL00577</td><td>学生</td><td>明德物业</td><td>5</td><td>5</td><td>9</td><td>6.3</td><td class="answer-cell">会议服务</td><td class="answer-cell">响应及时</td><td>2026-07-20 11:46</td></tr>
+          <tr class="muted"><td>赵四</td><td>SL00602</td><td>学生</td><td>一号餐厅</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>未提交</td></tr>
         </tbody>
       </table>
       <div class="pagination"><button data-action="prevPage">上一页</button><span>1 / 12</span><button data-action="nextPage">下一页</button></div>
@@ -204,11 +205,3 @@
   <script src="./script.js"></script>
 </body>
 </html>
-
-
-
-
-
-
-
-
