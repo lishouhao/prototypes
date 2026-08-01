@@ -108,7 +108,6 @@ meter { width: 100%; height: 10px; }
 }
 
 
-
 .dimension-rules { display: grid; gap: 10px; margin-top: 12px; }
 .dimension-rule { min-height: 44px; display: grid; grid-template-columns: 1fr 110px 110px; align-items: center; gap: 12px; padding: 10px 12px; border: 1px solid #eeeeef; border-radius: 4px; background: #f7f7fa; }
 .dimension-rule span { font-weight: 700; color: #36373b; }
@@ -122,4 +121,10 @@ meter { width: 100%; height: 10px; }
 .extra-question label { display: grid; gap: 6px; }
 .extra-question .switch-row { min-height: 36px; display: flex; align-items: center; gap: 8px; }
 .extra-question input[type="checkbox"] { width: 16px; height: 16px; accent-color: #4165ec; }
+
+.rule-tip { margin-top: 12px; background: #fff7d6; }
+.rule-tip span { color: #6f5b12; }
+.answer-cell { max-width: 180px; overflow: hidden; text-overflow: ellipsis; }
+
+.scope-help { margin-top: 8px; color: #8f9098; font-size: 12px; }
 
