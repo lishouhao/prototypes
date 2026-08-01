@@ -303,7 +303,14 @@ document.querySelectorAll('[data-back]').forEach(btn => btn.onclick = () => show
         document.getElementById('allFilters1').style.display = btn.textContent.includes('全部工单') ? 'flex' : 'none';
       }
     }));
-  </script>
+    document.querySelectorAll('.filter-row').forEach(row => {
+      row.querySelectorAll('.filter-chip').forEach(chip => {
+        chip.addEventListener('click', () => {
+          row.querySelectorAll('.filter-chip').forEach(item => item.classList.remove('active'));
+          chip.classList.add('active');
+        });
+      });
+    });  </script>
 </body>
 </html>
 
