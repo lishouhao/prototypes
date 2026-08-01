@@ -108,10 +108,13 @@
       </div>
       <div class="block">
         <h3>评价维度与评分规则</h3>
+        <p class="dimension-help">从已配置且启用的评价维度中选择，勾选后可设置本任务分值范围。</p>
         <div class="dimension-rules" data-dimension-options>
-          <div class="dimension-rule"><span>环境卫生</span><label>最低分<input type="number" value="1" /></label><label>最高分<input type="number" value="5" /></label></div>
-          <div class="dimension-rule"><span>服务态度</span><label>最低分<input type="number" value="1" /></label><label>最高分<input type="number" value="5" /></label></div>
-          <div class="dimension-rule"><span>服务质量</span><label>最低分<input type="number" value="1" /></label><label>最高分<input type="number" value="10" /></label></div>
+          <div class="dimension-rule"><label class="dimension-check"><input type="checkbox" data-dimension-enabled checked /><span>环境卫生</span></label><label>最低分<input type="number" value="1" /></label><label>最高分<input type="number" value="5" /></label></div>
+          <div class="dimension-rule"><label class="dimension-check"><input type="checkbox" data-dimension-enabled checked /><span>服务态度</span></label><label>最低分<input type="number" value="1" /></label><label>最高分<input type="number" value="5" /></label></div>
+          <div class="dimension-rule"><label class="dimension-check"><input type="checkbox" data-dimension-enabled checked /><span>服务质量</span></label><label>最低分<input type="number" value="1" /></label><label>最高分<input type="number" value="10" /></label></div>
+          <div class="dimension-rule off"><label class="dimension-check"><input type="checkbox" data-dimension-enabled /><span>响应效率</span></label><label>最低分<input type="number" value="1" disabled /></label><label>最高分<input type="number" value="5" disabled /></label></div>
+          <div class="dimension-rule off"><label class="dimension-check"><input type="checkbox" data-dimension-enabled /><span>价格感知</span></label><label>最低分<input type="number" value="1" disabled /></label><label>最高分<input type="number" value="5" disabled /></label></div>
         </div>
       </div>
       <div class="block">
