@@ -1,4 +1,4 @@
-﻿* { box-sizing: border-box; }
+* { box-sizing: border-box; }
 body {
   margin: 0;
   min-height: 100vh;
@@ -118,7 +118,7 @@ button { color: inherit; cursor: pointer; }
   padding: 12px 0;
 }
 .task-row:first-of-type { border-top: 0; }
-.task-row { grid-template-columns: 42px 1fr 54px; }
+.task-row { grid-template-columns: 1fr 54px; }
 .object-row { grid-template-columns: 1fr 64px; }
 .task-mark {
   width: 38px;
@@ -258,3 +258,31 @@ button { color: inherit; cursor: pointer; }
   font-size: 12px;
   font-weight: 400;
 }
+
+.status-demo-card .task-row { grid-template-columns: 42px 1fr 58px; }
+.muted-mark { color: #8f9098; background: #f7f7fa; }
+.upcoming { color: #8a6d00; background: #fff7d6; }
+.expired { color: #d14343; background: #fff0f0; }
+.score-help { margin: -4px 0 10px; color: #8f9098; font-size: 12px; }
+.state-card {
+  min-height: 520px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 24px;
+}
+.state-icon {
+  width: 62px;
+  height: 62px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  color: #fff;
+  background: #8f9098;
+  font-size: 22px;
+  font-weight: 700;
+}
+.state-card h2 { margin: 16px 0 8px; color: #585858; font-size: 16px; }
+.state-card p { margin: 0 0 24px; color: #8f9098; font-size: 13px; line-height: 1.6; }
