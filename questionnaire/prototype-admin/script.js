@@ -1,4 +1,4 @@
-﻿const navItems = document.querySelectorAll(".menu-item");
+const navItems = document.querySelectorAll(".menu-item");
 const pages = document.querySelectorAll(".page");
 const pageTitle = document.getElementById("pageTitle");
 const pageDesc = document.getElementById("pageDesc");
@@ -56,7 +56,6 @@ function openDrawer(mode = "create") {
   drawerDesc.textContent = isView ? "已发布任务仅可查看。" : "配置问卷任务。";
   drawer.querySelectorAll("input, select, textarea").forEach((field) => { field.disabled = isView; });
   drawer.querySelectorAll("[data-task-submit]").forEach((button) => { button.style.display = isView ? "none" : "inline-flex"; });
-  drawer.querySelectorAll(".chip-add").forEach((button) => { button.style.display = isView ? "none" : "inline-flex"; });
   taskError.textContent = "";
   drawer.classList.add("open");
   drawer.setAttribute("aria-hidden", "false");
@@ -76,14 +75,14 @@ function validateTask() {
   const extraQuestionRows = [...drawer.querySelectorAll("[data-extra-question]")];
   const checkedObjects = drawer.querySelectorAll("[data-object-options] input[type='checkbox']:checked").length;
   const checkedScopes = drawer.querySelectorAll("[data-user-scope] input[type='checkbox']:checked").length;
-  const dimensionRows = [...drawer.querySelectorAll(".dimension-rule")];
+  const dimensionRows = [...drawer.querySelectorAll(".dimension-rule")].filter((row) => row.querySelector("[data-dimension-enabled]")?.checked);
   if (!document.getElementById("taskName").value.trim()) return "请输入任务名称";
   if (!startDate || !endDate || startDate > endDate) return "结束时间不能早于开始时间";
   if (instruction.length > 300) return "填写说明不能超过 300 字";
   const invalidExtraQuestion = extraQuestionRows.some((row) => row.querySelector("[data-extra-enabled]").checked && !row.querySelector("[data-extra-title]").value.trim());
   if (invalidExtraQuestion) return "请输入已启用的附加文本问题标题";
   if (checkedObjects === 0) return "请至少选择一个评价对象";
-  if (dimensionRows.length === 0) return "请至少保留一个评价维度";
+  if (dimensionRows.length === 0) return "请至少选择一个评价维度";
   if (checkedScopes === 0) return "请选择评价人范围";
   const invalidDimension = dimensionRows.some((row) => {
     const inputs = row.querySelectorAll("input[type='number']");
@@ -135,6 +134,15 @@ function openSubmissions() {
   submissionsModal.setAttribute("aria-hidden", "false");
 }
 
+
+document.addEventListener("change", (event) => {
+  const target = event.target;
+  if (!target.matches("[data-dimension-enabled]")) return;
+  const row = target.closest(".dimension-rule");
+  row.classList.toggle("off", !target.checked);
+  row.querySelectorAll("input[type='number']").forEach((input) => { input.disabled = !target.checked; });
+});
+
 document.addEventListener("click", (event) => {
   const target = event.target.closest("button");
   if (!target) return;
@@ -144,6 +152,7 @@ document.addEventListener("click", (event) => {
   if (target.dataset.entity) openFormModal(target.dataset.entity, target.dataset.mode);
   if (target.dataset.confirm) openConfirm(target.dataset.confirm);
   if (target.dataset.closeModal !== undefined) closeModals();
+
 
   if (target.dataset.toggleState) {
     const isOn = target.dataset.toggleState === "on";
