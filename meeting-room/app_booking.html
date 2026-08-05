@@ -1,0 +1,1000 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>APP 会议预约</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+    background: #e8eaf0; display: flex; justify-content: center; align-items: center;
+    min-height: 100vh; color: #585858;
+  }
+  .device {
+    width: 393px; height: 852px; background: #F7F7FA;
+    border-radius: 44px; overflow: hidden; position: relative;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+  }
+  .page {
+    position: absolute; inset: 0; display: flex; flex-direction: column;
+    visibility: hidden; opacity: 0; transition: opacity .2s;
+  }
+  .page.active { visibility: visible; opacity: 1; z-index: 1; }
+
+  /* 状态栏 */
+  .statusbar {
+    height: 44px; display: flex; align-items: flex-end; justify-content: space-between;
+    padding: 0 24px 6px; font-size: 14px; font-weight: 600; color: #fff;
+  }
+  .statusbar.dark { color: #585858; }
+
+  /* 顶部导航 */
+  .header {
+    height: 44px; display: flex; align-items: center; justify-content: center;
+    position: relative; color: #fff; font-size: 16px; font-weight: 600;
+    background: #4C7AE8;
+  }
+  .header .back {
+    position: absolute; left: 12px; top: 0; bottom: 0; display: flex; align-items: center;
+    padding: 0 8px; cursor: pointer;
+  }
+  .header .back svg { width: 24px; height: 24px; fill: #fff; }
+
+  /* 内容区 */
+  .content { flex: 1; overflow-y: auto; padding: 16px 16px 80px; }
+  .content::-webkit-scrollbar { display: none; }
+
+  /* 底部按钮 */
+  .bottom-btn {
+    position: absolute; left: 16px; right: 16px; bottom: 66px; z-index: 5;
+    height: 38px; line-height: 38px; text-align: center; border-radius: 6px;
+    background: #4C7AE8; color: #fff; font-size: 14px; font-weight: 500;
+    box-shadow: 0 4px 12px rgba(76,122,232,0.3); cursor: pointer;
+  }
+  .bottom-btn:active { opacity: .85; }
+  .bottom-btn.secondary {
+    background: #F7F7FA; color: #585858; border: none; box-shadow: none;
+    height: 36px; line-height: 36px; border-radius: 4px;
+  }
+  .bottom-btn.secondary:active { opacity: .7; }
+
+  /* 底部标签栏 */
+  .tabbar {
+    position: absolute; bottom: 0; left: 0; right: 0; height: 83px;
+    background: #fff; border-top: 1px solid #F6F6F8;
+    display: flex; justify-content: space-around; padding-top: 8px; z-index: 10;
+  }
+  .tab-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; }
+  .tab-item svg { width: 24px; height: 24px; }
+  .tab-item span { font-size: 12px; color: #999; }
+  .tab-item.active span { color: #4C7AE8; }
+  .tab-item.active svg { fill: #4C7AE8; }
+
+  /* ========== 首页 ========== */
+  .home-header {
+    height: 44px; display: flex; align-items: center; justify-content: center;
+    background: #fff; font-size: 16px; font-weight: 600; color: #585858;
+  }
+  .home-content { flex: 1; overflow-y: auto; padding: 16px 16px 90px; }
+  .home-content::-webkit-scrollbar { display: none; }
+  .stat-cards {
+    display: flex; gap: 12px; margin-bottom: 16px;
+  }
+  .stat-card {
+    flex: 1; background: #fff; border-radius: 12px; padding: 16px 12px;
+    display: flex; align-items: center; gap: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+  }
+  .stat-icon { width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .stat-icon svg { width: 22px; height: 22px; }
+  .stat-info { display: flex; flex-direction: column; }
+  .stat-label { font-size: 12px; color: #999; }
+  .stat-value { font-size: 22px; font-weight: 700; color: #585858; line-height: 1.2; }
+  .stat-value small { font-size: 12px; color: #999; font-weight: 400; margin-left: 2px; }
+
+  .section-block {
+    background: #fff; border-radius: 12px; padding: 16px; margin-bottom: 16px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+  }
+  .section-title-bar {
+    display: flex; align-items: center; gap: 8px; margin-bottom: 16px;
+    font-size: 14px; font-weight: 600; color: #585858;
+  }
+  .section-title-bar::before {
+    content: ''; width: 4px; height: 16px; background: #4C7AE8; border-radius: 2px;
+  }
+
+  .work-grid {
+    display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px 12px;
+  }
+  .work-cell { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+  .work-icon {
+    width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .work-icon svg { width: 22px; height: 22px; }
+  .work-text { display: flex; flex-direction: column; }
+  .work-title { font-size: 14px; font-weight: 500; color: #585858; }
+  .work-desc { font-size: 12px; color: #999; margin-top: 2px; }
+
+  .service-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px 8px;
+  }
+  .service-cell { display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer; }
+  .service-icon {
+    width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center;
+  }
+  .service-icon svg { width: 26px; height: 26px; }
+  .service-cell span { font-size: 12px; color: #585858; }
+
+  /* ========== 列表页 ========== */
+  .tabs { display: flex; justify-content: center; gap: 40px; margin-bottom: 16px; }
+  .tab-pill { position: relative; padding: 8px 4px; font-size: 14px; color: #999; cursor: pointer; }
+  .tab-pill.active { color: #4C7AE8; font-weight: 600; }
+  .tab-pill.active::after {
+    content: ''; position: absolute; left: 50%; bottom: 0; transform: translateX(-50%);
+    width: 24px; height: 3px; background: #4C7AE8; border-radius: 2px;
+  }
+
+  .card {
+    background: #fff; border-radius: 12px; padding: 16px; margin-bottom: 16px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+  }
+  .card-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+  .status-tag {
+    display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 4px;
+    font-size: 12px; line-height: 18px;
+  }
+  .status-tag.blue { background: #E6F0FF; color: #4C7AE8; }
+  .status-tag.green { background: #E6F7EF; color: #52C41A; }
+  .status-tag.grey { background: #F5F5F5; color: #999; }
+  .status-tag.orange { background: #FFF2E8; color: #FA8C16; }
+  .status-tag::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+  .card-time { font-size: 12px; color: #999; }
+  .card-row { display: flex; margin-bottom: 6px; font-size: 14px; line-height: 22px; }
+  .card-row:last-child { margin-bottom: 0; }
+  .card-label { width: 72px; color: #999; flex-shrink: 0; }
+  .card-value { color: #585858; flex: 1; }
+  .cancel-mini {
+    display: inline-block; margin-top: 8px; padding: 4px 12px; border-radius: 4px;
+    border: 1px solid #4C7AE8; color: #4C7AE8; font-size: 12px; float: right; cursor: pointer;
+  }
+  .empty-tip { text-align: center; color: #999; font-size: 12px; padding: 20px 0; }
+
+  /* ========== 详情页 ========== */
+  .section { margin-bottom: 16px; }
+  .section-title {
+    color: #4C7AE8; font-size: 14px; font-weight: 600; margin-bottom: 12px;
+    display: inline-block; position: relative; padding-bottom: 4px;
+  }
+  .section-title::after {
+    content: ''; position: absolute; left: 0; bottom: 0; width: 100%; height: 3px;
+    background: #4C7AE8; border-radius: 2px;
+  }
+  .section-head { display: flex; justify-content: space-between; align-items: flex-start; }
+  .info-row { display: flex; margin-bottom: 10px; font-size: 14px; line-height: 22px; }
+  .info-label { width: 84px; color: #999; flex-shrink: 0; }
+  .info-value { color: #585858; flex: 1; }
+  .file-box {
+    width: 80px; height: 80px; background: #F6F6F8; border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .file-box svg { width: 32px; height: 32px; fill: #ccc; }
+  .log-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 10px 0; font-size: 14px; color: #585858; cursor: pointer;
+  }
+  .log-row svg { width: 16px; height: 16px; fill: #ccc; }
+
+  /* ========== 表单页 ========== */
+  .form-group { background: #fff; border-radius: 12px; padding: 16px; margin-bottom: 16px; }
+  .form-item {
+    display: flex; align-items: center; min-height: 40px; padding: 8px 0; border-bottom: 1px solid #F6F6F8;
+  }
+  .form-item:last-child { border-bottom: none; }
+  .form-item.vertical { flex-direction: column; align-items: stretch; gap: 8px; }
+  .form-label { width: 90px; font-size: 14px; color: #585858; flex-shrink: 0; }
+  .form-label .required { color: #FF4D4F; margin-right: 2px; }
+  .form-input {
+    flex: 1; height: 40px; background: #F7F7FA; border-radius: 8px; border: none;
+    padding: 0 12px; font-size: 14px; color: #585858; outline: none;
+  }
+  .form-input::placeholder { color: #999999; }
+  .form-input.picker {
+    display: flex; align-items: center; color: #999999; cursor: pointer;
+    background: #F7F7FA url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24'%3E%3Cpath fill='%23999' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E") no-repeat right 10px center;
+  }
+  .form-input.picker.has-value { color: #585858; }
+  .upload-box {
+    width: 80px; height: 80px; background: #F6F6F8; border-radius: 6px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    color: #999; font-size: 12px; gap: 4px; cursor: pointer;
+  }
+  .upload-box svg { width: 28px; height: 28px; fill: #999; }
+  .upload-tip { font-size: 12px; color: #999; margin-top: 6px; }
+  .file-list { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; width: 100%; }
+  .file-item {
+    display: flex; align-items: center; justify-content: space-between; gap: 8px;
+    background: #F6F6F8; border-radius: 6px; padding: 8px 10px; font-size: 12px; color: #585858;
+  }
+  .file-item .fname { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .file-item .fremove { color: #FF4D4F; flex-shrink: 0; cursor: pointer; }
+  .error-msg { color: #FF4D4F; font-size: 12px; margin-top: 4px; display: none; }
+  .error-msg.show { display: block; }
+
+  /* ========== 弹窗 ========== */
+  .modal-mask {
+    position: absolute; inset: 0; background: rgba(0,0,0,0.45); z-index: 50;
+    display: none; align-items: center; justify-content: center; padding: 40px;
+  }
+  .modal-mask.show { display: flex; }
+  .modal-box {
+    background: #fff; border-radius: 12px; width: 100%; max-width: 280px;
+    padding: 24px 20px 16px; text-align: center;
+  }
+  .modal-title { font-size: 16px; font-weight: 600; color: #585858; margin-bottom: 12px; }
+  .modal-body { font-size: 14px; color: #666; margin-bottom: 20px; }
+  .modal-btns { display: flex; gap: 12px; }
+  .modal-btns .btn {
+    flex: 1; height: 36px; line-height: 36px; border-radius: 6px; font-size: 14px; cursor: pointer;
+  }
+  .modal-btns .btn.cancel { background: #F5F5F5; color: #666; }
+  .modal-btns .btn.confirm { background: #4C7AE8; color: #fff; }
+
+  /* 会议室选择 */
+  .select-list { max-height: 240px; overflow-y: auto; }
+  .select-item { padding: 12px 0; border-bottom: 1px solid #F6F6F8; font-size: 14px; text-align: left; cursor: pointer; }
+  .select-item:last-child { border-bottom: none; }
+  .select-item:active { background: #F7F7FA; }
+
+  /* Toast */
+  .toast {
+    position: absolute; top: 100px; left: 50%; transform: translateX(-50%);
+    background: rgba(0,0,0,0.7); color: #fff; padding: 8px 16px; border-radius: 6px;
+    font-size: 12px; z-index: 60; display: none;
+  }
+  .toast.show { display: block; }
+
+  /* ========== 移动端新增：会议预约规范字段 ========== */
+  .form-textarea {
+    width: 100%; min-height: 76px; background: #F7F7FA; border-radius: 8px;
+    border: none; padding: 10px 12px; font-size: 14px; color: #585858;
+    outline: none; resize: none; line-height: 22px; box-sizing: border-box;
+  }
+  .form-textarea::placeholder { color: #999999; }
+  .form-radio-group { display: flex; gap: 28px; flex: 1; flex-wrap: wrap; }
+  .form-radio { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; color: #585858; cursor: pointer; }
+  .form-radio input { width: 16px; height: 16px; accent-color: #4C7AE8; margin: 0; cursor: pointer; }
+  .hidden-field { display: none; }
+
+  /* 交互规范：点击反馈 + 触摸热区（点击区 ≥ 44px） */
+  .tab-item { min-height: 44px; justify-content: center; }
+  .tab-item:active, .work-cell:active, .service-cell:active, .card:active,
+  .select-item:active, .cancel-mini:active, .upload-box:active, .header .back:active { opacity: .6; }
+  .sel-fac { font-size: 12px; color: #999999; margin-top: 4px; }
+</style>
+</head>
+<body>
+
+<div class="device">
+
+  <!-- ================= 首页 ================= -->
+  <div class="page active" id="page-home">
+    <div class="statusbar dark">9:41<span></span></div>
+    <div class="home-header">首页</div>
+    <div class="home-content">
+      <div class="stat-cards">
+        <div class="stat-card">
+          <div class="stat-icon" style="background:#E6F0FF;"><svg viewBox="0 0 24 24" style="fill:none;stroke:#4C7AE8;stroke-width:1.6;"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg></div>
+          <div class="stat-info"><span class="stat-label">剩余车位</span><span class="stat-value">0<small>个</small></span></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:#FFF2E8;"><svg viewBox="0 0 24 24" style="fill:none;stroke:#FA8C16;stroke-width:1.6;"><path d="M4 4h16v14H4z"/><path d="M8 8h8M8 12h5M8 16h3"/></svg></div>
+          <div class="stat-info"><span class="stat-label">待办工单</span><span class="stat-value">75<small>条</small></span></div>
+        </div>
+      </div>
+
+      <div class="section-block">
+        <div class="section-title-bar">物业工作台</div>
+        <div class="work-grid">
+          <div class="work-cell" onclick="showToast('我的工单：待建设')">
+            <div class="work-icon" style="background:#E6F0FF;"><svg viewBox="0 0 24 24" style="fill:#4C7AE8;"><path d="M4 4h16v16H4z"/><path d="M8 8h8M8 12h5M8 16h3" stroke="#fff" stroke-width="1.5"/></svg></div>
+            <div class="work-text"><span class="work-title">我的工单</span><span class="work-desc">处理我的工单</span></div>
+          </div>
+          <div class="work-cell" onclick="showToast('告警处置：待建设')">
+            <div class="work-icon" style="background:#FFF2E8;"><svg viewBox="0 0 24 24" style="fill:#FA8C16;"><path d="M12 2L2 19h20L12 2z"/><path d="M12 8v5" stroke="#fff" stroke-width="2"/><circle cx="12" cy="16" r="1" fill="#fff"/></svg></div>
+            <div class="work-text"><span class="work-title">告警处置</span><span class="work-desc">查看告警处置</span></div>
+          </div>
+          <div class="work-cell" onclick="showToast('个人排班：待建设')">
+            <div class="work-icon" style="background:#E6F7EF;"><svg viewBox="0 0 24 24" style="fill:#52C41A;"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M8 2v4M16 2v4M3 10h18" stroke="#fff" stroke-width="1.5"/></svg></div>
+            <div class="work-text"><span class="work-title">个人排班</span><span class="work-desc">查看排班班次</span></div>
+          </div>
+          <div class="work-cell" onclick="showToast('能耗预警：待建设')">
+            <div class="work-icon" style="background:#FFF8E8;"><svg viewBox="0 0 24 24" style="fill:#FAAD14;"><path d="M13 2L4 14h7l-1 8 9-12h-7l1-8z"/></svg></div>
+            <div class="work-text"><span class="work-title">能耗预警</span><span class="work-desc">查看能耗异常</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-block">
+        <div class="section-title-bar">员工服务</div>
+        <div class="service-grid">
+          <div class="service-cell" onclick="showToast('餐卡消费：待建设')">
+            <div class="service-icon" style="background:#FFF2E8;"><svg viewBox="0 0 24 24" style="fill:#FA8C16;"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M7 10h2M7 14h2" stroke="#fff" stroke-width="1.5"/></svg></div>
+            <span>餐卡消费</span>
+          </div>
+          <div class="service-cell" onclick="showToast('智慧场馆：待建设')">
+            <div class="service-icon" style="background:#E6F7EF;"><svg viewBox="0 0 24 24" style="fill:#52C41A;"><path d="M12 2L2 9h20L12 2z"/><path d="M5 9v11h14V9" stroke="#fff" stroke-width="1.5"/><path d="M9 20v-7h6v7" stroke="#fff" stroke-width="1.5"/></svg></div>
+            <span>智慧场馆</span>
+          </div>
+          <div class="service-cell" onclick="showToast('一卡通：待建设')">
+            <div class="service-icon" style="background:#E6F0FF;"><svg viewBox="0 0 24 24" style="fill:#4C7AE8;"><rect x="4" y="6" width="16" height="12" rx="2"/><circle cx="12" cy="12" r="3" stroke="#fff" stroke-width="1.5" fill="none"/></svg></div>
+            <span>一卡通</span>
+          </div>
+          <div class="service-cell" onclick="showToast('访客审批：待建设')">
+            <div class="service-icon" style="background:#E6F0FF;"><svg viewBox="0 0 24 24" style="fill:#4C7AE8;"><circle cx="12" cy="8" r="4"/><path d="M6 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/></svg></div>
+            <span>访客审批</span>
+          </div>
+          <div class="service-cell" onclick="showToast('一键报修：待建设')">
+            <div class="service-icon" style="background:#E6F0FF;"><svg viewBox="0 0 24 24" style="fill:#4C7AE8;"><path d="M14.7 6.3l1-1a2.12 2.12 0 0 1 3 3l-8.4 8.4a2 2 0 0 1-1 .55l-2.5.5.5-2.5a2 2 0 0 1 .55-1l8.4-8.4"/><path d="M9 15l6-6"/></svg></div>
+            <span>一键报修</span>
+          </div>
+          <div class="service-cell" onclick="showToast('IT服务：待建设')">
+            <div class="service-icon" style="background:#FFF8E8;"><svg viewBox="0 0 24 24" style="fill:#FAAD14;"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4M6 8h2M6 11h2" stroke="#fff" stroke-width="1.5"/></svg></div>
+            <span>IT服务</span>
+          </div>
+          <div class="service-cell" onclick="showToast('沁园服务：待建设')">
+            <div class="service-icon" style="background:#E6F7EF;"><svg viewBox="0 0 24 24" style="fill:#52C41A;"><path d="M3 11h18v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M8 11V7a4 4 0 0 1 8 0v4" stroke="#fff" stroke-width="1.5" fill="none"/></svg></div>
+            <span>沁园服务</span>
+          </div>
+          <div class="service-cell" onclick="showToast('车位申请：待建设')">
+            <div class="service-icon" style="background:#FFF2E8;"><svg viewBox="0 0 24 24" style="fill:#FA8C16;"><rect x="3" y="10" width="18" height="9" rx="2"/><circle cx="7.5" cy="17.5" r="1.5"/><circle cx="16.5" cy="17.5" r="1.5"/><path d="M6 10V8a3 3 0 0 1 6 0v2M12 10V7a3 3 0 0 1 6 0v3"/></svg></div>
+            <span>车位申请</span>
+          </div>
+          <div class="service-cell" onclick="showToast('门禁申请：待建设')">
+            <div class="service-icon" style="background:#E6F0FF;"><svg viewBox="0 0 24 24" style="fill:#4C7AE8;"><rect x="6" y="3" width="12" height="18" rx="2"/><circle cx="12" cy="10" r="2" fill="none" stroke="#fff" stroke-width="1.5"/><path d="M9 16h6" stroke="#fff" stroke-width="1.5"/></svg></div>
+            <span>门禁申请</span>
+          </div>
+          <div class="service-cell" onclick="goList()">
+            <div class="service-icon" style="background:#E6F0FF;"><svg viewBox="0 0 24 24" style="fill:#4C7AE8;"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 9h8M8 13h5M8 17h3" stroke="#fff" stroke-width="1.5"/><circle cx="17" cy="16" r="3" fill="#52C41A"/><path d="M16 16l1 1 2-2" stroke="#fff" stroke-width="1.2"/></svg></div>
+            <span>会议预约</span>
+          </div>
+          <div class="service-cell" onclick="showToast('我的问卷：待建设')">
+            <div class="service-icon" style="background:#FFF8E8;"><svg viewBox="0 0 24 24" style="fill:#FAAD14;"><path d="M4 4h16v16H4z"/><path d="M8 8h2M8 12h8M8 16h6" stroke="#fff" stroke-width="1.5"/></svg></div>
+            <span>我的问卷</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="tabbar">
+      <div class="tab-item active" onclick="switchTab('home')">
+        <svg viewBox="0 0 24 24" style="fill:#4C7AE8;"><path d="M3 10.5L12 3l9 7.5V20a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+        <span>首页</span>
+      </div>
+      <div class="tab-item" onclick="showToast('待建设')">
+        <svg viewBox="0 0 24 24" style="fill:#999;"><circle cx="12" cy="8" r="4"/><path d="M6 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/></svg>
+        <span>我的</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= 列表页 ================= -->
+  <div class="page" id="page-list">
+    <div class="statusbar">9:41<span></span></div>
+    <div class="header">
+      <div class="back" onclick="goHome()"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6" stroke="#fff" stroke-width="2" fill="none"/></svg></div>
+      会议预约
+    </div>
+    <div class="content">
+      <div class="tabs">
+        <div class="tab-pill active" data-tab="pending" onclick="switchListTab('pending')">待审批</div>
+        <div class="tab-pill" data-tab="all" onclick="switchListTab('all')">全部</div>
+      </div>
+      <div id="listContainer"></div>
+      <div class="empty-tip">没有更多数据了</div>
+    </div>
+    <div class="bottom-btn" onclick="goForm()">发起预约</div>
+  </div>
+
+  <!-- ================= 详情页 ================= -->
+  <div class="page" id="page-detail">
+    <div class="statusbar">9:41<span></span></div>
+    <div class="header">
+      <div class="back" onclick="goList()"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6" stroke="#fff" stroke-width="2" fill="none"/></svg></div>
+      会议预约
+    </div>
+    <div class="content">
+      <div class="card">
+        <div class="section-head">
+          <div class="section-title">基础信息</div>
+          <div class="status-tag blue" id="detailStatus"><span></span>待审批</div>
+        </div>
+        <div class="info-row"><div class="info-label">会议名称</div><div class="info-value" id="dName">-</div></div>
+        <div class="info-row"><div class="info-label">会议类别</div><div class="info-value" id="dCategory">-</div></div>
+        <div class="info-row"><div class="info-label">会议类型</div><div class="info-value" id="dType">-</div></div>
+        <div class="info-row"><div class="info-label">会议召集人</div><div class="info-value" id="dConvener">-</div></div>
+        <div class="info-row"><div class="info-label">是否涉密</div><div class="info-value" id="dConfidential">-</div></div>
+        <div class="info-row"><div class="info-label">发起部门</div><div class="info-value" id="dDept">-</div></div>
+        <div class="info-row"><div class="info-label">申请人</div><div class="info-value" id="dApplicant">-</div></div>
+        <div class="info-row"><div class="info-label">联系电话</div><div class="info-value" id="dContact">-</div></div>
+        <div class="info-row"><div class="info-label">审批状态</div><div class="info-value" id="dStatus">-</div></div>
+        <div class="info-row"><div class="info-label">会议时间</div><div class="info-value" id="dTime">-</div></div>
+        <div class="info-row"><div class="info-label">会议内容</div><div class="info-value" id="dContent">-</div></div>
+        <div class="info-row">
+          <div class="info-label">附件</div>
+          <div class="info-value"><div class="file-list" id="dAttachments"></div></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="section-title">会议室信息</div>
+        <div class="info-row"><div class="info-label">会议室名称</div><div class="info-value" id="dRoom">-</div></div>
+        <div class="info-row"><div class="info-label">会议室规模</div><div class="info-value" id="dScale">-</div></div>
+        <div class="info-row"><div class="info-label">会议室位置</div><div class="info-value" id="dLocation">-</div></div>
+        <div class="info-row"><div class="info-label">容纳人数</div><div class="info-value" id="dSeats">-</div></div>
+        <div class="info-row"><div class="info-label">配套设施</div><div class="info-value" id="dFacilities">-</div></div>
+        <div class="info-row"><div class="info-label">成本</div><div class="info-value" id="dCost">-</div></div>
+      </div>
+      <div class="card">
+        <div class="section-title">外出开会</div>
+        <div class="info-row"><div class="info-label">是否外出开会</div><div class="info-value" id="dOffsite">否</div></div>
+      </div>
+      <div class="card">
+        <div class="section-title">会务服务</div>
+        <div class="info-row"><div class="info-label">是否需要</div><div class="info-value" id="dNeedService">-</div></div>
+        <div class="info-row"><div class="info-label">服务类型</div><div class="info-value" id="dServiceType">-</div></div>
+        <div class="info-row"><div class="info-label">会务说明</div><div class="info-value" id="dRemark">-</div></div>
+      </div>
+      <div class="card">
+        <div class="section-title">费用分摊</div>
+        <div class="info-row"><div class="info-label">是否分摊</div><div class="info-value" id="dCostShare">-</div></div>
+        <div class="info-row"><div class="info-label">分摊项目组</div><div class="info-value" id="dShareGroup">-</div></div>
+      </div>
+      <div class="card">
+        <div class="section-title">会议通知</div>
+        <div class="info-row"><div class="info-label">是否通知会议</div><div class="info-value" id="dNotice">-</div></div>
+        <div class="info-row"><div class="info-label">通知对象</div><div class="info-value" id="dNoticeObj">-</div></div>
+        <div class="info-row"><div class="info-label">参会领导</div><div class="info-value" id="dLeaders">-</div></div>
+        <div class="info-row"><div class="info-label">参会部门</div><div class="info-value" id="dDeptAttend">-</div></div>
+        <div class="info-row"><div class="info-label">参会人员</div><div class="info-value" id="dMembers">-</div></div>
+        <div class="info-row"><div class="info-label">允许另派他人</div><div class="info-value" id="dAllowProxy">-</div></div>
+        <div class="info-row"><div class="info-label">是否回执</div><div class="info-value" id="dReceipt">-</div></div>
+      </div>
+      <div class="card">
+        <div class="section-title">操作日志</div>
+        <div class="log-row" style="cursor:default;">
+          <div>
+            <div style="font-size:14px;color:#585858;">发起流程引擎审批</div>
+            <div style="font-size:12px;color:#999;margin-top:4px;">操作人员：admin</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="bottom-btn secondary" id="detailCancelBtn" onclick="openCancelModal()">撤销预约</div>
+  </div>
+
+  <!-- ================= 表单页 ================= -->
+  <div class="page" id="page-form">
+    <div class="statusbar">9:41<span></span></div>
+    <div class="header">
+      <div class="back" onclick="goList()"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6" stroke="#fff" stroke-width="2" fill="none"/></svg></div>
+      会议预约
+    </div>
+    <div class="content">
+      <div class="form-group">
+        <div class="section-title">基础信息</div>
+        <div class="form-item vertical">
+          <div class="form-label"><span class="required">*</span>会议名称</div>
+          <input class="form-input" id="fName" placeholder="请输入">
+          <div class="error-msg" id="errName">请输入会议名称</div>
+        </div>
+        <div class="form-item vertical">
+          <div class="form-label"><span class="required">*</span>会议类别</div>
+          <select class="form-input" id="fCategory">
+            <option value="">请选择会议类别</option>
+            <option>管理类</option>
+            <option>科研类</option>
+          </select>
+          <div class="error-msg" id="errCategory">请选择会议类别</div>
+        </div>
+        <div class="form-item vertical">
+          <div class="form-label"><span class="required">*</span>会议类型</div>
+          <select class="form-input" id="fType">
+            <option value="">请选择会议类型</option>
+            <option>党委会</option>
+            <option>主任办公会</option>
+            <option>专题办公会</option>
+            <option>部门例会</option>
+            <option>其他</option>
+          </select>
+          <div class="error-msg" id="errType">请选择会议类型</div>
+        </div>
+        <div class="form-item vertical">
+          <div class="form-label"><span class="required">*</span>会议召集人</div>
+          <input class="form-input" id="fConvener" placeholder="请输入会议召集人">
+          <div class="error-msg" id="errConvener">请输入会议召集人</div>
+        </div>
+        <div class="form-item vertical">
+          <div class="form-label"><span class="required">*</span>是否涉密</div>
+          <select class="form-input" id="fConfidential">
+            <option value="否" selected>否</option>
+            <option value="是">是</option>
+          </select>
+          <div class="error-msg" id="errConfidential">请选择是否涉密</div>
+        </div>
+        <div class="form-item vertical">
+          <div class="form-label">发起部门</div>
+          <input class="form-input" id="fDept" value="系统管理员" readonly>
+        </div>
+        <div class="form-item vertical">
+          <div class="form-label">申请人</div>
+          <input class="form-input" id="fApplicant" value="admin" readonly>
+        </div>
+        <div class="form-item vertical">
+          <div class="form-label"><span class="required">*</span>联系电话</div>
+          <input class="form-input" id="fContact" placeholder="请输入联系电话">
+          <div class="error-msg" id="errContact">请输入联系电话</div>
+        </div>
+        <div class="form-item vertical">
+          <div class="form-label"><span class="required">*</span>会议时间</div>
+          <div style="display:flex; gap:8px; align-items:center;">
+            <input class="form-input" id="fDate" type="date" value="2026-08-05" style="flex:1.3;">
+            <select class="form-input" id="fStartTime" style="flex:1;"><option>08:00</option><option>09:00</option><option>10:00</option><option>11:00</option><option>13:00</option><option>14:00</option><option>15:00</option><option>16:00</option><option>17:00</option></select>
+            <span style="color:#999;">至</span>
+            <select class="form-input" id="fEndTime" style="flex:1;"><option>09:00</option><option>10:00</option><option>11:00</option><option>12:00</option><option>14:00</option><option>15:00</option><option>16:00</option><option>17:00</option><option>18:00</option></select>
+          </div>
+          <div class="error-msg" id="errTime">请选择会议时间</div>
+        </div>
+        <div class="form-item vertical">
+          <div class="form-label">会议内容</div>
+          <textarea class="form-textarea" id="fContent" placeholder="请输入会议内容"></textarea>
+        </div>
+        <div class="form-item vertical">
+          <div class="form-label">附件</div>
+          <div class="upload-box" onclick="document.getElementById('fAttachment').click()">
+            <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" stroke="#999" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+            <span>上传</span>
+          </div>
+          <input type="file" id="fAttachment" multiple hidden onchange="handleAttachment(this)">
+          <div class="file-list" id="attachList"></div>
+          <div class="upload-tip" id="attachTip">最多上传5个文件（支持图片、文档等）</div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="section-title">外出开会</div>
+        <div class="form-item vertical">
+          <div class="form-label">是否外出开会</div>
+          <div class="form-radio-group">
+            <label class="form-radio"><input type="radio" name="fOffsite" value="否" checked onclick="toggleOffsite()">否</label>
+            <label class="form-radio"><input type="radio" name="fOffsite" value="是" onclick="toggleOffsite()">是</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group" id="roomInfoSection">
+        <div class="section-title">会议室信息</div>
+        <div class="form-item vertical">
+          <div class="form-label"><span class="required">*</span>会议室名称</div>
+          <div class="form-input picker" id="fRoom" onclick="openRoomSelect()">请选择</div>
+          <div class="error-msg" id="errRoom">请选择会议室</div>
+        </div>
+        <div class="form-item">
+          <div class="form-label">会议室规模</div>
+          <input class="form-input" id="fScale" placeholder="自动带入" readonly>
+        </div>
+        <div class="form-item">
+          <div class="form-label">会议室位置</div>
+          <input class="form-input" id="fLocation" placeholder="自动带入" readonly>
+        </div>
+        <div class="form-item">
+          <div class="form-label">容纳人数</div>
+          <input class="form-input" id="fSeats" placeholder="自动带入" readonly>
+        </div>
+        <div class="form-item">
+          <div class="form-label">成本</div>
+          <input class="form-input" id="fCost" placeholder="元/小时" readonly>
+        </div>
+        <div class="form-item vertical">
+          <div class="form-label">配套设施</div>
+          <input class="form-input" id="fFacilities" placeholder="自动带入" readonly>
+        </div>
+      </div>
+
+      <div class="form-group" id="serviceFormGroup">
+        <div class="section-title">会务服务</div>
+        <div class="form-item vertical">
+          <div class="form-label">是否需要</div>
+          <select class="form-input" id="fNeedService" onchange="toggleService()">
+            <option value="否">否</option>
+            <option value="是">是</option>
+          </select>
+        </div>
+        <div id="serviceDetail" style="display:none;">
+          <div class="form-item vertical">
+            <div class="form-label">服务类型</div>
+            <select class="form-input" id="fServiceType">
+              <option value="">请选择服务类型</option>
+              <option>会务服务</option>
+              <option>纸笔套装</option>
+              <option>席卡</option>
+              <option>矿泉水</option>
+              <option>茶水</option>
+            </select>
+          </div>
+          <div class="form-item vertical">
+            <div class="form-label">会务说明</div>
+            <input class="form-input" id="fRemark" placeholder="请输入具体要求">
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group" id="costShareFormGroup">
+        <div class="section-title">费用分摊</div>
+        <div class="form-item vertical">
+          <div class="form-label">是否分摊</div>
+          <div class="form-radio-group">
+            <label class="form-radio"><input type="radio" name="fCostShare" value="否" checked onchange="toggleCostShare()">否</label>
+            <label class="form-radio"><input type="radio" name="fCostShare" value="是" onchange="toggleCostShare()">是</label>
+          </div>
+        </div>
+        <div class="form-item vertical hidden-field" id="shareGroupItem">
+          <div class="form-label">分摊项目组</div>
+          <input class="form-input" id="fShareGroup" placeholder="请输入分摊项目组">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="section-title">会议通知</div>
+        <div class="form-item vertical">
+          <div class="form-label">是否通知会议</div>
+          <div class="form-radio-group">
+            <label class="form-radio"><input type="radio" name="fNotice" value="否" checked onchange="toggleNotice()">否</label>
+            <label class="form-radio"><input type="radio" name="fNotice" value="是" onchange="toggleNotice()">是</label>
+          </div>
+        </div>
+        <div id="noticeDetail" style="display:none;">
+          <div class="form-item vertical">
+            <div class="form-label">通知对象</div>
+            <div class="form-radio-group">
+              <label class="form-radio"><input type="radio" name="fNoticeObj" value="部门联络人" checked onchange="toggleNoticeObj()">部门联络人</label>
+              <label class="form-radio"><input type="radio" name="fNoticeObj" value="指定参会人" onchange="toggleNoticeObj()">指定参会人</label>
+            </div>
+          </div>
+          <div class="form-item vertical">
+            <div class="form-label">参会领导</div>
+            <input class="form-input" id="fLeaders" placeholder="请选择参会领导">
+          </div>
+          <div class="form-item vertical">
+            <div class="form-label">参会部门</div>
+            <input class="form-input" id="fDeptAttend" placeholder="请选择参会部门">
+          </div>
+          <div class="form-item vertical hidden-field" id="attendeesItem">
+            <div class="form-label"><span class="required">*</span>参会人员</div>
+            <input class="form-input" id="fMembers" placeholder="请输入">
+            <div class="error-msg" id="errMembers">请选择参会人员</div>
+          </div>
+          <div class="form-item vertical">
+            <div class="form-label">允许另派他人</div>
+            <div class="form-radio-group">
+              <label class="form-radio"><input type="radio" name="fAllowProxy" value="否" checked>否</label>
+              <label class="form-radio"><input type="radio" name="fAllowProxy" value="是">是</label>
+            </div>
+          </div>
+          <div class="form-item vertical">
+            <div class="form-label">会议材料</div>
+            <div class="upload-box" onclick="showToast('会议材料上传：待接入')">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3" fill="none" stroke="#999" stroke-width="1.5"/><path d="M20 7h-2l-1-2H7L6 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z" fill="none" stroke="#999" stroke-width="1.5"/></svg>
+              <span>上传</span>
+            </div>
+          </div>
+          <div class="form-item vertical">
+            <div class="form-label">是否回执</div>
+            <div class="form-radio-group">
+              <label class="form-radio"><input type="radio" name="fReceipt" value="否" checked>否</label>
+              <label class="form-radio"><input type="radio" name="fReceipt" value="是">是</label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="bottom-btn" onclick="submitForm()">提交</div>
+  </div>
+
+  <!-- 撤销确认弹窗 -->
+  <div class="modal-mask" id="cancelModal">
+    <div class="modal-box">
+      <div class="modal-title">系统提示</div>
+      <div class="modal-body">确定要撤销预约？</div>
+      <div class="modal-btns">
+        <div class="btn cancel" onclick="closeCancelModal()">取消</div>
+        <div class="btn confirm" onclick="confirmCancel()">确定</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 会议室选择弹窗 -->
+  <div class="modal-mask" id="roomModal">
+    <div class="modal-box">
+      <div class="modal-title">选择会议室</div>
+      <div class="select-list" id="roomList"></div>
+      <div class="modal-btns" style="margin-top:12px;">
+        <div class="btn cancel" onclick="closeRoomSelect()">取消</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+</div>
+
+<script>
+const rooms = [
+  { name: '301', scale: '大报告厅', seats: 263, cost: '205', location: '3F', facilities: ['投影仪','视频会议','白板','麦克风'] },
+  { name: '302', scale: '中会议室', seats: 40, cost: '80', location: '2F', facilities: ['投影仪','白板'] },
+  { name: '303', scale: '小会议室', seats: 12, cost: '50', location: '1F', facilities: ['白板','麦克风'] }
+];
+
+const allData = [
+  { id: 1, status: 'pending', statusText: '待审批', name: '测试', members: '1人', time: '2026-08-05 08:30-09:30', place: '大报告厅', createTime: '2026-08-04 14:00:49',
+    category: '管理类', type: '党委会', convener: '张三', confidential: '否', dept: '系统管理员', applicant: 'admin', contact: '17621189702',
+    content: '季度运营复盘会议', offsite: '否', attachments: ['会议议程.docx', '参会名单.xlsx'],
+    needService: '是', serviceType: '茶水、席卡、纸笔套装', costShare: '否', shareGroup: '',
+    notice: '是', noticeObj: '部门联络人', leaders: '李总', deptAttend: '研发部', attendees: 'bmct', allowProxy: '否', receipt: '否',
+    room: '301', scale: '大报告厅', location: '3F', seats: 263, cost: '205元/小时', facilities: ['投影仪','视频会议','白板','麦克风'], remark: '请按时准备' },
+  { id: 2, status: 'revoked', statusText: '已撤销', name: 'T 会议预定052802', members: '2人', time: '2026-05-29 08:00-09:00', place: '中会议室', createTime: '2026-05-28 19:07:57', category: '科研类', type: '主任办公会', dept: '研发部', applicant: 'admin' },
+  { id: 3, status: 'approved', statusText: '已通过', name: 'T 会议预定052801', members: '1人', time: '2026-05-28 19:02-20:00', place: '中会议室', createTime: '2026-05-28 19:05:14', category: '科研类', type: '专题办公会', dept: '研发部', applicant: 'admin' },
+  { id: 4, status: 'approved', statusText: '已通过', name: '526预约2', members: '3人', time: '2026-05-26 11:30-12:30', place: '大报告厅', createTime: '2026-05-26 10:04:38', category: '管理类', type: '部门例会', dept: '培训组', applicant: 'admin' },
+  { id: 5, status: 'approved', statusText: '已通过', name: '526预约2', members: '2人', time: '2026-05-26 11:00-12:00', place: '大报告厅', createTime: '2026-05-26 10:03:52', category: '管理类', type: '部门例会', dept: '培训组', applicant: 'admin' },
+  { id: 6, status: 'approved', statusText: '已通过', name: '526预约1', members: '2人', time: '2026-05-26 10:30-11:30', place: '大报告厅', createTime: '2026-05-26 10:03:07', category: '管理类', type: '其他', dept: '行政部', applicant: 'admin' },
+  { id: 7, status: 'expired', statusText: '过期未审批', name: '部门周会', members: '2人', time: '2026-05-23 15:51-16:51', place: '大报告厅', createTime: '2026-05-23 15:51:39', category: '管理类', type: '部门例会', dept: '研发部', applicant: 'admin' },
+  { id: 8, status: 'expired', statusText: '过期未审批', name: '部门周会', members: '2人', time: '2026-05-22 14:57-15:57', place: '大报告厅', createTime: '2026-05-22 14:57:24', category: '管理类', type: '部门例会', dept: '研发部', applicant: 'admin' }
+];
+
+let currentTab = 'pending';
+let selectedRoom = null;
+let currentDetailId = null;
+
+function switchPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function switchTab(name) {
+  if (name === 'home') {
+    switchPage('page-home');
+    document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-item')[0].classList.add('active');
+  }
+}
+
+function goHome() { switchPage('page-home'); }
+function goList() { renderList(); switchPage('page-list'); }
+function goForm() { switchPage('page-form'); }
+
+function statusClass(s) {
+  if (s === 'pending') return 'blue';
+  if (s === 'approved') return 'green';
+  if (s === 'revoked') return 'grey';
+  return 'orange';
+}
+
+function renderList() {
+  const container = document.getElementById('listContainer');
+  const list = currentTab === 'pending' ? allData.filter(d => d.status === 'pending') : allData;
+  container.innerHTML = list.map(item => `
+    <div class="card" onclick="goDetail(${item.id})">
+      <div class="card-head">
+        <div class="status-tag ${statusClass(item.status)}"><span></span>${item.statusText}</div>
+      </div>
+      <div class="card-row"><div class="card-label">会议名称</div><div class="card-value">${item.name}</div></div>
+      <div class="card-row"><div class="card-label">会议类型</div><div class="card-value">${item.type || '-'}</div></div>
+      <div class="card-row"><div class="card-label">参会人数</div><div class="card-value">${item.members}</div></div>
+      <div class="card-row"><div class="card-label">会议时间</div><div class="card-value">${item.time}</div></div>
+      <div class="card-row"><div class="card-label">会议地点</div><div class="card-value">${item.place}</div></div>
+      ${item.status === 'pending' ? '<div style="overflow:hidden;"><span class="cancel-mini" onclick="event.stopPropagation();openCancelModal(' + item.id + ')">撤销预约</span></div>' : ''}
+    </div>
+  `).join('');
+}
+
+function switchListTab(tab) {
+  currentTab = tab;
+  document.querySelectorAll('.tab-pill').forEach(t => t.classList.remove('active'));
+  document.querySelector(`.tab-pill[data-tab="${tab}"]`).classList.add('active');
+  renderList();
+}
+
+function goDetail(id) {
+  const item = allData.find(d => d.id === id);
+  if (!item) return;
+  currentDetailId = id;
+  const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+  set('dName', item.name);
+  set('dCategory', item.category || '-');
+  set('dType', item.type || '-');
+  set('dConvener', item.convener || '-');
+  set('dConfidential', item.confidential || '-');
+  set('dDept', item.dept || '-');
+  set('dApplicant', item.applicant || '-');
+  set('dContact', item.contact || '-');
+  set('dStatus', item.statusText || '-');
+  set('dTime', item.time);
+  set('dContent', item.content || '-');
+  set('dRoom', item.room || '-');
+  set('dScale', item.scale || '-');
+  set('dLocation', item.location || '-');
+  set('dSeats', item.seats || '-');
+  const _fac = (item.facilities && item.facilities.length) ? item.facilities : ((rooms.find(r => r.name === item.room) || {}).facilities || []);
+  set('dFacilities', _fac.length ? _fac.join('、') : '-');
+  set('dCost', item.cost || '-');
+  set('dOffsite', item.offsite || '否');
+  set('dNeedService', item.needService || '-');
+  set('dServiceType', item.serviceType || '-');
+  set('dCostShare', item.costShare || '-');
+  set('dShareGroup', item.shareGroup || '-');
+  set('dRemark', item.remark || '-');
+  set('dNotice', item.notice || '-');
+  set('dNoticeObj', item.noticeObj || '-');
+  set('dLeaders', item.leaders || '-');
+  set('dDeptAttend', item.deptAttend || '-');
+  set('dMembers', item.attendees || item.members);
+  set('dAllowProxy', item.allowProxy || '-');
+  set('dReceipt', item.receipt || '-');
+  const dAtt = document.getElementById('dAttachments');
+  if (dAtt) dAtt.innerHTML = (item.attachments && item.attachments.length)
+    ? item.attachments.map(n => '<div class="file-item"><span class="fname">' + escapeHtml(n) + '</span></div>').join('')
+    : '<span style="color:#999;">无</span>';
+  const tag = document.getElementById('detailStatus');
+  tag.className = 'status-tag ' + statusClass(item.status);
+  tag.innerHTML = '<span></span>' + item.statusText;
+  document.getElementById('detailCancelBtn').style.display = item.status === 'pending' ? 'block' : 'none';
+  switchPage('page-detail');
+}
+
+function openCancelModal(id) {
+  if (id) currentDetailId = id;
+  document.getElementById('cancelModal').classList.add('show');
+}
+function closeCancelModal() {
+  document.getElementById('cancelModal').classList.remove('show');
+}
+function confirmCancel() {
+  const item = allData.find(d => d.id === currentDetailId);
+  if (item) {
+    item.status = 'revoked';
+    item.statusText = '已撤销';
+  }
+  closeCancelModal();
+  showToast('撤销成功');
+  goList();
+}
+
+function setField(id, val) {
+  const el = document.getElementById(id);
+  el.textContent = val;
+  el.classList.add('has-value');
+}
+
+function openRoomSelect() {
+  const list = document.getElementById('roomList');
+  list.innerHTML = rooms.map((r, i) => `<div class="select-item" onclick="selectRoom(${i})"><div class="sel-name">${r.name}（${r.scale}，${r.seats}人）</div><div class="sel-fac">${(r.facilities||[]).join('、')}</div></div>`).join('');
+  document.getElementById('roomModal').classList.add('show');
+}
+function closeRoomSelect() {
+  document.getElementById('roomModal').classList.remove('show');
+}
+function selectRoom(idx) {
+  const r = rooms[idx];
+  selectedRoom = r;
+  setField('fRoom', r.name);
+  document.getElementById('fScale').value = r.scale;
+  document.getElementById('fSeats').value = r.seats;
+  document.getElementById('fLocation').value = r.location;
+  document.getElementById('fCost').value = r.cost + '元/小时';
+  document.getElementById('fFacilities').value = (r.facilities || []).join('、');
+  closeRoomSelect();
+}
+
+function submitForm() {
+  let ok = true;
+  const offsiteEl = document.querySelector('input[name="fOffsite"]:checked');
+  const offsiteVal = offsiteEl ? offsiteEl.value : '否';
+  const fields = [
+    ['fName', 'errName'], ['fCategory', 'errCategory'],
+    ['fType', 'errType'], ['fConvener', 'errConvener'],
+    ['fConfidential', 'errConfidential'], ['fContact', 'errContact']
+  ];
+  if (offsiteVal !== '是') fields.push(['fRoom', 'errRoom']);
+  fields.push(['fDate', 'errTime'], ['fStartTime', 'errTime'], ['fEndTime', 'errTime']);
+  fields.forEach(([id, errId]) => {
+    const el = document.getElementById(id);
+    const err = document.getElementById(errId);
+    let val;
+    if (el.tagName === 'SELECT') val = el.value;
+    else if (el.tagName === 'INPUT') val = el.value.trim();
+    else val = (el.textContent || '').trim();
+    const empty = !val || val === '请选择' || (typeof val === 'string' && val.startsWith('换行显示'));
+    if (empty) { err.classList.add('show'); ok = false; }
+    else { err.classList.remove('show'); }
+  });
+  const notice = document.querySelector('input[name="fNotice"]:checked');
+  const noticeObj = document.querySelector('input[name="fNoticeObj"]:checked');
+  if (notice && notice.value === '是' && noticeObj && noticeObj.value === '指定参会人') {
+    const m = document.getElementById('fMembers');
+    const me = document.getElementById('errMembers');
+    if (!m.value.trim()) { me.classList.add('show'); ok = false; }
+    else { me.classList.remove('show'); }
+  }
+  if (!ok) return;
+  attachFiles = [];
+  renderAttach();
+  showToast('提交成功');
+  setTimeout(goList, 800);
+}
+
+/* ========== 附件上传（不限类型，限制张数） ========== */
+let attachFiles = [];
+const MAX_ATTACH = 5;
+function handleAttachment(input) {
+  const picked = Array.from(input.files).map(f => f.name);
+  picked.forEach(name => {
+    if (attachFiles.length < MAX_ATTACH) attachFiles.push(name);
+  });
+  input.value = '';
+  if (picked.length > 0 && attachFiles.length >= MAX_ATTACH) {
+    showToast('最多上传 ' + MAX_ATTACH + ' 个文件');
+  }
+  renderAttach();
+}
+function removeAttachment(idx) {
+  attachFiles.splice(idx, 1);
+  renderAttach();
+}
+function renderAttach() {
+  const box = document.getElementById('attachList');
+  if (box) box.innerHTML = attachFiles.map((name, i) =>
+    '<div class="file-item"><span class="fname">' + escapeHtml(name) + '</span><span class="fremove" onclick="removeAttachment(' + i + ')">移除</span></div>'
+  ).join('');
+  const tip = document.getElementById('attachTip');
+  if (tip) tip.textContent = '已选 ' + attachFiles.length + '/' + MAX_ATTACH + ' 个文件（支持图片、文档等）';
+}
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+
+function toggleOffsite() {
+  const el = document.querySelector('input[name="fOffsite"]:checked');
+  const val = el ? el.value : '否';
+  document.getElementById('roomInfoSection').style.display = val === '是' ? 'none' : '';
+  document.getElementById('costShareFormGroup').style.display = val === '是' ? 'none' : '';
+  if (document.getElementById('serviceFormGroup')) document.getElementById('serviceFormGroup').style.display = val === '是' ? 'none' : '';
+}
+function toggleService() {
+  const el = document.getElementById('fNeedService');
+  document.getElementById('serviceDetail').style.display = el.value === '是' ? '' : 'none';
+}
+function toggleCostShare() {
+  const el = document.querySelector('input[name="fCostShare"]:checked');
+  document.getElementById('shareGroupItem').style.display = el && el.value === '是' ? 'flex' : 'none';
+}
+function toggleNotice() {
+  const el = document.querySelector('input[name="fNotice"]:checked');
+  document.getElementById('noticeDetail').style.display = el && el.value === '是' ? '' : 'none';
+}
+function toggleNoticeObj() {
+  const el = document.querySelector('input[name="fNoticeObj"]:checked');
+  document.getElementById('attendeesItem').style.display = el && el.value === '指定参会人' ? 'flex' : 'none';
+}
+
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+renderList();
+</script>
+</body>
+</html>
