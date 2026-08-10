@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>智慧园区 · 通知公告（移动端）</title>
+<style>
+:root{--p:#4C7AE8;--txt:#585858;--mut:#8F9098;--bg:#FFFFFF;--card:#FFFFFF;--soft:#F7F7FA;--line:#F6F6F8}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--txt);font:14px -apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;-webkit-tap-highlight-color:transparent}
+.phone{width:100%;max-width:480px;min-height:100vh;margin:0 auto;position:relative;overflow:hidden;background:var(--bg)}
+.ms{display:none}.ms.on{display:block}
+
+/* 标签 */
+.badge{display:inline-flex;align-items:center;height:22px;padding:0 8px;border-radius:4px;font-size:12px;white-space:nowrap}
+.blue{color:var(--p);background:#EAF1FB}.green{color:#22A06B;background:#EAF8F1}.orange{color:#A15C00;background:#FFF3DC}.red{color:#E5484D;background:#FFF0F0}.gray{color:#6D7684;background:#EEF0F3}.violet{color:#6D5BD0;background:#F1EFFF}
+.link{padding:0;background:transparent;color:var(--p);border:0;cursor:pointer;font:inherit}
+
+/* 白底卡片 */
+.mcard{margin-bottom:16px;overflow:hidden;border-radius:12px;background:var(--card);box-shadow:0 1px 4px rgba(28,40,71,.04)}
+.mct{padding:14px 16px;border-bottom:1px solid var(--line);font-size:14px;font-weight:700;color:var(--txt)}
+
+/* 首页 Banner：实景园区图 */
+.hero{height:150px;position:relative;background:linear-gradient(145deg,#4C7AE8,#6E94F2) url('https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=800&q=80') center/cover no-repeat}
+.hero::after{content:"";position:absolute;left:0;right:0;bottom:0;height:60px;background:linear-gradient(transparent,rgba(0,0,0,.15))}
+.status{display:flex;justify-content:space-between;position:relative;z-index:2;padding:12px 16px 0;color:#FFFFFF;font-size:12px;font-weight:700;text-shadow:0 1px 3px rgba(0,0,0,.25)}
+.mbrand{position:absolute;left:0;right:0;bottom:18px;z-index:2;color:#fff;text-align:center;text-shadow:0 2px 6px rgba(0,0,0,.35)}
+.mbrand strong{display:block;font-size:22px;font-weight:700}.mbrand span{font-size:12px;opacity:.95}
+
+.mbody{padding:16px 16px 80px}
+
+/* 数据总览 */
+.stats2{display:flex;justify-content:space-around;padding:16px 8px}
+.stat{text-align:center}
+.stat .num{color:var(--p);font-size:30px;font-weight:800;line-height:1}
+.stat .num small{font-size:13px;font-weight:400;color:var(--p);margin-left:2px}
+.stat .lab{margin-top:6px;color:var(--mut);font-size:12px}
+
+/* 公告条 */
+.homeNotice .hline{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;padding:12px 16px;border:0;border-top:1px solid var(--line);background:transparent;text-align:left;cursor:pointer}
+.homeNotice .hline:first-child{border-top:0}
+.homeNotice .hline:active{background:var(--soft)}
+.homeNotice .hempty{text-align:center;color:var(--mut);padding:28px 0;font-size:13px}
+.homeNotice .hline h3{margin:0;flex:1;min-width:0;font-size:14px;font-weight:600;line-height:1.4;color:var(--txt);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.homeNotice .hline .date{margin:0;flex:none;color:var(--mut);font-size:12px;white-space:nowrap}
+
+/* 工具图标 */
+.tools{display:grid;grid-template-columns:repeat(4,1fr);gap:18px 8px;padding:18px 10px}
+.tools button{display:grid;justify-items:center;gap:8px;background:transparent;color:var(--txt);font-size:12px;border:0;cursor:pointer}
+.tools button:active{opacity:.65}
+.tools i{display:grid;place-items:center;width:40px;height:40px;border-radius:10px;font-style:normal;font-size:22px;color:#fff}
+.ico-blue{background:#4C7AE8}
+.ico-orange{background:#FF9F43}
+.ico-green{background:#22A06B}
+.ico-red{background:#E5484D}
+.ico-cyan{background:#00B8D9}
+.ico-violet{background:#6D5BD0}
+.ico-pink{background:#E64980}
+.ico-teal{background:#008B8B}
+.ico-gray{background:#8F9098}
+
+/* 底部导航 */
+.mnav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;height:56px;display:flex;align-items:center;justify-content:space-around;background:rgba(255,255,255,.98);border-top:1px solid var(--line);z-index:5}
+.mnav button{background:transparent;border:0;color:#7D8796;font-size:11px;cursor:pointer;display:grid;justify-items:center;gap:2px;min-height:44px;padding:6px 0}
+.mnav .on{color:var(--p)}.mnav span{display:block;font-size:22px;line-height:1}
+
+/* 列表 / 详情头部 */
+.mtop{height:48px;padding:0 16px;display:flex;align-items:center;gap:8px;background:#fff;border-bottom:1px solid #F6F6F8;position:sticky;top:0;z-index:4}
+.mtop h2{flex:1;text-align:center;font-size:16px;font-weight:700;color:var(--txt)}
+.mlist{padding:16px 16px 80px}
+.mf{display:grid;grid-template-columns:1fr;gap:8px;margin-bottom:16px}
+.mf input,.mf select{height:40px;min-width:0;padding:0 12px;border:1px solid #E2E6EF;border-radius:8px;background:#F7F7FA;color:var(--txt);font-size:14px}
+.mf input::placeholder{color:#999999}
+.mi{display:block;width:100%;margin-bottom:14px;padding:16px;border-radius:12px;background:var(--card);box-shadow:0 1px 4px rgba(28,40,71,.04);text-align:left;border:0;cursor:pointer}
+.mi:active{background:#F4F5F7}
+.mi h3{margin:8px 0;font-size:15px;font-weight:700;line-height:1.45;color:var(--txt)}
+.mi p{color:var(--mut);font-size:12px;margin:0}
+.mdetail{padding:16px 16px 84px;background:#fff;min-height:calc(100vh - 48px)}
+.mdetail h1{font-size:17px;font-weight:700;line-height:1.5;margin:0;color:var(--txt)}
+.mmeta{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 18px;color:var(--mut);font-size:12px}
+.mart{color:var(--txt);font-size:15px;line-height:1.85}.mart p{margin-bottom:12px}
+.msign{margin-top:28px;padding-top:16px;border-top:1px solid #EEEEEE;text-align:right;color:var(--mut);font-size:13px;line-height:1.7}
+.msign p{margin:0}
+
+/* Toast */
+.toast{position:fixed;left:50%;bottom:80px;transform:translateX(-50%);z-index:30;display:none;max-width:80%;padding:10px 16px;background:rgba(27,35,48,.92);color:#fff;font-size:13px;border-radius:8px;text-align:center}
+.toast.show{display:block}
+</style>
+</head>
+<body>
+<div class="phone">
+  <!-- 首页 -->
+  <div class="ms on" id="mHome">
+    <div class="hero">
+      <div class="status"><span id="clock">10:39</span><span>◉ ◒ ▰</span></div>
+      <div class="mbrand"><strong>苏实 e站</strong><span>智慧园区服务平台</span></div>
+    </div>
+    <div class="mbody">
+      <div class="mcard homeNotice">
+        <div class="mct" style="display:flex;justify-content:space-between;align-items:center"><span>通知公告</span><button class="link" style="color:var(--p);font-size:13px;font-weight:400" onclick="mobileList(true)">更多 ›</button></div>
+        <div id="homeNoticeList"></div>
+      </div>
+
+      <div class="mcard">
+        <div class="mct">数据总览</div>
+        <div class="stats2">
+          <div class="stat"><div class="num">985<small>个</small></div><div class="lab">剩余车位</div></div>
+          <div class="stat"><div class="num">0<small>条</small></div><div class="lab">待办工单</div></div>
+        </div>
+      </div>
+
+      <div class="mcard">
+        <div class="mct">物业工作台</div>
+        <div class="tools">
+          <button onclick="toast('我的工单')"><i class="ico-blue">▣</i>我的工单</button>
+          <button onclick="toast('告警处置')"><i class="ico-orange">▤</i>告警处置</button>
+          <button onclick="toast('个人排班')"><i class="ico-green">▦</i>个人排班</button>
+          <button onclick="toast('能耗预警')"><i class="ico-cyan">◈</i>能耗预警</button>
+        </div>
+      </div>
+
+      <div class="mcard">
+        <div class="mct">员工服务</div>
+        <div class="tools">
+          <button onclick="toast('餐卡消费')"><i class="ico-orange">餐</i>餐卡消费</button>
+          <button onclick="toast('场馆预约')"><i class="ico-green">场</i>场馆预约</button>
+          <button onclick="toast('访客审批')"><i class="ico-blue">访</i>访客审批</button>
+          <button onclick="toast('一键报修')"><i class="ico-red">修</i>一键报修</button>
+          <button onclick="toast('IT服务')"><i class="ico-violet">IT</i>IT服务</button>
+          <button onclick="toast('沁园服务')"><i class="ico-pink">沁</i>沁园服务</button>
+          <button onclick="toast('车位申请')"><i class="ico-teal">车</i>车位申请</button>
+          <button onclick="toast('会议预约')"><i class="ico-cyan">会</i>会议预约</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 通知公告列表 -->
+  <div class="ms" id="mList">
+    <div class="mtop"><button class="link" onclick="mobileHome()">‹</button><h2>通知公告</h2><span style="width:18px"></span></div>
+      <div class="mlist">
+      <div class="mf"><input id="mSearch" placeholder="公告名称" oninput="mSearch=this.value.trim();appPage=1;renderList()"></div>
+      <div id="mListBody"></div>
+      <div id="loadMoreWrap"></div>
+    </div>
+  </div>
+
+  <!-- 公告详情 -->
+  <div class="ms" id="mDetail">
+    <div class="mtop"><button class="link" onclick="mobileList()">‹</button><h2>公告详情</h2><span style="width:18px"></span></div>
+    <div class="mdetail" id="mDetailBody"></div>
+  </div>
+
+  <!-- 底部导航 -->
+  <nav class="mnav">
+    <button class="on" onclick="mobileHome()"><span>⌂</span>首页</button>
+    <button onclick="toast('我的页面本期未包含')"><span>♙</span>我的</button>
+  </nav>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const data=[
+{title:"关于近期园区访客管理调整的通知",scope:"全体员工",applicant:"综合管理部",publish:"2026-08-05 10:30",status:"已上架",body:"为进一步规范园区访客管理，近期将对访客预约及入园登记流程进行调整。请各部门按照最新流程办理访客申请，并提前告知来访人员完成实名登记。"},
+{title:"园区设备维护期间服务调整通知",scope:"物业管理部",applicant:"物业管理部",publish:"2026-08-08 09:00",status:"已上架",body:"园区部分设备将在维护期间暂停服务，具体恢复时间以现场通知为准，请相关人员提前做好工作安排。"},
+{title:"园区消防设施巡检安排",scope:"指定部门",applicant:"安全保卫部",publish:"2026-08-10 14:00",status:"已上架",body:"本周将开展消防设施巡检，请相关部门配合现场检查，保持消防通道畅通。"}
+];
+
+const $=id=>document.getElementById(id);
+let appPage=1;const APP_PAGE=10;let mSearch="";
+function sortByPublishDesc(arr){return arr.slice().sort((a,b)=>a.publish===b.publish?0:(a.publish<b.publish?1:-1))}
+function bodyHtml(s){return String(s==null?"":s).replace(/\n/g,"<br>")}
+function mobileHome(){["mHome","mList","mDetail"].forEach(id=>$(id).classList.remove("on"));mHome.classList.add("on")}
+function mobileList(reset){if(reset)appPage=1;["mHome","mList","mDetail"].forEach(id=>$(id).classList.remove("on"));mList.classList.add("on");if(reset)renderList()}
+function mobileDetail(i){const n=data[i];const d=n.publish.slice(0,10);const cnDate=d==="-"?"":d.replace(/^(\d{4})-(\d{2})-(\d{2})$/,"$1年$2月$3日").replace(/0(\d)/g,"$1");mDetailBody.innerHTML=`<h1>${n.title}</h1><div class="mmeta"><span>发布时间：${n.publish.slice(0,10)}</span></div><div class="mart">${bodyHtml(n.body)}</div><div class="msign"><p>${n.applicant}</p><p>${cnDate}</p></div>`;["mHome","mList","mDetail"].forEach(id=>$(id).classList.remove("on"));mDetail.classList.add("on")}
+
+function renderList(){
+  const all=sortByPublishDesc(data.filter(n=>n.status==="已上架"&&(!mSearch||n.title.includes(mSearch))));
+  const shown=all.slice(0,appPage*APP_PAGE);
+  if(!all.length){mListBody.innerHTML='<div style="text-align:center;color:#999;padding:40px">暂无公告</div>';loadMoreWrap.innerHTML="";return}
+  mListBody.innerHTML=shown.map(n=>{const idx=data.indexOf(n);return `<button class="mi" onclick="mobileDetail(${idx})"><h3>${n.title}</h3><p>${n.publish}</p></button>`}).join("");
+  loadMoreWrap.innerHTML=(shown.length>=all.length)?'<div style="text-align:center;color:#999;padding:14px;font-size:12px">没有更多了</div>':'<button class="mi" style="text-align:center;color:var(--p)" onclick="loadMore()">加载更多</button>';
+}
+function loadMore(){appPage++;renderList()}
+
+function toast(t){toast.textContent=t;toast.classList.add("show");clearTimeout(window.tt);window.tt=setTimeout(()=>toast.classList.remove("show"),1800)}
+
+(function(){const d=new Date();clock.textContent=String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0")})();
+function renderHomeNotice(){const list=sortByPublishDesc(data.filter(n=>n.status==="已上架")).slice(0,3);if(!list.length){homeNoticeList.innerHTML='<div class="hempty">暂无公告</div>';return}homeNoticeList.innerHTML=list.map(n=>{const idx=data.indexOf(n);return `<button class="hline" onclick="mobileDetail(${idx})"><h3>${n.title}</h3><span class="date">${n.publish.slice(0,10)}</span></button>`}).join("")}
+renderHomeNotice();
+renderList();
+</script>
+</body>
+</html>
