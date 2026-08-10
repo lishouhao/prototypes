@@ -1,0 +1,312 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>智慧园区通知公告原型</title>
+<style>
+:root{--p:#4165EC;--pd:#3554D8;--app:#4165EC;--side:#031B2F;--bg:#F8F8F8;--card:#FFFFFF;--soft:#F7F7FA;--line:#EDEFF3;--bd:#D8D8D8;--txt:#36373B;--mut:#8F9098;--ok:#22A06B;--warn:#FA8C16;--err:#E5484D;--vio:#6D5BD0;--divider:#F6F6F8}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--txt);font:14px -apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif}button,input,textarea,select{font:inherit}button{border:0;cursor:pointer}h1,h2,h3,p{margin:0}
+.app{width:100%;min-width:1024px;min-height:100vh;margin:0 auto;display:grid;grid-template-columns:190px 1fr;background:var(--bg)}
+.side{background:#001529;color:#B7C7D8;overflow:auto}.brand{height:56px;padding:0 16px;display:flex;align-items:center;gap:12px;color:#fff;border-bottom:1px solid rgba(255,255,255,.08)}.brand .ham{width:18px;height:18px;display:grid;place-items:center;color:#fff;font-size:16px;cursor:pointer}.brand strong{font-size:16px;font-weight:600}.nav{padding:8px 0}.group{margin-bottom:4px}.nav button{width:100%;min-height:40px;padding:0 16px;display:flex;align-items:center;gap:10px;background:transparent;color:#A6ADB4;text-align:left;border:0;font-size:14px;cursor:pointer}.nav button .arrow{margin-left:auto;font-size:10px;transition:.2s}.nav button .arrow.open{transform:rotate(90deg)}.nav button:hover{color:#fff;background:#0c2135}.nav button.active{background:var(--p);color:#fff}.nav button.sub{padding-left:40px;font-size:13px;height:36px;min-height:36px}.nav button.sub.active{background:var(--p);color:#fff;box-shadow:inset 3px 0 0 rgba(255,255,255,.4)}.nav button.sub:hover{background:#0c2135;color:#fff}.nav .subs{display:none}.nav .subs.open{display:block}
+.main{display:grid;grid-template-rows:48px 1fr;min-width:0}.top{display:flex;flex-direction:column;background:#fff;border-bottom:1px solid var(--line)}.topbar{height:48px;padding:0 20px;display:flex;align-items:center;justify-content:space-between}.crumb{color:var(--mut);font-size:13px}.crumb b{color:var(--txt);font-weight:400}.tabs{display:flex;gap:4px;padding:0 20px;border-top:1px solid var(--line)}.tab{height:47px;padding:0 16px;display:inline-flex;align-items:center;gap:6px;background:transparent;border:0;border-bottom:2px solid transparent;color:var(--mut);font-size:14px;cursor:pointer}.tab.active{color:var(--p);border-bottom-color:var(--p);background:#fff;font-weight:600}.tab:hover{color:var(--p)}.topright{display:flex;align-items:center;gap:16px;color:var(--mut);font-size:13px}.topright a{color:var(--mut);text-decoration:none}.topright a:hover{color:var(--p)}.avatar{width:28px;height:28px;display:grid;place-items:center;border-radius:50%;background:#D48A35;color:#fff;font-size:12px}
+.work{padding:24px;overflow:hidden}.view{display:none}.view.on{display:block}.head{height:40px;display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}.head h1{font-size:16px;font-weight:700}.head p{margin-top:4px;color:var(--mut);font-size:12px}.acts{display:flex;gap:10px}
+.btn{height:36px;padding:0 14px;display:inline-flex;align-items:center;justify-content:center;gap:6px;border-radius:4px;white-space:nowrap}.primary{background:var(--p);color:#fff}.primary:hover{background:var(--pd)}.secondary{background:var(--soft);border:1px solid var(--bd);color:var(--txt)}.secondary:hover{background:#EEF0F3}.danger{background:var(--err);color:#fff}.link{padding:0;background:transparent;color:var(--p)}.link.red{color:var(--err)}.link.gray{color:var(--mut)}
+.dash{display:grid;grid-template-columns:1fr;gap:24px}
+.webhome{min-height:624px;padding:40px 48px;border:1px solid var(--line);border-radius:8px;background:#FFFFFF}
+.greet{text-align:center;margin-bottom:24px;color:var(--txt);font-size:28px;font-weight:800}
+.search{max-width:760px;width:100%;height:40px;margin:0 auto 18px;padding:0 16px;display:flex;align-items:center;justify-content:space-between;background:var(--soft);border:1px solid var(--bd);color:var(--mut);border-radius:4px}
+.homecard{max-width:760px;width:100%;margin:0 auto 24px;padding:24px;background:#FFFFFF;border:1px solid var(--line);border-radius:8px}
+.cardhd{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}.cardhd strong{font-size:14px;font-weight:700}
+.line{min-height:44px;display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:12px;border-top:1px solid var(--divider)}.line:first-of-type{border-top:0}.title{overflow:hidden;background:transparent;color:var(--txt);text-align:left;text-overflow:ellipsis;white-space:nowrap;font-size:14px}.title:hover{color:var(--p)}.date{color:var(--mut);font-size:12px}
+.badge{display:inline-flex;align-items:center;height:22px;padding:0 8px;border-radius:4px;font-size:12px;white-space:nowrap}.blue{color:var(--p);background:#EAF1FB}.green{color:var(--ok);background:#EAF8F1}.orange{color:#A15C00;background:#FFF3DC}.red{color:var(--err);background:#FFF0F0}.gray{color:#6D7684;background:#EEF0F3}.violet{color:var(--vio);background:#F1EFFF}
+.quick{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}.quick button{min-height:62px;padding:0 14px;display:flex;align-items:center;gap:10px;border-radius:8px;background:var(--soft);color:var(--txt);text-align:left;border:1px solid transparent}.quick button:hover{border-color:var(--bd)}.quick i{color:var(--p);font-style:normal}
+/* 移动端样式已迁出，独立文件见 通知公告-移动端.html */
+.pagehd{height:48px;display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}.pagehd h1{font-size:18px;font-weight:700;color:var(--txt)}
+.panel{background:#FFFFFF;border:1px solid var(--line);border-radius:8px;box-shadow:0 1px 3px rgba(28,40,71,.04)}.filters{padding:20px 24px;display:grid;grid-template-columns:190px 150px 150px 1fr auto auto;gap:10px;align-items:end}.filters.ref{grid-template-columns:220px 160px 160px auto auto;gap:12px;align-items:end}.filters label{display:flex;flex-direction:column;gap:6px;color:var(--mut);font-size:13px}.filters input,.filters select{width:100%;height:36px;padding:0 10px;border:1px solid var(--bd);border-radius:4px;background:var(--soft);color:var(--txt);font-size:14px}.filters input::placeholder{color:var(--mut)}.fbtns{display:flex;align-items:end;gap:10px}.toolbar{padding:0 24px 14px}.toolbar .btn{height:32px;padding:0 14px;font-size:13px}.tablewrap{overflow:auto;border-top:1px solid var(--line)}table{width:100%;min-width:900px;border-collapse:collapse}th,td{padding:14px 16px;border-bottom:1px solid var(--divider);text-align:left;vertical-align:middle;font-size:14px}th{background:var(--soft);color:var(--txt);font-weight:600}.ops-h,.ops-cell{padding-left:8px;padding-right:8px}.ops{display:flex;align-items:center;gap:4px;flex-wrap:nowrap;white-space:nowrap}.ops .sep{color:var(--bd);font-size:12px;user-select:none}.ops .link{height:26px;padding:0 6px;display:inline-flex;align-items:center;border-radius:4px;font-size:13px}.ops .link:hover{background:#F2F3F6}.ops .link.gray{color:var(--mut)}.page{height:52px;padding:0 24px;display:flex;align-items:center;justify-content:space-between;color:var(--mut);font-size:13px}.pg{display:flex;align-items:center;gap:10px}.pg input{width:40px;height:28px;padding:0 4px;text-align:center;border:1px solid var(--bd);border-radius:4px;background:#fff}
+.detailgrid{display:grid;grid-template-columns:minmax(0,1fr);gap:24px}.detail,.sidecard{padding:24px}.detail h2{margin-bottom:12px;font-size:20px;font-weight:700}.metagrid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:18px 0}.mbox{padding:12px;background:var(--soft);border-radius:6px}.mbox span{display:block;margin-bottom:5px;color:var(--mut);font-size:12px}.article{padding-top:18px;border-top:1px solid var(--line);color:#46556A;line-height:1.9}.article p{margin-bottom:14px}.sidecard h3{margin-bottom:14px;font-size:15px;font-weight:700}.timeline{display:grid;gap:14px}.node{display:grid;grid-template-columns:12px 1fr;gap:10px}.dot{width:9px;height:9px;margin-top:5px;border-radius:50%;background:var(--p)}.node strong{display:block;margin-bottom:4px}.node span{color:var(--mut);font-size:12px;line-height:1.6}
+.form.single{grid-template-columns:1fr}.form.single label{grid-column:1/-1}.rich-editor{border:1px solid var(--bd);border-radius:4px;overflow:hidden;background:#fff;display:flex;flex-direction:column}.rich-bar{display:flex;gap:2px;padding:6px 8px;border-bottom:1px solid var(--line);background:#FAFAFC;flex-wrap:wrap;align-items:center}.rich-bar button{height:26px;padding:0 7px;display:inline-flex;align-items:center;justify-content:center;background:transparent;border:1px solid transparent;border-radius:3px;color:#555;font-size:12px;cursor:pointer}.rich-bar button:hover{background:#EAEAEA}.rich-bar button:active{background:#DCDCDC}.rich-bar .sep{width:1px;height:14px;background:var(--bd);margin:0 3px}.rich-bar select{height:26px;border:1px solid var(--bd);border-radius:3px;background:#fff;color:#555;font-size:12px}.rich-area{min-height:160px;max-height:360px;overflow:auto;padding:12px;line-height:1.7;background:#fff;outline:none}.rich-area:empty:before{content:attr(data-placeholder);color:var(--mut)}.rich-area img{max-width:100%;height:auto;margin:4px 0;border-radius:4px}.rich-area video{max-width:100%;height:auto;margin:4px 0;border-radius:4px}.rich-area a{color:var(--p)}.rich-foot{display:flex;justify-content:flex-end;padding:6px 10px;border-top:1px solid var(--line);background:#FAFAFC;color:var(--mut);font-size:12px}.rich-foot.over{color:var(--err)}.btn:disabled{opacity:.5;cursor:not-allowed}.mask{position:fixed;inset:0;z-index:20;display:none;background:rgba(10,18,32,.34)}.mask.show{display:block}.drawer{position:fixed;top:0;right:0;bottom:0;z-index:21;width:640px;max-width:100%;display:grid;grid-template-rows:72px 1fr 64px;background:#fff;transform:translateX(100%);transition:.2s;box-shadow:-16px 0 36px rgba(22,35,58,.14)}.drawer.show{transform:translateX(0)}.dh,.df{padding:0 24px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line)}.df{justify-content:flex-end;gap:10px;border-top:1px solid var(--line);border-bottom:0}.dh h2{font-size:16px;font-weight:700}.dh p{margin-top:4px;color:var(--mut);font-size:12px}.x{width:34px;height:34px;display:grid;place-items:center;border-radius:4px;background:var(--soft);color:#596579;cursor:pointer}.db{padding:24px;overflow:auto}.form{display:grid;grid-template-columns:1fr 1fr;gap:16px}label{display:grid;gap:7px;color:#596579;font-size:13px}.req span:after{content:" *";color:var(--err)}input,textarea,select{border:1px solid var(--bd);border-radius:4px;background:var(--soft);color:var(--txt);outline:none;font-size:14px}.form input,.form select{height:36px;padding:0 10px}textarea{min-height:92px;padding:10px;resize:vertical;line-height:1.65}.wide{grid-column:1/-1}.fs{margin-top:18px;padding-top:18px;border-top:1px solid var(--line)}.fs h3{margin-bottom:12px;font-size:14px;font-weight:700}.scope{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.check{display:flex;align-items:center;gap:8px;min-height:36px;padding:0 10px;border-radius:4px;background:var(--soft);color:var(--txt)}input[type=checkbox],input[type=radio]{accent-color:var(--p);width:16px;height:16px}
+.modal{position:fixed;top:50%;left:50%;z-index:31;width:420px;max-width:92%;display:none;transform:translate(-50%,-50%);background:#fff;border-radius:8px;box-shadow:0 20px 50px rgba(13,24,45,.18)}.modal.show{display:block}.mh,.mf2{height:56px;padding:0 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line)}.mf2{justify-content:flex-end;gap:10px;border-top:1px solid var(--line);border-bottom:0}.modalbody{padding:20px;color:var(--txt);font-size:14px;line-height:1.7}
+.toast{position:fixed;left:50%;bottom:40px;transform:translateX(-50%);z-index:40;display:none;max-width:80%;padding:10px 16px;background:rgba(27,35,48,.92);color:#fff;font-size:13px;border-radius:8px;text-align:center}.toast.show{display:block}
+tbody tr:hover{background:#FAFAFC}
+input::placeholder,textarea::placeholder{color:var(--mut)}
+.flowbtn{width:100%;margin:14px 0 4px}
+.tree-select{position:relative;max-width:420px}
+.tree-input{height:36px;padding:0 10px;display:flex;align-items:center;justify-content:space-between;border:1px solid var(--bd);border-radius:4px;background:var(--soft);cursor:pointer}
+.tree-input input{flex:1;border:0;background:transparent;cursor:pointer;color:var(--txt);font-size:14px}
+.tree-arrow{color:var(--mut);font-size:12px;transition:.2s}
+.tree-arrow.open{transform:rotate(180deg)}
+.tree-panel{position:absolute;left:0;right:0;top:calc(100% + 6px);z-index:10;max-height:320px;overflow:auto;display:none;background:#fff;border:1px solid var(--bd);border-radius:4px;box-shadow:0 8px 24px rgba(20,30,55,.12)}
+.tree-panel.open{display:block}
+.tree-search{padding:8px 10px;border-bottom:1px solid var(--line)}
+.tree-search input{width:100%;height:32px;padding:0 10px;border:1px solid var(--bd);border-radius:4px;background:var(--soft);font-size:13px}
+.tree-body{padding:6px 0;font-size:13px}
+.tree-row{display:flex;align-items:center;flex-wrap:wrap;min-height:34px;padding:0 10px}
+.tree-row.child{padding-left:26px}
+.tree-row.person{padding-left:42px}
+.tree-check{display:flex;align-items:center;gap:8px;cursor:pointer;color:var(--txt)}
+.tree-check input{width:16px;height:16px;accent-color:var(--p);cursor:pointer}
+.toggler{width:18px;height:18px;display:grid;place-items:center;margin-right:4px;color:var(--mut);cursor:pointer;font-size:10px}
+.tree-children{width:100%;display:none}
+.tree-children.open{display:block}
+@media (max-width:1180px){.filters.ref{grid-template-columns:1fr 1fr;gap:12px}.filters.ref .fbtns{grid-column:1/-1}.filters.ref .fbtns .btn{flex:1}.webhome{padding:32px 24px}}
+@media (max-width:1024px){.app{grid-template-columns:190px 1fr}.detailgrid{grid-template-columns:1fr}.sidecard{border-top:1px solid var(--line)}}
+.userDetailHead{padding:18px 0 0;max-width:840px;margin:0 auto}
+.userDetailWrap{max-width:840px;margin:0 auto;padding:14px 0 48px}
+.userDetail{position:relative;background:#fff;border-radius:16px;padding:40px 48px 44px;box-shadow:0 4px 20px rgba(16,38,76,.06);border:1px solid var(--line);overflow:hidden}
+.userDetail::before{content:"";position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--p),#7AA0F2)}
+.userDetail .uhead{text-align:center}
+.userDetail .uhead .badge{height:24px;font-size:13px;margin-bottom:14px}
+.userDetail .uhead h1{font-size:26px;line-height:1.4;color:var(--txt);margin:0 0 18px;font-weight:700}
+.userDetail .umeta{display:flex;justify-content:center;flex-wrap:wrap;gap:8px 28px;color:var(--mut);font-size:13px;padding-bottom:22px;margin-bottom:26px;border-bottom:1px dashed var(--divider)}
+.userDetail .umeta b{color:var(--txt);font-weight:600}
+.userDetail .ucontent{font-size:15px;line-height:2;color:#374151}
+.userDetail .ucontent p{margin:0 0 16px}
+.userDetail .usign{margin-top:30px;text-align:right;color:var(--txt);font-size:14px;line-height:1.8}
+.userDetail .usign p{margin:0}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="side">
+    <div class="brand"><span class="ham">☰</span><strong>智慧园区</strong></div>
+    <div class="nav">
+      <div class="group"><button data-view="home">📢 首页</button></div>
+      <div class="group"><button>💡 智慧照明</button></div>
+      <div class="group"><button>🌱 智慧灌溉</button></div>
+      <div class="group"><button>🚶 访客管理</button></div>
+      <div class="group"><button>🏟 场馆预约</button></div>
+      <div class="group"><button>🌿 环境监测</button></div>
+      <div class="group">
+        <button onclick="toggleGroup(this)">🏢 对内管理平台<span class="arrow open">▶</span></button>
+        <div class="subs open">
+          <button class="sub">园区运行监控</button>
+          <button class="sub">信息咨询</button>
+          <button class="sub">规章制度</button>
+          <button class="sub active" data-view="manage">通知公告管理</button>
+          <button class="sub">通讯录</button>
+        </div>
+      </div>
+      <div class="group"><button>🍽 后勤服务</button></div>
+      <div class="group"><button>📢 信息发布</button></div>
+      <div class="group"><button>⚙ 系统管理</button></div>
+      <div class="group"><button>🏗 基础设施</button></div>
+    </div>
+  </aside>
+  <main class="main">
+    <header class="top">
+      <div class="topbar">
+        <div class="crumb" id="crumb">对内管理平台 / <b>通知公告管理</b></div>
+        <div class="topright"><a href="#">下载客户端</a><span class="avatar">管</span><span>admin</span></div>
+      </div>
+    </header>
+    <section class="work">
+      <div class="view" id="homeView">
+        <div class="dash">
+          <div class="webhome">
+            <div class="greet">Hi，傍晚好！</div>
+            <button class="search" onclick="showToast('搜索入口沿用现有首页能力')"><span>请输入您想要的内容</span><span>⌄</span></button>
+            <div class="homecard">
+              <div class="cardhd"><strong>通知公告</strong><button class="link" onclick="go('list')">更多 &gt;</button></div>
+              <div class="notices" id="homeNotices"></div>
+            </div>
+            <div class="homecard"><div class="cardhd"><strong>快捷入口</strong></div><div class="quick"><button><i>▣</i>视频调阅</button><button><i>▤</i>设备台账</button><button><i>☑</i>所有工单</button><button><i>＋</i>添加快捷入口</button></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="view" id="listView">
+        <div class="pagehd"><h1>通知公告</h1></div>
+        <div class="panel">
+          <div class="filters ref">
+            <label><span>公告名称</span><input id="userSearch" placeholder="请输入"></label>
+            <div class="fbtns"><button class="btn primary" onclick="doUserSearch()">搜索</button><button class="btn secondary" onclick="resetUserSearch()">重置</button></div>
+          </div>
+          <div class="tablewrap"><table><thead><tr><th style="width:60px">序号</th><th style="min-width:240px">公告名称</th><th style="width:180px">发布时间</th><th class="ops-h" style="width:90px">操作</th></tr></thead><tbody id="listRows"></tbody></table></div>
+          <div class="page"><span id="listTotal">共 0 条</span><div class="pg"><span>10条/页</span><button class="btn secondary" id="userPrev">上一页</button><span id="userCur">1/1</span><button class="btn secondary" id="userNext">下一页</button><span>前往 <input id="userJump" value="1" style="width:40px;height:28px;text-align:center;border:1px solid var(--bd);border-radius:4px"> 页</span></div></div>
+        </div>
+      </div>
+
+      <div class="view on" id="manageView">
+        <div class="pagehd"><h1>通知公告</h1></div>
+        <div class="panel">
+          <div class="filters ref">
+            <label><span>公告名称</span><input placeholder="请输入"></label>
+            <div class="fbtns"><button class="btn primary" onclick="showToast('已按条件查询')">搜索</button><button class="btn secondary" onclick="showToast('查询条件已重置')">重置</button></div>
+          </div>
+          <div class="toolbar"><button class="btn primary" onclick="openDrawer('create')">添加公告</button></div>
+          <div class="tablewrap"><table><thead><tr><th style="width:60px">序号</th><th style="min-width:240px">公告名称</th><th style="width:110px">公告状态</th><th style="width:180px">发布时间</th><th class="ops-h" style="width:100px">操作</th></tr></thead><tbody id="rows"></tbody></table></div>
+          <div class="page"><span id="totalCount">共 1 条</span><div class="pg"><span>10条/页</span><button class="btn secondary" id="mgPrev">上一页</button><span id="mgCur">1/1</span><button class="btn secondary" id="mgNext">下一页</button><span>前往 <input id="mgJump" value="1" style="width:40px;height:28px;text-align:center;border:1px solid var(--bd);border-radius:4px"> 页</span></div></div>
+        </div>
+      </div>
+
+      <div class="view" id="detailView">
+        <div class="head"><div><h1>公告详情</h1></div><div class="acts"><button class="btn secondary" onclick="go(currentBaseView)">返回列表</button></div></div>
+        <div class="detailgrid">
+          <article class="panel detail" id="detail"></article>
+        </div>
+      </div>
+
+      <div class="view" id="userDetailView">
+        <div class="userDetailHead"><button class="btn secondary" onclick="go(currentBaseView)">← 返回</button></div>
+        <div class="userDetailWrap"><article class="userDetail" id="userDetail"></article></div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div class="mask" id="mask" onclick="closeDrawer()"></div>
+<aside class="drawer" id="drawer">
+  <div class="dh"><div><h2 id="drawerTitle">新增</h2></div><button class="x" onclick="closeDrawer()">×</button></div>
+  <div class="db">
+    <div class="form single">
+      <label class="req"><span>公告名称</span><input id="titleInput" placeholder="请输入公告名称"></label>
+      <label class="req"><span>公告内容</span>
+        <div class="rich-editor">
+          <div class="rich-bar">
+            <button type="button" title="加粗" onclick="richCmd('bold')"><b>B</b></button>
+            <button type="button" title="斜体" onclick="richCmd('italic')"><i>I</i></button>
+            <button type="button" title="下划线" onclick="richCmd('underline')"><u>U</u></button>
+            <button type="button" title="删除线" onclick="richCmd('strikeThrough')"><s>S</s></button>
+            <span class="sep"></span>
+            <select title="字号" onchange="richCmd('fontSize',this.value);this.selectedIndex=0">
+              <option value="">字号</option><option value="2">小</option><option value="3">标准</option><option value="5">大</option><option value="6">特大</option>
+            </select>
+            <span class="sep"></span>
+            <button type="button" title="左对齐" onclick="richCmd('justifyLeft')">左</button>
+            <button type="button" title="居中" onclick="richCmd('justifyCenter')">中</button>
+            <button type="button" title="右对齐" onclick="richCmd('justifyRight')">右</button>
+            <span class="sep"></span>
+            <button type="button" title="无序列表" onclick="richList('insertUnorderedList')">•</button>
+            <button type="button" title="有序列表" onclick="richList('insertOrderedList')">1.</button>
+            <span class="sep"></span>
+            <button type="button" title="插入链接" onclick="insertLink()">🔗</button>
+            <button type="button" title="插入图片" onclick="insertImg()">🖼</button>
+            <button type="button" title="插入视频" onclick="insertVideo()">🎬</button>
+            <button type="button" title="插入表情" onclick="insertEmoji()">😊</button>
+          </div>
+          <div class="rich-area" id="editor" contenteditable="true" data-placeholder="请输入公告内容..."></div>
+        </div>
+      </label>
+      <label class="req"><span>发布范围</span>
+        <div class="tree-select">
+          <div class="tree-input" onclick="toggleScopeTree()">
+            <input id="scopeInput" readonly placeholder="请选择部门或人员">
+            <span class="tree-arrow" id="scopeArrow">▾</span>
+          </div>
+          <div class="tree-panel open" id="scopeTreePanel">
+            <div class="tree-search"><input type="text" placeholder="请输入组织/人员名称"></div>
+            <div class="tree-body">
+              <div class="tree-row root"><label class="tree-check"><input type="checkbox" id="scopeAll" onchange="checkScopeAll(this)">全选</label></div>
+              <div class="tree-row"><span class="toggler open" onclick="toggleTreeNode(this)">▾</span><label class="tree-check"><input type="checkbox" onchange="updateScopeInput()">食堂</label></div>
+              <div class="tree-row">
+                <span class="toggler open" onclick="toggleTreeNode(this)">▾</span>
+                <label class="tree-check"><input type="checkbox" onchange="updateScopeInput()">苏州国家实验室</label>
+                <div class="tree-children open">
+                  <div class="tree-row child"><label class="tree-check"><input type="checkbox" onchange="updateScopeInput()">bmct</label></div>
+                  <div class="tree-row child"><label class="tree-check"><input type="checkbox" onchange="updateScopeInput()">沁智达</label></div>
+                  <div class="tree-row child">
+                    <span class="toggler open" onclick="toggleTreeNode(this)">▾</span>
+                    <label class="tree-check"><input type="checkbox" onchange="updateScopeInput()">物业公司</label>
+                    <div class="tree-children open">
+                      <div class="tree-row person"><label class="tree-check"><input type="checkbox" onchange="updateScopeInput()">万科物业</label></div>
+                    </div>
+                  </div>
+                  <div class="tree-row child">
+                    <span class="toggler open" onclick="toggleTreeNode(this)">▾</span>
+                    <label class="tree-check"><input type="checkbox" onchange="updateScopeInput()">姑苏实验室</label>
+                    <div class="tree-children open">
+                      <div class="tree-row person"><label class="tree-check"><input type="checkbox" onchange="updateScopeInput()">高技术项目管理办公室</label></div>
+                      <div class="tree-row person"><label class="tree-check"><input type="checkbox" onchange="updateScopeInput()">系统管理员二级部门</label></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="tree-row"><span class="toggler open" onclick="toggleTreeNode(this)">▾</span><label class="tree-check"><input type="checkbox" onchange="updateScopeInput()">江苏天创科技有限公司</label></div>
+              <div class="tree-row"><label class="tree-check"><input type="checkbox" onchange="updateScopeInput()">卓越</label></div>
+            </div>
+          </div>
+        </div>
+      </label>
+    </div>
+  </div>
+  <div class="df"><button class="btn secondary" onclick="closeDrawer()">取消</button><button class="btn primary" onclick="submitApproval()">确定</button></div>
+</aside>
+
+<div class="mask" id="modalMask"></div>
+<div class="modal" id="modal"><div class="mh"><h2 id="modalTitle">确认操作</h2><button class="x" onclick="closeModal()">×</button></div><div class="modalbody" id="modalBody"></div><div class="mf2"><button class="btn secondary" onclick="closeModal()">取消</button><button class="btn primary" id="modalOk">确定</button></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+const data=[
+{title:"关于开展员工法律咨询服务活动的通知",scope:"苏州国家实验室",applicant:"综合管理部与服务部",status:"已上架",badge:"green",publish:"2026-08-04 00:00:00",offline:"手动下架",body:"为更好满足员工日常法律需求，提升员工法律意识，实验室将联合外部律师事务所开展现场法律咨询服务活动。现将有关事项通知如下：\n一、咨询范围\n活动答疑范围仅限员工个人日常生活中的法律问题，不涉及实验室科研、管理等工作类法律问题，律师将提供专业法律分析与应对建议。\n二、报名方式\n本次活动采取预约制，名额有限、约满即止。请拟参与员工于8月11日前，将预约信息发送至外部律师专用邮箱：sylviashen@allbrightlaw.com。邮件主题统一注明“苏实法助—部门—姓名”，预约成功后将通过邮件反馈专属咨询时段。\n三、现场流程\n员工根据预约时间到场后，依次开展一对一、面对面咨询。现场禁止录音录像，禁止旁听他人咨询。每位员工咨询时长原则上不超过30分钟。\n四、注意事项\n1.材料准备：建议携带与问题相关的书面材料复印件（如合同、借条、判决书、聊天记录截图等），请勿携带原件，以防遗失。律师不保留任何材料复印件，咨询结束后由员工自行带回。\n2.效力声明：律师在现场解答仅基于员工单方陈述作出的法律参考分析，不属于正式法律意见，不构成委托代理关系。\n特此通知。\n如有疑问，请联系：李佳远，18896725810。"},
+{title:"关于近期园区访客管理调整的通知",scope:"苏州国家实验室",applicant:"行政管理部",status:"已上架",badge:"green",publish:"2026-08-05 09:12:00",offline:"手动下架",body:"为提升园区安全管理水平，自 2026 年 8 月 10 日起，所有访客须提前通过「园区访客预约」小程序登记，并凭二维码在门岗核验后入内。\n请各单位及时通知相关合作方，感谢配合。"},
+{title:"园区设备维护期间服务调整通知",scope:"苏州国家实验室",applicant:"设施运行部",status:"已上架",badge:"green",publish:"2026-08-03 14:30:00",offline:"手动下架",body:"受中央空调主机年度保养影响，8 月 9 日 19:00 至 22:00 期间 B 区办公楼层将暂停供冷。\n期间请合理安排加班人员，带来不便敬请谅解。"},
+{title:"园区消防设施巡检安排",scope:"苏州国家实验室",applicant:"安全管理部",status:"已上架",badge:"green",publish:"2026-08-01 10:00:00",offline:"手动下架",body:"本月消防月度巡检定于 8 月 12 日 09:00-17:00，将对各楼层烟感、喷淋及疏散通道进行抽检。\n巡检期间请勿遮挡消防设备，疏散通道保持畅通。"},
+{title:"园区食堂中秋供应安排",scope:"苏州国家实验室",applicant:"后勤保障部",status:"已上架",badge:"green",publish:"2026-07-28 09:00:00",offline:"手动下架",body:"中秋节期间园区食堂将调整供应时间并推出节日套餐，具体安排详见食堂公告栏。\n请各位员工提前规划就餐时间，避免高峰拥挤。"},
+{title:"园区停车场临时管制通知",scope:"物业公司",applicant:"王磊",status:"已下架",badge:"gray",publish:"-",offline:"手动下架",body:"因地下车库管道检修，8 月 10 日 22:00 至次日 6:00 临时封闭 B2 区，请相关车辆提前移出。"}
+];
+const $=id=>document.getElementById(id);
+const toastEl=$("toast");
+const editor=$("editor");
+function bodyHtml(s){return String(s==null?"":s).replace(/\n/g,"<br>")}
+function richCmd(cmd,val){document.execCommand(cmd,false,val);editor.focus()}
+function richList(cmd){document.execCommand(cmd,false,null);editor.focus()}
+function insertLink(){const u=prompt("请输入链接地址（http/https）","https://");if(!u)return;document.execCommand("createLink",false,u)}
+function insertImg(){const u=prompt("请输入图片地址（http/https）","https://");if(!u)return;document.execCommand("insertImage",false,u)}
+function insertVideo(){const u=prompt("请输入视频地址（http/https）","https://");if(!u)return;document.execCommand("insertHTML",false,'<video controls src="'+u+'" style="max-width:100%"></video>')}
+function insertEmoji(){document.execCommand("insertText",false,"😊")}
+function setupPager(){
+  $("mgPrev").onclick=()=>{mgPage=Math.max(1,mgPage-1);renderRows()};
+  $("mgNext").onclick=()=>{const tp=Math.max(1,Math.ceil(visibleList().length/PAGE));mgPage=Math.min(tp,mgPage+1);renderRows()};
+  $("mgJump").onchange=()=>{const tp=Math.max(1,Math.ceil(visibleList().length/PAGE));mgPage=Math.min(tp,Math.max(1,parseInt($("mgJump").value)||1));renderRows()};
+  $("userPrev").onclick=()=>{userPage=Math.max(1,userPage-1);renderUserList()};
+  $("userNext").onclick=()=>{const all=data.filter(n=>n.status==="已上架").length;const tp=Math.max(1,Math.ceil(all/PAGE));userPage=Math.min(tp,userPage+1);renderUserList()};
+  $("userJump").onchange=()=>{const all=data.filter(n=>n.status==="已上架").length;const tp=Math.max(1,Math.ceil(all/PAGE));userPage=Math.min(tp,Math.max(1,parseInt($("userJump").value)||1));renderUserList()}
+}
+let statusFilter="";let mgPage=1,userPage=1;const PAGE=10;let userSearch="";
+let editingIndex=null,currentDetailIndex=0,currentBaseView="manage";
+function sortByPublishDesc(arr){return arr.slice().sort((a,b)=>{const ta=(a.n&&a.n.publish)||"",tb=(b.n&&b.n.publish)||"";return ta===tb?0:(ta<tb?1:-1)})}
+function doUserSearch(){userSearch=($("userSearch").value||"").trim();userPage=1;renderUserList()}
+function resetUserSearch(){$("userSearch").value="";userSearch="";userPage=1;renderUserList()}
+function visibleList(){return sortByPublishDesc(data.map((n,i)=>({n,i})).filter(x=>!statusFilter||x.n.status===statusFilter))}
+function statusBadge(s){return s==="已上架"?"green":"gray"}
+function rowOps(n){if(n.status==="已上架")return["下架","详情"];if(n.status==="已下架")return["上架","编辑","删除","详情"];return["详情"]}
+function renderRows(){const all=visibleList();const total=all.length,pages=Math.max(1,Math.ceil(total/PAGE));if(mgPage>pages)mgPage=pages;const list=all.slice((mgPage-1)*PAGE,mgPage*PAGE);if(!total){rows.innerHTML='<tr><td colspan="5" style="text-align:center;color:var(--mut);padding:48px">暂无公告</td></tr>';$("totalCount").textContent="共 0 条";$("mgCur").textContent="0/0";$("mgPrev").disabled=mgPage<=1;$("mgNext").disabled=true;return}rows.innerHTML=list.map((x,pos)=>{const n=x.n,i=x.i;const no=(mgPage-1)*PAGE+pos+1;return `<tr><td>${no}</td><td>${n.title}</td><td><span class="badge ${statusBadge(n.status)}">${n.status}</span></td><td>${n.publish}</td><td class="ops-cell"><div class="ops">${rowOps(n).map((o,idx)=>`${idx?'<span class="sep">|</span>':''}<button class="link ${o==="下架"||o==="删除"?"red":""}" onclick="op('${o}',${i})">${o}</button>`).join("")}</div></td></tr>`}).join("");$("totalCount").textContent="共 "+total+" 条";$("mgCur").textContent=mgPage+"/"+pages;$("mgPrev").disabled=mgPage<=1;$("mgNext").disabled=mgPage>=pages}
+function renderUserList(){const all=sortByPublishDesc(data.map((n,i)=>({n,i})).filter(x=>x.n.status==="已上架"&&(!userSearch||x.n.title.includes(userSearch))));const total=all.length,pages=Math.max(1,Math.ceil(total/PAGE));if(userPage>pages)userPage=pages;const list=all.slice((userPage-1)*PAGE,userPage*PAGE);if(!total){listRows.innerHTML='<tr><td colspan="4" style="text-align:center;color:var(--mut);padding:48px">暂无公告</td></tr>';$("listTotal").textContent="共 0 条";$("userCur").textContent="0/0";$("userPrev").disabled=userPage<=1;$("userNext").disabled=true;return}listRows.innerHTML=list.map((x,pos)=>{const n=x.n,i=x.i;const no=(userPage-1)*PAGE+pos+1;return `<tr><td>${no}</td><td><button class="title" onclick="openDetail(${i})">${n.title}</button></td><td>${n.publish}</td><td class="ops-cell"><div class="ops"><button class="link" onclick="openDetail(${i})">查看</button></div></td></tr>`}).join("");$("listTotal").textContent="共 "+total+" 条";$("userCur").textContent=userPage+"/"+pages;$("userPrev").disabled=userPage<=1;$("userNext").disabled=userPage>=pages}
+function renderHomeNotices(){const list=sortByPublishDesc(data.map((n,i)=>({n,i})).filter(x=>x.n.status==="已上架")).slice(0,3);homeNotices.innerHTML=list.length?list.map(x=>{const n=x.n,i=x.i;return `<div class="line"><button class="title" onclick="openDetail(${i})">${n.title}</button><span class="date">${n.publish.slice(0,10)}</span></div>`}).join(""):`<div class="line"><span class="mut" style="color:var(--mut)">暂无已发布公告</span></div>`}
+function toggleGroup(btn){const subs=btn.nextElementSibling,arrow=btn.querySelector(".arrow");subs.classList.toggle("open");arrow.classList.toggle("open")}
+function go(v){if(v!=="detail")currentBaseView=v;let target;if(v==="manage")target="manageView";else if(v==="detail")target=(currentBaseView==="manage")?"detailView":"userDetailView";else target=v+"View";document.querySelectorAll(".view").forEach(x=>x.classList.remove("on"));document.querySelectorAll(".nav button").forEach(x=>x.classList.remove("active"));$(target).classList.add("on");document.querySelectorAll(`[data-view="${v}"]`).forEach(x=>x.classList.add("active"));if(v==="list"){const hb=document.querySelector('.nav button[data-view="home"]');if(hb)hb.classList.add("active")}crumb.innerHTML=(v==="detail")?(currentBaseView==="manage"?"对内管理平台 / <b>通知公告管理</b> / 详情":"通知公告 / <b>详情</b>"):{home:"",manage:"对内管理平台 / <b>通知公告管理</b>",list:"通知公告"}[v]}
+document.querySelectorAll("[data-view]").forEach(b=>b.onclick=()=>go(b.dataset.view));
+function renderDetail(i=0){currentDetailIndex=i;const n=data[i];detail.innerHTML=`<h2>${n.title}</h2><span class="badge ${n.badge}">${n.status}</span><div class="metagrid"><div class="mbox"><span>发布范围</span>${n.scope}</div><div class="mbox"><span>创建人</span>${n.applicant}</div><div class="mbox"><span>发布时间</span>${n.publish}</div></div><div class="article">${bodyHtml(n.body)}<p style="color:var(--mut);font-size:12px;margin-top:16px">用户端仅展示「已上架」公告；新建公告默认下架，需管理员手动上架后用户可见。</p></div>`}
+function renderUserDetail(i=0){currentDetailIndex=i;const n=data[i];const d=n.publish.slice(0,10);const cnDate=d==="-"?"-":d.replace(/^(\d{4})-(\d{2})-(\d{2})$/,"$1年$2月$3日").replace(/0(\d)/g,"$1");userDetail.innerHTML=`<div class="uhead"><h1>${n.title}</h1><div class="umeta"><span>发布时间：<b>${n.publish.slice(0,10)}</b></span></div></div><div class="ucontent">${bodyHtml(n.body)}</div><div class="usign"><p>${n.applicant}</p><p>${cnDate}</p></div>`}
+function openDetail(i){if(currentBaseView==="manage"){renderDetail(i)}else{renderUserDetail(i)}go("detail")}
+function fillDrawer(n){$("titleInput").value=n.title;$("editor").innerHTML=n.body;$("scopeInput").value=n.scope}
+function clearDrawer(){$("titleInput").value="";$("editor").innerHTML="";$("scopeInput").value="";document.querySelectorAll("#scopeTreePanel input[type=checkbox]").forEach(x=>x.checked=false);updateScopeInput()}
+function openDrawer(m,i){editingIndex=(m==="edit")?((i===undefined)?currentDetailIndex:i):null;drawerTitle.textContent=m==="create"?"新增":"编辑";if(m==="edit"){fillDrawer(data[editingIndex])}else{clearDrawer()}mask.classList.add("show");drawer.classList.add("show")}
+function closeDrawer(){mask.classList.remove("show");drawer.classList.remove("show")}
+function modal(t,b,ok,cb){$("modalTitle").textContent=t;$("modalBody").innerHTML=b;$("modalOk").textContent=ok;$("modalOk").onclick=()=>{closeModal();cb&&cb()};$("modalMask").classList.add("show");$("modal").classList.add("show")}
+function closeModal(){$("modalMask").classList.remove("show");$("modal").classList.remove("show")}
+function op(o,i){if(o==="详情"){openDetail(i);return}if(o==="上架"){modal("上架公告","上架后公告将在 APP/Web 用户端展示，用户可查看。","确认上架",()=>{const d=new Date(),p=x=>String(x).padStart(2,"0");data[i].status="已上架";data[i].badge="green";data[i].publish=`${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`;renderRows();showToast("已上架，用户端可展示，发布时间已刷新")});return}if(o==="下架"){modal("下架公告","下架后公告将从用户端移除，仅管理员后台可查看详情。","确认下架",()=>{data[i].status="已下架";data[i].badge="gray";renderRows();showToast("已下架")});return}if(o==="编辑"){openDrawer("edit",i);return}if(o==="删除"){modal("删除公告","删除后该公告将从列表中移除，此操作不可恢复。","确认删除",()=>{data.splice(i,1);renderRows();showToast("已删除")});return}}
+function submitApproval(){
+  const title=titleInput.value.trim();
+  if(!title){showToast("公告名称不能为空");titleInput.focus();return}
+  const bodyHtmlVal=editor.innerHTML;
+  const plain=(editor.innerText||"").replace(/　/g," ").trim();
+  if(!plain){showToast("公告内容不能为空");editor.focus();return}
+  const scopeVal=scopeInput.value;
+  if(!scopeVal||scopeVal==="请选择发布范围"){showToast("请选择发布范围");return}
+  if(editingIndex!=null){const n=data[editingIndex];n.title=title;n.scope=scopeVal;n.body=bodyHtmlVal;renderRows();showToast("保存成功，公告仍为下架状态");editingIndex=null}
+  else{data.unshift({title:title,scope:scopeVal,applicant:"admin",status:"已下架",badge:"gray",publish:"-",offline:"手动下架",body:bodyHtmlVal});renderRows();showToast("提交成功，已保存为下架状态，待管理员上架后用户可见")}
+  closeDrawer()
+}
+function showToast(t){toastEl.textContent=t;toastEl.classList.add("show");clearTimeout(window.tt);window.tt=setTimeout(()=>toastEl.classList.remove("show"),1800)}
+function toggleScopeTree(){const p=$('scopeTreePanel'),a=$('scopeArrow');p.classList.toggle('open');a.classList.toggle('open')}
+function toggleTreeNode(el){el.classList.toggle('open');const wrap=el.parentElement.querySelector('.tree-children');if(wrap)wrap.classList.toggle('open');el.textContent=el.classList.contains('open')?'▾':'▸'}
+function checkScopeAll(cb){const panel=$('scopeTreePanel');panel.querySelectorAll('input[type=checkbox]').forEach(x=>x.checked=cb.checked);updateScopeInput()}
+function updateScopeInput(){const panel=$('scopeTreePanel'),input=$('scopeInput');const checked=[...panel.querySelectorAll('.tree-check input:checked')].map(i=>i.parentElement.textContent.trim()).filter(t=>t!=='全选');input.value=checked.length?checked.slice(0,3).join('、')+(checked.length>3?' 等 '+checked.length+' 个':''):'请选择发布范围'}
+document.addEventListener('click',e=>{if(!e.target.closest('.tree-select')){const p=$('scopeTreePanel'),a=$('scopeArrow');p&&p.classList.remove('open');a&&a.classList.remove('open')}})
+renderRows();renderUserList();renderHomeNotices();go("manage");renderDetail(0);setupPager();
+</script>
+</body>
+</html>
