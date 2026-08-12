@@ -58,6 +58,7 @@
     height: 36px; line-height: 36px; border-radius: 4px;
   }
   .bottom-btn.secondary:active { opacity: .7; }
+  .bottom-btn.secondary.danger { background: #FFF1F0; color: #FF4D4F; border: 1px solid #FFCCC7; }
 
   /* 底部标签栏 */
   .tabbar {
@@ -127,6 +128,7 @@
   }
   .service-icon svg { width: 26px; height: 26px; }
   .service-cell span { font-size: 12px; color: #585858; }
+  .work-cell.soon, .service-cell.soon, .menu-row.soon { opacity: .4; filter: grayscale(1); cursor: not-allowed; }
 
   /* ========== 列表页 ========== */
   .tabs { display: flex; justify-content: center; gap: 40px; margin-bottom: 16px; }
@@ -150,6 +152,7 @@
   .status-tag.green { background: #E6F7EF; color: #52C41A; }
   .status-tag.grey { background: #F5F5F5; color: #999; }
   .status-tag.orange { background: #FFF2E8; color: #FA8C16; }
+  .status-tag.purple { background: #F1EEFF; color: #7B61FF; }
   .status-tag::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
   .card-time { font-size: 12px; color: #999; }
   .card-row { display: flex; margin-bottom: 6px; font-size: 14px; line-height: 22px; }
@@ -158,9 +161,48 @@
   .card-value { color: #585858; flex: 1; }
   .cancel-mini {
     display: inline-block; margin-top: 8px; padding: 4px 12px; border-radius: 4px;
+    border: 1px solid #FFCCC7; color: #FF4D4F; font-size: 12px; float: right; cursor: pointer;
+  }
+  .change-mini {
+    display: inline-block; margin-top: 8px; padding: 4px 12px; border-radius: 4px;
     border: 1px solid #4C7AE8; color: #4C7AE8; font-size: 12px; float: right; cursor: pointer;
   }
+  .edit-mini {
+    display: inline-block; margin-top: 8px; padding: 4px 12px; border-radius: 4px;
+    border: 1px solid #4C7AE8; color: #4C7AE8; font-size: 12px; float: right; cursor: pointer;
+  }
+  .mini-bar { overflow: hidden; display: flex; justify-content: flex-end; gap: 8px; }
+  .mini-bar .cancel-mini, .mini-bar .change-mini, .mini-bar .edit-mini { float: none; margin-top: 8px; }
+  .receipt-btn {
+    display: inline-block; margin-top: 8px; padding: 4px 14px; border-radius: 4px;
+    font-size: 12px; float: right; cursor: pointer;
+  }
+  .receipt-btn.attend { border: 1px solid #4C7AE8; color: #4C7AE8; background: #fff; }
+  .receipt-btn.absent { border: 1px solid #FFCCC7; color: #FF4D4F; background: #fff; }
+  .mini-bar .receipt-btn { float: none; margin-top: 8px; }
+  .receipt-done { display: inline-block; margin-top: 8px; padding: 4px 12px; border-radius: 4px;
+    background: #F7F7FA; color: #8F9098; font-size: 12px; float: right; }
+  .mini-bar .receipt-done { float: none; margin-top: 8px; }
   .empty-tip { text-align: center; color: #999; font-size: 12px; padding: 20px 0; }
+
+  /* 详情页双按钮底栏 */
+  .detail-actions {
+    position: absolute; left: 16px; right: 16px; bottom: 66px; z-index: 5;
+    display: flex; gap: 12px;
+  }
+  .detail-actions .bottom-btn { position: static; left: auto; right: auto; bottom: auto; flex: 1; }
+
+  /* 修改预约提示条 */
+  .change-banner {
+    background: #FFF7E6; border: 1px solid #FFE0A3; border-radius: 8px;
+    padding: 10px 12px; margin-bottom: 12px; font-size: 12px; line-height: 20px;
+    color: #B26A00; display: none;
+  }
+  .change-banner.show { display: block; }
+  .change-banner .cb-title { font-weight: 600; color: #FA8C16; margin-bottom: 2px; }
+  .modal-body.warn { text-align: left; color: #585858; }
+  .modal-body.warn .warn-hl { color: #FF4D4F; font-weight: 600; }
+  .modal-body .m-line { margin-bottom: 6px; }
 
   /* ========== 详情页 ========== */
   .section { margin-bottom: 16px; }
@@ -176,6 +218,15 @@
   .info-row { display: flex; margin-bottom: 10px; font-size: 14px; line-height: 22px; }
   .info-label { width: 84px; color: #999; flex-shrink: 0; }
   .info-value { color: #585858; flex: 1; }
+  .svc-detail-title { color: #999; font-size: 13px; margin: 12px 0 6px; }
+  .svc-lines { border: 1px solid #EFEFEF; border-radius: 6px; overflow: hidden; }
+  .svc-line { display: flex; align-items: center; justify-content: space-between; padding: 8px 10px; font-size: 13px; border-bottom: 1px solid #F4F4F4; }
+  .svc-line:last-child { border-bottom: none; }
+  .svc-line .sl-name { color: #585858; }
+  .svc-line .sl-calc { color: #999; flex: 1; text-align: center; }
+  .svc-line .sl-amt { color: #585858; font-weight: 600; min-width: 60px; text-align: right; }
+  .svc-empty { color: #bbb; padding: 8px 10px; font-size: 13px; }
+  .fee-total { color: #4165EC; font-weight: 700; }
   .file-box {
     width: 80px; height: 80px; background: #F6F6F8; border-radius: 6px;
     display: flex; align-items: center; justify-content: center;
@@ -273,6 +324,64 @@
   .tab-item:active, .work-cell:active, .service-cell:active, .card:active,
   .select-item:active, .cancel-mini:active, .upload-box:active, .header .back:active { opacity: .6; }
   .sel-fac { font-size: 12px; color: #999999; margin-top: 4px; }
+
+  /* 会务服务多选列表（移动端） */
+  .svc-list { margin: 4px 0 8px; border: 1px solid #F0F0F0; border-radius: 8px; overflow: hidden; }
+  .svc-row { display: flex; align-items: center; gap: 8px; padding: 10px 12px; border-bottom: 1px solid #F0F0F0; font-size: 14px; color: #585858; }
+  .svc-row:last-child { border-bottom: none; }
+  .svc-chk { flex: 1; display: inline-flex; align-items: center; gap: 8px; cursor: pointer; }
+  .svc-chk input { width: 16px; height: 16px; accent-color: #4C7AE8; margin: 0; }
+  .svc-price { color: #8F9098; font-size: 12px; white-space: nowrap; }
+  .svc-qty { color: #8F9098; font-size: 12px; white-space: nowrap; }
+  .svc-qty input { width: 48px; height: 28px; border: 1px solid #D8D8D8; border-radius: 4px; text-align: center; font-size: 13px; background: #F7F7FA; color: #585858; }
+  .svc-total { font-size: 14px; color: #585858; padding: 4px 0 8px; font-weight: 600; }
+  .svc-total span { color: #4C7AE8; }
+  .tab-item.active svg { fill: #4C7AE8 !important; }
+  .tab-item.active span { color: #4C7AE8; }
+
+  /* ========== 会议管理 hub ========== */
+  .mt-badge {
+    display: inline-block; min-width: 16px; height: 16px; line-height: 16px;
+    text-align: center; background: #FF4D4F; color: #fff; font-size: 11px;
+    border-radius: 8px; padding: 0 4px; margin-left: 4px; vertical-align: middle;
+  }
+  #page-meeting .tabs { margin-bottom: 12px; }
+  #page-meeting .tabs .tab-pill { font-size: 14px; }
+  .meeting-cta { bottom: 16px; display: flex; align-items: center; justify-content: center; gap: 4px; }
+
+  /* ========== 个人中心 ========== */
+  .profile-card {
+    display: flex; align-items: center; gap: 14px; background: #fff;
+    border-radius: 12px; padding: 20px 16px; margin-bottom: 16px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+  }
+  .avatar {
+    width: 52px; height: 52px; border-radius: 50%; background: #4C7AE8;
+    color: #fff; font-size: 22px; font-weight: 600;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .profile-info { display: flex; flex-direction: column; }
+  .p-name { font-size: 16px; font-weight: 600; color: #585858; }
+  .p-sub { font-size: 12px; color: #999; margin-top: 4px; }
+  .menu-list { background: #fff; border-radius: 12px; padding: 0 16px; box-shadow: 0 2px 10px rgba(0,0,0,0.04); }
+  .menu-row {
+    display: flex; align-items: center; justify-content: space-between;
+    height: 50px; font-size: 14px; color: #585858;
+    border-bottom: 1px solid #F6F6F8; cursor: pointer;
+  }
+  .menu-row:last-child { border-bottom: none; }
+  .menu-row .arrow { color: #ccc; font-size: 18px; }
+  /* 参会人员回执标注（人员级） */
+  .att-list { display:flex; flex-direction:column; gap:6px; }
+  .att-row { display:flex; align-items:center; justify-content:space-between; gap:8px; padding:8px 10px; background:#F7F7FA; border-radius:8px; }
+  .att-name { font-size:14px; color:#585858; }
+  .att-me { font-size:11px; color:#4C7AE8; margin-left:2px; }
+  .att-tag { font-size:12px; padding:2px 10px; border-radius:10px; white-space:nowrap; }
+  .att-tag.attend { background:#E8F5E9; color:#2E7D32; }
+  .att-tag.absent { background:#FDECEA; color:#C62828; }
+  .att-tag.pending { background:#F2F3F5; color:#999; }
+  .mini-disabled { color:#bbb !important; border-color:#e0e0e0 !important; background:#f7f7f7 !important; cursor:not-allowed; }
+  .bottom-btn.disabled-btn { color:#bbb !important; background:#f7f7f7 !important; border:1px solid #e0e0e0 !important; cursor:not-allowed; }
 </style>
 </head>
 <body>
@@ -298,19 +407,19 @@
       <div class="section-block">
         <div class="section-title-bar">物业工作台</div>
         <div class="work-grid">
-          <div class="work-cell" onclick="showToast('我的工单：待建设')">
+          <div class="work-cell soon" onclick="showToast('我的工单：非本期开放')">
             <div class="work-icon" style="background:#E6F0FF;"><svg viewBox="0 0 24 24" style="fill:#4C7AE8;"><path d="M4 4h16v16H4z"/><path d="M8 8h8M8 12h5M8 16h3" stroke="#fff" stroke-width="1.5"/></svg></div>
             <div class="work-text"><span class="work-title">我的工单</span><span class="work-desc">处理我的工单</span></div>
           </div>
-          <div class="work-cell" onclick="showToast('告警处置：待建设')">
+          <div class="work-cell soon" onclick="showToast('告警处置：非本期开放')">
             <div class="work-icon" style="background:#FFF2E8;"><svg viewBox="0 0 24 24" style="fill:#FA8C16;"><path d="M12 2L2 19h20L12 2z"/><path d="M12 8v5" stroke="#fff" stroke-width="2"/><circle cx="12" cy="16" r="1" fill="#fff"/></svg></div>
             <div class="work-text"><span class="work-title">告警处置</span><span class="work-desc">查看告警处置</span></div>
           </div>
-          <div class="work-cell" onclick="showToast('个人排班：待建设')">
+          <div class="work-cell soon" onclick="showToast('个人排班：非本期开放')">
             <div class="work-icon" style="background:#E6F7EF;"><svg viewBox="0 0 24 24" style="fill:#52C41A;"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M8 2v4M16 2v4M3 10h18" stroke="#fff" stroke-width="1.5"/></svg></div>
             <div class="work-text"><span class="work-title">个人排班</span><span class="work-desc">查看排班班次</span></div>
           </div>
-          <div class="work-cell" onclick="showToast('能耗预警：待建设')">
+          <div class="work-cell soon" onclick="showToast('能耗预警：非本期开放')">
             <div class="work-icon" style="background:#FFF8E8;"><svg viewBox="0 0 24 24" style="fill:#FAAD14;"><path d="M13 2L4 14h7l-1 8 9-12h-7l1-8z"/></svg></div>
             <div class="work-text"><span class="work-title">能耗预警</span><span class="work-desc">查看能耗异常</span></div>
           </div>
@@ -320,47 +429,47 @@
       <div class="section-block">
         <div class="section-title-bar">员工服务</div>
         <div class="service-grid">
-          <div class="service-cell" onclick="showToast('餐卡消费：待建设')">
+          <div class="service-cell soon" onclick="showToast('餐卡消费：非本期开放')">
             <div class="service-icon" style="background:#FFF2E8;"><svg viewBox="0 0 24 24" style="fill:#FA8C16;"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M7 10h2M7 14h2" stroke="#fff" stroke-width="1.5"/></svg></div>
             <span>餐卡消费</span>
           </div>
-          <div class="service-cell" onclick="showToast('智慧场馆：待建设')">
+          <div class="service-cell soon" onclick="showToast('智慧场馆：非本期开放')">
             <div class="service-icon" style="background:#E6F7EF;"><svg viewBox="0 0 24 24" style="fill:#52C41A;"><path d="M12 2L2 9h20L12 2z"/><path d="M5 9v11h14V9" stroke="#fff" stroke-width="1.5"/><path d="M9 20v-7h6v7" stroke="#fff" stroke-width="1.5"/></svg></div>
             <span>智慧场馆</span>
           </div>
-          <div class="service-cell" onclick="showToast('一卡通：待建设')">
+          <div class="service-cell soon" onclick="showToast('一卡通：非本期开放')">
             <div class="service-icon" style="background:#E6F0FF;"><svg viewBox="0 0 24 24" style="fill:#4C7AE8;"><rect x="4" y="6" width="16" height="12" rx="2"/><circle cx="12" cy="12" r="3" stroke="#fff" stroke-width="1.5" fill="none"/></svg></div>
             <span>一卡通</span>
           </div>
-          <div class="service-cell" onclick="showToast('访客审批：待建设')">
+          <div class="service-cell soon" onclick="showToast('访客审批：非本期开放')">
             <div class="service-icon" style="background:#E6F0FF;"><svg viewBox="0 0 24 24" style="fill:#4C7AE8;"><circle cx="12" cy="8" r="4"/><path d="M6 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/></svg></div>
             <span>访客审批</span>
           </div>
-          <div class="service-cell" onclick="showToast('一键报修：待建设')">
+          <div class="service-cell soon" onclick="showToast('一键报修：非本期开放')">
             <div class="service-icon" style="background:#E6F0FF;"><svg viewBox="0 0 24 24" style="fill:#4C7AE8;"><path d="M14.7 6.3l1-1a2.12 2.12 0 0 1 3 3l-8.4 8.4a2 2 0 0 1-1 .55l-2.5.5.5-2.5a2 2 0 0 1 .55-1l8.4-8.4"/><path d="M9 15l6-6"/></svg></div>
             <span>一键报修</span>
           </div>
-          <div class="service-cell" onclick="showToast('IT服务：待建设')">
+          <div class="service-cell soon" onclick="showToast('IT服务：非本期开放')">
             <div class="service-icon" style="background:#FFF8E8;"><svg viewBox="0 0 24 24" style="fill:#FAAD14;"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4M6 8h2M6 11h2" stroke="#fff" stroke-width="1.5"/></svg></div>
             <span>IT服务</span>
           </div>
-          <div class="service-cell" onclick="showToast('沁园服务：待建设')">
+          <div class="service-cell soon" onclick="showToast('沁园服务：非本期开放')">
             <div class="service-icon" style="background:#E6F7EF;"><svg viewBox="0 0 24 24" style="fill:#52C41A;"><path d="M3 11h18v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M8 11V7a4 4 0 0 1 8 0v4" stroke="#fff" stroke-width="1.5" fill="none"/></svg></div>
             <span>沁园服务</span>
           </div>
-          <div class="service-cell" onclick="showToast('车位申请：待建设')">
+          <div class="service-cell soon" onclick="showToast('车位申请：非本期开放')">
             <div class="service-icon" style="background:#FFF2E8;"><svg viewBox="0 0 24 24" style="fill:#FA8C16;"><rect x="3" y="10" width="18" height="9" rx="2"/><circle cx="7.5" cy="17.5" r="1.5"/><circle cx="16.5" cy="17.5" r="1.5"/><path d="M6 10V8a3 3 0 0 1 6 0v2M12 10V7a3 3 0 0 1 6 0v3"/></svg></div>
             <span>车位申请</span>
           </div>
-          <div class="service-cell" onclick="showToast('门禁申请：待建设')">
+          <div class="service-cell soon" onclick="showToast('门禁申请：非本期开放')">
             <div class="service-icon" style="background:#E6F0FF;"><svg viewBox="0 0 24 24" style="fill:#4C7AE8;"><rect x="6" y="3" width="12" height="18" rx="2"/><circle cx="12" cy="10" r="2" fill="none" stroke="#fff" stroke-width="1.5"/><path d="M9 16h6" stroke="#fff" stroke-width="1.5"/></svg></div>
             <span>门禁申请</span>
           </div>
-          <div class="service-cell" onclick="goList()">
+          <div class="service-cell" onclick="goMeeting()">
             <div class="service-icon" style="background:#E6F0FF;"><svg viewBox="0 0 24 24" style="fill:#4C7AE8;"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 9h8M8 13h5M8 17h3" stroke="#fff" stroke-width="1.5"/><circle cx="17" cy="16" r="3" fill="#52C41A"/><path d="M16 16l1 1 2-2" stroke="#fff" stroke-width="1.2"/></svg></div>
-            <span>会议预约</span>
+            <span>会议管理</span>
           </div>
-          <div class="service-cell" onclick="showToast('我的问卷：待建设')">
+          <div class="service-cell soon" onclick="showToast('我的问卷：非本期开放')">
             <div class="service-icon" style="background:#FFF8E8;"><svg viewBox="0 0 24 24" style="fill:#FAAD14;"><path d="M4 4h16v16H4z"/><path d="M8 8h2M8 12h8M8 16h6" stroke="#fff" stroke-width="1.5"/></svg></div>
             <span>我的问卷</span>
           </div>
@@ -369,32 +478,59 @@
     </div>
     <div class="tabbar">
       <div class="tab-item active" onclick="switchTab('home')">
-        <svg viewBox="0 0 24 24" style="fill:#4C7AE8;"><path d="M3 10.5L12 3l9 7.5V20a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+        <svg viewBox="0 0 24 24" style="fill:#999;"><path d="M3 10.5L12 3l9 7.5V20a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
         <span>首页</span>
       </div>
-      <div class="tab-item" onclick="showToast('待建设')">
+      <div class="tab-item" onclick="switchTab('mine')">
         <svg viewBox="0 0 24 24" style="fill:#999;"><circle cx="12" cy="8" r="4"/><path d="M6 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/></svg>
         <span>我的</span>
       </div>
     </div>
   </div>
 
-  <!-- ================= 列表页 ================= -->
-  <div class="page" id="page-list">
+  <!-- ================= 会议管理（首页卡片入口进入） ================= -->
+  <div class="page" id="page-meeting">
     <div class="statusbar">9:41<span></span></div>
     <div class="header">
       <div class="back" onclick="goHome()"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6" stroke="#fff" stroke-width="2" fill="none"/></svg></div>
-      会议预约
+      会议管理
     </div>
-    <div class="content">
+    <div class="content" style="padding-bottom: 90px;">
       <div class="tabs">
-        <div class="tab-pill active" data-tab="pending" onclick="switchListTab('pending')">待审批</div>
-        <div class="tab-pill" data-tab="all" onclick="switchListTab('all')">全部</div>
+        <div class="tab-pill active" data-tab="initiated" onclick="switchListTab('initiated')">我发起的</div>
+        <div class="tab-pill" data-tab="joined" onclick="switchListTab('joined')">我参加的<span class="mt-badge" id="joinedReceiptBadge">0</span></div>
       </div>
-      <div id="listContainer"></div>
+      <div id="meetingContainer"></div>
       <div class="empty-tip">没有更多数据了</div>
     </div>
-    <div class="bottom-btn" onclick="goForm()">发起预约</div>
+    <div class="bottom-btn meeting-cta" onclick="goForm()">
+      <svg viewBox="0 0 24 24" style="width:18px;height:18px;fill:#fff;vertical-align:middle;margin-right:4px;"><path d="M11 11V5h2v6h6v2h-6v6h-2v-6H5v-2z"/></svg>
+      发起会议
+    </div>
+  </div>
+
+  <!-- ================= 我的（个人中心） ================= -->
+  <div class="page" id="page-mine">
+    <div class="statusbar">9:41<span></span></div>
+    <div class="header">
+      <div class="back" onclick="switchTab('home')"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6" stroke="#fff" stroke-width="2" fill="none"/></svg></div>
+      我的
+    </div>
+    <div class="content">
+      <div class="profile-card">
+        <div class="avatar">陈</div>
+        <div class="profile-info">
+          <div class="p-name">陈琼梦</div>
+          <div class="p-sub">主任办公室 · 工号 2026001</div>
+        </div>
+      </div>
+      <div class="menu-list">
+        <div class="menu-row" onclick="goMeeting()"><span>我的会议</span><span class="arrow">›</span></div>
+        <div class="menu-row soon" onclick="showToast('我的草稿：非本期开放')"><span>我的草稿</span><span class="arrow">›</span></div>
+        <div class="menu-row soon" onclick="showToast('消息通知：非本期开放')"><span>消息通知</span><span class="arrow">›</span></div>
+        <div class="menu-row soon" onclick="showToast('设置：非本期开放')"><span>设置</span><span class="arrow">›</span></div>
+      </div>
+    </div>
   </div>
 
   <!-- ================= 详情页 ================= -->
@@ -402,7 +538,7 @@
     <div class="statusbar">9:41<span></span></div>
     <div class="header">
       <div class="back" onclick="goList()"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6" stroke="#fff" stroke-width="2" fill="none"/></svg></div>
-      会议预约
+      会议详情
     </div>
     <div class="content">
       <div class="card">
@@ -414,17 +550,14 @@
         <div class="info-row"><div class="info-label">会议类别</div><div class="info-value" id="dCategory">-</div></div>
         <div class="info-row"><div class="info-label">会议类型</div><div class="info-value" id="dType">-</div></div>
         <div class="info-row"><div class="info-label">会议召集人</div><div class="info-value" id="dConvener">-</div></div>
-        <div class="info-row"><div class="info-label">是否涉密</div><div class="info-value" id="dConfidential">-</div></div>
         <div class="info-row"><div class="info-label">发起部门</div><div class="info-value" id="dDept">-</div></div>
         <div class="info-row"><div class="info-label">申请人</div><div class="info-value" id="dApplicant">-</div></div>
         <div class="info-row"><div class="info-label">联系电话</div><div class="info-value" id="dContact">-</div></div>
         <div class="info-row"><div class="info-label">审批状态</div><div class="info-value" id="dStatus">-</div></div>
+        <div class="info-row"><div class="info-label">预订状态</div><div class="info-value" id="dOccupancy">-</div></div>
         <div class="info-row"><div class="info-label">会议时间</div><div class="info-value" id="dTime">-</div></div>
         <div class="info-row"><div class="info-label">会议内容</div><div class="info-value" id="dContent">-</div></div>
-        <div class="info-row">
-          <div class="info-label">附件</div>
-          <div class="info-value"><div class="file-list" id="dAttachments"></div></div>
-        </div>
+        <div class="info-row"><div class="info-label">附件</div><div class="info-value" id="dAttachments">-</div></div>
       </div>
       <div class="card">
         <div class="section-title">会议室信息</div>
@@ -433,11 +566,6 @@
         <div class="info-row"><div class="info-label">会议室位置</div><div class="info-value" id="dLocation">-</div></div>
         <div class="info-row"><div class="info-label">容纳人数</div><div class="info-value" id="dSeats">-</div></div>
         <div class="info-row"><div class="info-label">配套设施</div><div class="info-value" id="dFacilities">-</div></div>
-        <div class="info-row"><div class="info-label">成本</div><div class="info-value" id="dCost">-</div></div>
-      </div>
-      <div class="card">
-        <div class="section-title">外出开会</div>
-        <div class="info-row"><div class="info-label">是否外出开会</div><div class="info-value" id="dOffsite">否</div></div>
       </div>
       <div class="card">
         <div class="section-title">会务服务</div>
@@ -445,40 +573,33 @@
         <div class="info-row"><div class="info-label">服务类型</div><div class="info-value" id="dServiceType">-</div></div>
         <div class="info-row"><div class="info-label">会务说明</div><div class="info-value" id="dRemark">-</div></div>
       </div>
-      <div class="card">
+      <div class="card" id="costShareCard">
         <div class="section-title">费用分摊</div>
         <div class="info-row"><div class="info-label">是否分摊</div><div class="info-value" id="dCostShare">-</div></div>
         <div class="info-row"><div class="info-label">分摊项目组</div><div class="info-value" id="dShareGroup">-</div></div>
       </div>
       <div class="card">
-        <div class="section-title">会议通知</div>
-        <div class="info-row"><div class="info-label">是否通知会议</div><div class="info-value" id="dNotice">-</div></div>
-        <div class="info-row"><div class="info-label">通知对象</div><div class="info-value" id="dNoticeObj">-</div></div>
-        <div class="info-row"><div class="info-label">参会领导</div><div class="info-value" id="dLeaders">-</div></div>
-        <div class="info-row"><div class="info-label">参会部门</div><div class="info-value" id="dDeptAttend">-</div></div>
-        <div class="info-row"><div class="info-label">参会人员</div><div class="info-value" id="dMembers">-</div></div>
-        <div class="info-row"><div class="info-label">允许另派他人</div><div class="info-value" id="dAllowProxy">-</div></div>
-        <div class="info-row"><div class="info-label">是否回执</div><div class="info-value" id="dReceipt">-</div></div>
-      </div>
-      <div class="card">
-        <div class="section-title">操作日志</div>
-        <div class="log-row" style="cursor:default;">
-          <div>
-            <div style="font-size:14px;color:#585858;">发起流程引擎审批</div>
-            <div style="font-size:12px;color:#999;margin-top:4px;">操作人员：admin</div>
-          </div>
+        <div class="section-title">参会通知</div>
+        <div id="detailNoticeBlock">
+          <div class="info-row"><div class="info-label">参会对象</div><div class="info-value" id="dNoticeObj">-</div></div>
+          <div class="info-row"><div class="info-label">参会部门</div><div class="info-value" id="dDeptAttend">-</div></div>
+          <div class="info-row" style="flex-direction:column;align-items:stretch;gap:8px;"><div class="info-label">参会人员</div><div class="info-value" id="dMembers"></div></div>
         </div>
       </div>
+      <div class="card" id="receiptCard" style="display:none;">
+        <div class="section-title">回执确认</div>
+        <div class="info-row"><div class="info-label">我的回执</div><div class="info-value" id="dReceiptReply">未回执</div></div>
+      </div>
     </div>
-    <div class="bottom-btn secondary" id="detailCancelBtn" onclick="openCancelModal()">撤销预约</div>
+    <div class="detail-actions" id="detailActions" style="display:none;"></div>
   </div>
 
   <!-- ================= 表单页 ================= -->
   <div class="page" id="page-form">
     <div class="statusbar">9:41<span></span></div>
     <div class="header">
-      <div class="back" onclick="goList()"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6" stroke="#fff" stroke-width="2" fill="none"/></svg></div>
-      会议预约
+      <div class="back" onclick="exitForm()"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6" stroke="#fff" stroke-width="2" fill="none"/></svg></div>
+      <span id="formTitle">会议预约</span>
     </div>
     <div class="content">
       <div class="form-group">
@@ -515,20 +636,12 @@
           <div class="error-msg" id="errConvener">请输入会议召集人</div>
         </div>
         <div class="form-item vertical">
-          <div class="form-label"><span class="required">*</span>是否涉密</div>
-          <select class="form-input" id="fConfidential">
-            <option value="否" selected>否</option>
-            <option value="是">是</option>
-          </select>
-          <div class="error-msg" id="errConfidential">请选择是否涉密</div>
+          <div class="form-label">申请人</div>
+          <input class="form-input" id="fApplicant" value="陈琼梦" readonly>
         </div>
         <div class="form-item vertical">
           <div class="form-label">发起部门</div>
-          <input class="form-input" id="fDept" value="系统管理员" readonly>
-        </div>
-        <div class="form-item vertical">
-          <div class="form-label">申请人</div>
-          <input class="form-input" id="fApplicant" value="admin" readonly>
+          <input class="form-input" id="fDept" value="主任办公室" readonly>
         </div>
         <div class="form-item vertical">
           <div class="form-label"><span class="required">*</span>联系电话</div>
@@ -538,11 +651,20 @@
         <div class="form-item vertical">
           <div class="form-label"><span class="required">*</span>会议时间</div>
           <div style="display:flex; gap:8px; align-items:center;">
-            <input class="form-input" id="fDate" type="date" value="2026-08-05" style="flex:1.3;">
-            <select class="form-input" id="fStartTime" style="flex:1;"><option>08:00</option><option>09:00</option><option>10:00</option><option>11:00</option><option>13:00</option><option>14:00</option><option>15:00</option><option>16:00</option><option>17:00</option></select>
+            <input class="form-input" id="fDate" type="date" value="2026-08-09" style="flex:1.3;">
+            <select class="form-input" id="fStartTime" style="flex:1;" onchange="mCalcRoomFee()"></select>
             <span style="color:#999;">至</span>
-            <select class="form-input" id="fEndTime" style="flex:1;"><option>09:00</option><option>10:00</option><option>11:00</option><option>12:00</option><option>14:00</option><option>15:00</option><option>16:00</option><option>17:00</option><option>18:00</option></select>
+            <select class="form-input" id="fEndTime" style="flex:1;" onchange="mCalcRoomFee()"></select>
           </div>
+          <script>
+            (function(){
+              var opts = [];
+              for (var h=6; h<=24; h++){ var hh = String(h).padStart(2,'0'); if (h<24){ opts.push('<option>'+hh+':00</option>'); opts.push('<option>'+hh+':30</option>'); } else { opts.push('<option>24:00</option>'); } }
+              var s = document.getElementById('fStartTime'), e = document.getElementById('fEndTime');
+              if (s) s.innerHTML = opts.join('');
+              if (e) e.innerHTML = opts.slice(1).join('');
+            })();
+          </script>
           <div class="error-msg" id="errTime">请选择会议时间</div>
         </div>
         <div class="form-item vertical">
@@ -550,25 +672,9 @@
           <textarea class="form-textarea" id="fContent" placeholder="请输入会议内容"></textarea>
         </div>
         <div class="form-item vertical">
-          <div class="form-label">附件</div>
-          <div class="upload-box" onclick="document.getElementById('fAttachment').click()">
-            <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" stroke="#999" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
-            <span>上传</span>
-          </div>
-          <input type="file" id="fAttachment" multiple hidden onchange="handleAttachment(this)">
-          <div class="file-list" id="attachList"></div>
-          <div class="upload-tip" id="attachTip">最多上传5个文件（支持图片、文档等）</div>
-        </div>
-      </div>
-
-      <div class="form-group">
-        <div class="section-title">外出开会</div>
-        <div class="form-item vertical">
-          <div class="form-label">是否外出开会</div>
-          <div class="form-radio-group">
-            <label class="form-radio"><input type="radio" name="fOffsite" value="否" checked onclick="toggleOffsite()">否</label>
-            <label class="form-radio"><input type="radio" name="fOffsite" value="是" onclick="toggleOffsite()">是</label>
-          </div>
+          <div class="form-label">附件上传</div>
+          <input type="file" id="fAttachments" multiple style="font-size:13px;padding:6px 0;">
+          <div id="fAttachList" style="margin-top:6px;font-size:12px;color:#999;line-height:1.8;"></div>
         </div>
       </div>
 
@@ -592,8 +698,12 @@
           <input class="form-input" id="fSeats" placeholder="自动带入" readonly>
         </div>
         <div class="form-item">
-          <div class="form-label">成本</div>
-          <input class="form-input" id="fCost" placeholder="元/小时" readonly>
+          <div class="form-label">单价（元/小时）</div>
+          <input class="form-input" id="fCost" placeholder="自动带入" readonly>
+        </div>
+        <div class="form-item">
+          <div class="form-label">会议室费用</div>
+          <input class="form-input" id="fRoomFee" placeholder="自动计算" readonly>
         </div>
         <div class="form-item vertical">
           <div class="form-label">配套设施</div>
@@ -611,17 +721,8 @@
           </select>
         </div>
         <div id="serviceDetail" style="display:none;">
-          <div class="form-item vertical">
-            <div class="form-label">服务类型</div>
-            <select class="form-input" id="fServiceType">
-              <option value="">请选择服务类型</option>
-              <option>会务服务</option>
-              <option>纸笔套装</option>
-              <option>席卡</option>
-              <option>矿泉水</option>
-              <option>茶水</option>
-            </select>
-          </div>
+          <div id="svcList" class="svc-list"></div>
+          <div class="svc-total">会务服务费用合计：<span id="svcTotal">¥0.00</span></div>
           <div class="form-item vertical">
             <div class="form-label">会务说明</div>
             <input class="form-input" id="fRemark" placeholder="请输入具体要求">
@@ -645,70 +746,44 @@
       </div>
 
       <div class="form-group">
-        <div class="section-title">会议通知</div>
+        <div class="section-title">参会通知</div>
         <div class="form-item vertical">
-          <div class="form-label">是否通知会议</div>
+          <div class="form-label">是否通知</div>
           <div class="form-radio-group">
-            <label class="form-radio"><input type="radio" name="fNotice" value="否" checked onchange="toggleNotice()">否</label>
-            <label class="form-radio"><input type="radio" name="fNotice" value="是" onchange="toggleNotice()">是</label>
+            <label class="form-radio"><input type="radio" name="fNotify" value="是" onchange="toggleNotify()">是</label>
+            <label class="form-radio"><input type="radio" name="fNotify" value="否" checked onchange="toggleNotify()">否</label>
           </div>
         </div>
-        <div id="noticeDetail" style="display:none;">
+        <div id="noticeObjBlock" style="display:none;">
           <div class="form-item vertical">
-            <div class="form-label">通知对象</div>
+            <div class="form-label">参会对象</div>
             <div class="form-radio-group">
-              <label class="form-radio"><input type="radio" name="fNoticeObj" value="部门联络人" checked onchange="toggleNoticeObj()">部门联络人</label>
-              <label class="form-radio"><input type="radio" name="fNoticeObj" value="指定参会人" onchange="toggleNoticeObj()">指定参会人</label>
+              <label class="form-radio"><input type="checkbox" name="fNoticeObj" value="部门联络人" onchange="toggleNoticeObj()">部门联络人</label>
+              <label class="form-radio"><input type="checkbox" name="fNoticeObj" value="指定参会人" onchange="toggleNoticeObj()">指定参会人</label>
             </div>
           </div>
-          <div class="form-item vertical">
-            <div class="form-label">参会领导</div>
-            <input class="form-input" id="fLeaders" placeholder="请选择参会领导">
-          </div>
-          <div class="form-item vertical">
+          <div class="form-item vertical" id="deptAttendItem">
             <div class="form-label">参会部门</div>
             <input class="form-input" id="fDeptAttend" placeholder="请选择参会部门">
           </div>
           <div class="form-item vertical hidden-field" id="attendeesItem">
-            <div class="form-label"><span class="required">*</span>参会人员</div>
-            <input class="form-input" id="fMembers" placeholder="请输入">
-            <div class="error-msg" id="errMembers">请选择参会人员</div>
-          </div>
-          <div class="form-item vertical">
-            <div class="form-label">允许另派他人</div>
-            <div class="form-radio-group">
-              <label class="form-radio"><input type="radio" name="fAllowProxy" value="否" checked>否</label>
-              <label class="form-radio"><input type="radio" name="fAllowProxy" value="是">是</label>
-            </div>
-          </div>
-          <div class="form-item vertical">
-            <div class="form-label">会议材料</div>
-            <div class="upload-box" onclick="showToast('会议材料上传：待接入')">
-              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3" fill="none" stroke="#999" stroke-width="1.5"/><path d="M20 7h-2l-1-2H7L6 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z" fill="none" stroke="#999" stroke-width="1.5"/></svg>
-              <span>上传</span>
-            </div>
-          </div>
-          <div class="form-item vertical">
-            <div class="form-label">是否回执</div>
-            <div class="form-radio-group">
-              <label class="form-radio"><input type="radio" name="fReceipt" value="否" checked>否</label>
-              <label class="form-radio"><input type="radio" name="fReceipt" value="是">是</label>
-            </div>
+            <div class="form-label">参会人员</div>
+            <input class="form-input" id="fMembers" placeholder="请选择参会人员">
           </div>
         </div>
       </div>
     </div>
-    <div class="bottom-btn" onclick="submitForm()">提交</div>
+    <div class="bottom-btn" id="formSubmitBtn" onclick="submitForm()">提交</div>
   </div>
 
-  <!-- 撤销确认弹窗 -->
+  <!-- 撤销/取消确认弹窗：仅做取消会议/取消会议这一单一动作；变更已独立为一级入口，不再挂在此弹窗 -->
   <div class="modal-mask" id="cancelModal">
     <div class="modal-box">
-      <div class="modal-title">系统提示</div>
-      <div class="modal-body">确定要撤销预约？</div>
+      <div class="modal-title" id="cancelModalTitle">取消会议</div>
+      <div class="modal-body" id="cancelModalText">取消后该会议室时段将立即释放，其他人可预订。确定取消？</div>
       <div class="modal-btns">
-        <div class="btn cancel" onclick="closeCancelModal()">取消</div>
-        <div class="btn confirm" onclick="confirmCancel()">确定</div>
+        <div class="btn cancel" onclick="closeCancelModal()">再想想</div>
+        <div class="btn confirm" id="mCancelBtn" onclick="confirmCancel()">确认取消</div>
       </div>
     </div>
   </div>
@@ -735,24 +810,54 @@ const rooms = [
 ];
 
 const allData = [
-  { id: 1, status: 'pending', statusText: '待审批', name: '测试', members: '1人', time: '2026-08-05 08:30-09:30', place: '大报告厅', createTime: '2026-08-04 14:00:49',
+  { id: 1, status: 'pending', statusText: '待审批', name: '测试', members: '1人', time: '2026-08-08 08:30-09:30', place: '大报告厅', createTime: '2026-08-07 14:00:49',
     category: '管理类', type: '党委会', convener: '张三', confidential: '否', dept: '系统管理员', applicant: 'admin', contact: '17621189702',
     content: '季度运营复盘会议', offsite: '否', attachments: ['会议议程.docx', '参会名单.xlsx'],
     needService: '是', serviceType: '茶水、席卡、纸笔套装', costShare: '否', shareGroup: '',
-    notice: '是', noticeObj: '部门联络人', leaders: '李总', deptAttend: '研发部', attendees: 'bmct', allowProxy: '否', receipt: '否',
+    notice: '是', noticeObj: ['部门联络人'], leaders: '李总', deptAttend: '研发部', attendees: ['陈琼梦'], receipts: {},
     room: '301', scale: '大报告厅', location: '3F', seats: 263, cost: '205元/小时', facilities: ['投影仪','视频会议','白板','麦克风'], remark: '请按时准备' },
-  { id: 2, status: 'revoked', statusText: '已撤销', name: 'T 会议预定052802', members: '2人', time: '2026-05-29 08:00-09:00', place: '中会议室', createTime: '2026-05-28 19:07:57', category: '科研类', type: '主任办公会', dept: '研发部', applicant: 'admin' },
-  { id: 3, status: 'approved', statusText: '已通过', name: 'T 会议预定052801', members: '1人', time: '2026-05-28 19:02-20:00', place: '中会议室', createTime: '2026-05-28 19:05:14', category: '科研类', type: '专题办公会', dept: '研发部', applicant: 'admin' },
-  { id: 4, status: 'approved', statusText: '已通过', name: '526预约2', members: '3人', time: '2026-05-26 11:30-12:30', place: '大报告厅', createTime: '2026-05-26 10:04:38', category: '管理类', type: '部门例会', dept: '培训组', applicant: 'admin' },
-  { id: 5, status: 'approved', statusText: '已通过', name: '526预约2', members: '2人', time: '2026-05-26 11:00-12:00', place: '大报告厅', createTime: '2026-05-26 10:03:52', category: '管理类', type: '部门例会', dept: '培训组', applicant: 'admin' },
-  { id: 6, status: 'approved', statusText: '已通过', name: '526预约1', members: '2人', time: '2026-05-26 10:30-11:30', place: '大报告厅', createTime: '2026-05-26 10:03:07', category: '管理类', type: '其他', dept: '行政部', applicant: 'admin' },
-  { id: 7, status: 'expired', statusText: '过期未审批', name: '部门周会', members: '2人', time: '2026-05-23 15:51-16:51', place: '大报告厅', createTime: '2026-05-23 15:51:39', category: '管理类', type: '部门例会', dept: '研发部', applicant: 'admin' },
-  { id: 8, status: 'expired', statusText: '过期未审批', name: '部门周会', members: '2人', time: '2026-05-22 14:57-15:57', place: '大报告厅', createTime: '2026-05-22 14:57:24', category: '管理类', type: '部门例会', dept: '研发部', applicant: 'admin' }
+  { id: 9, status: 'approved', statusText: '已通过', name: '产品评审会', members: '6人', time: '2026-08-08 14:00-16:00', place: '中会议室', createTime: '2026-08-06 09:20:11',
+    category: '管理类', type: '专题办公会', convener: '李四', dept: '主任办公室', applicant: '陈琼梦', contact: '17621189702',
+    content: '版本迭代评审', needService: '否', serviceType: '', costShare: '否', notice: '否', receipt: '是',
+    room: '302', scale: '中会议室', location: '2F', seats: 40, cost: '80元/小时', facilities: ['投影仪','白板'], attendees: ['陈琼梦','王芳','李华','张敏','周涛','吴磊'], receipts: {'陈琼梦':'attend','王芳':'attend','李华':'absent','张敏':'attend'} },
+  { id: 11, status: 'pending', statusText: '待审批', name: '季度预算评审会', members: '8人', time: '2026-08-15 14:00-16:00', place: '中会议室', createTime: '2026-08-12 10:30:00',
+    category: '管理类', type: '主任办公会', convener: '李四', dept: '主任办公室', applicant: '陈琼梦', contact: '17621189702',
+    content: 'Q3 预算评审', needService: '是', serviceType: '茶水、席卡', costShare: '否', notice: '否',
+    room: '302', scale: '中会议室', location: '2F', seats: 40, cost: '80元/小时', facilities: ['投影仪','白板'], attendees: ['陈琼梦','王芳','李华'], receipts: {} },
+  { id: 10, status: 'approved', statusText: '已通过', name: '安全巡检例会', members: '4人', time: '2026-08-08 10:00-11:00', place: '小会议室', createTime: '2026-08-05 16:40:02',
+    category: '管理类', type: '部门例会', convener: '王五', dept: '行政部', applicant: 'admin', contact: '13800000000',
+    room: '303', scale: '小会议室', location: '1F', seats: 12, cost: '50元/小时', facilities: ['白板','麦克风'], attendees: ['陈琼梦','王五','赵敏'], receipt: '是', receipts: {'王五':'attend'} },
+  { id: 2, status: 'revoked', statusText: '已撤销', name: 'T 会议预定052802', members: '2人', time: '2026-08-05 08:00-09:00', place: '中会议室', createTime: '2026-08-04 19:07:57', category: '科研类', type: '主任办公会', dept: '研发部', applicant: 'admin', room: '302', scale: '中会议室' },
+  { id: 3, status: 'approved', statusText: '已通过', name: 'T 会议预定052801', members: '1人', time: '2026-08-06 19:02-20:00', place: '中会议室', createTime: '2026-08-06 19:05:14', category: '科研类', type: '专题办公会', dept: '研发部', applicant: 'admin', room: '302', scale: '中会议室', attendees: '陈琼梦' },
+  { id: 4, status: 'approved', statusText: '已通过', name: '526预约2', members: '3人', time: '2026-08-06 11:30-12:30', place: '大报告厅', createTime: '2026-08-05 10:04:38', category: '管理类', type: '部门例会', dept: '培训组', applicant: 'admin', room: '301', scale: '大报告厅', attendees: '陈琼梦', receipt: '是' },
+  { id: 5, status: 'approved', statusText: '已通过', name: '526预约2', members: '2人', time: '2026-08-07 11:00-12:00', place: '大报告厅', createTime: '2026-05-26 10:03:52', category: '管理类', type: '部门例会', dept: '培训组', applicant: 'admin', room: '301', scale: '大报告厅' },
+  { id: 6, status: 'approved', statusText: '已通过', name: '526预约1', members: '2人', time: '2026-08-07 10:30-11:30', place: '大报告厅', createTime: '2026-05-26 10:03:07', category: '管理类', type: '其他', dept: '行政部', applicant: 'admin', room: '301', scale: '大报告厅' },
+  { id: 7, status: 'expired', statusText: '已过期', name: '部门周会', members: '2人', time: '2026-08-05 15:51-16:51', place: '大报告厅', createTime: '2026-08-04 15:51:39', category: '管理类', type: '部门例会', dept: '研发部', applicant: 'admin', room: '301', scale: '大报告厅' },
+  { id: 8, status: 'expired', statusText: '已过期', name: '部门周会', members: '2人', time: '2026-08-05 14:57-15:57', place: '大报告厅', createTime: '2026-08-04 14:57:24', category: '管理类', type: '部门例会', dept: '研发部', applicant: 'admin', room: '301', scale: '大报告厅' },
+  { id: 12, status: 'approved', statusText: '已通过', name: '园区安全联席会议', members: '4人', time: '2026-08-11 14:00-16:00', place: '中会议室', createTime: '2026-08-09 09:10:00',
+    category: '管理类', type: '专题办公会', convener: '李四', dept: '主任办公室', applicant: '陈琼梦', contact: '17621189702',
+    content: '园区安全季度联席', needService: '否', serviceType: '', costShare: '否', notice: '否',
+    room: '302', scale: '中会议室', location: '2F', seats: 40, cost: '80元/小时', facilities: ['投影仪','白板'], attendees: ['陈琼梦','王芳','李华'], receipts: {} },
+  { id: 13, status: 'approved', statusText: '已通过', name: '学术委员会例会', members: '3人', time: '2026-08-11 09:00-10:00', place: '小会议室', createTime: '2026-08-09 09:12:00',
+    category: '科研类', type: '部门例会', convener: '王五', dept: '科研管理部', applicant: 'admin', contact: '13800000000',
+    content: '学术委员会例行会议', needService: '否', serviceType: '', costShare: '否', notice: '否',
+    room: '303', scale: '小会议室', location: '1F', seats: 12, cost: '50元/小时', facilities: ['白板','麦克风'], attendees: ['陈琼梦','王五','赵敏'], receipts: {} }
 ];
 
-let currentTab = 'pending';
+allData.forEach(d => { if (!d.occupancy) d.occupancy = '已预订'; }); // 预订状态初始化：提交即预占，默认已预订
+
+const currentUser = '陈琼梦';
+let currentTab = 'initiated';
 let selectedRoom = null;
 let currentDetailId = null;
+let editingId = null;   // 正在编辑的草稿 id（null=新建预约）
+let mRebookSourceId = null;   // 变更源 id（null=非变更）；原单仅在新单提交成功时释放，避免开了表单不提交导致原单丢失
+
+/* ===== 变更模型 =====
+   规则：变更 = 取消原单（释放房间）+ 用历史信息开全新申请重提；
+        新单重新触发审批流（按会议类型路由），不做原子换占，无"已变更"状态。 */
+/* 已释放状态：不再占用会议室时段（已由 occupancy === '已释放' 判断，此常量保留供参考） */
+const RELEASED = ['revoked', 'cancelled', 'expired', 'rejected', 'draft'];
 
 function switchPage(id) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -760,50 +865,160 @@ function switchPage(id) {
 }
 
 function switchTab(name) {
+  const tabs = document.querySelectorAll('.tab-item');
+  tabs.forEach(t => t.classList.remove('active'));
   if (name === 'home') {
     switchPage('page-home');
-    document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
-    document.querySelectorAll('.tab-item')[0].classList.add('active');
+    tabs[0].classList.add('active');
+  } else if (name === 'mine') {
+    switchPage('page-mine');
+    tabs[1].classList.add('active');
   }
 }
 
 function goHome() { switchPage('page-home'); }
-function goList() { renderList(); switchPage('page-list'); }
-function goForm() { switchPage('page-form'); }
+/* 会议管理页：从首页「会议管理」卡片/个人中心「我的会议」进入 */
+function goMeeting() { switchListTab('initiated'); switchPage('page-meeting'); }
+function goList() { goMeeting(); }
+/* 新建预约：清空表单 */
+function goForm() {
+  editingId = null;
+  mRebookSourceId = null;   // 进入全新预约，清空任何变更源
+  const ft = document.getElementById('formTitle');
+  if (ft) ft.textContent = '会议预约';
+  clearForm();
+  switchPage('page-form');
+}
+/* 表单返回 */
+function exitForm() {
+  mRebookSourceId = null;   // 放弃表单（含放弃变更）：清空变更源，原单保留不释放
+  goList();
+}
 
 function statusClass(s) {
   if (s === 'pending') return 'blue';
   if (s === 'approved') return 'green';
   if (s === 'revoked') return 'grey';
+  if (s === 'cancelled') return 'grey';
+  if (s === 'draft') return 'grey';
+  if (s === 'expired') return 'grey';   // 已过期：灰色，不占用资源
   return 'orange';
-}
-
-function renderList() {
-  const container = document.getElementById('listContainer');
-  const list = currentTab === 'pending' ? allData.filter(d => d.status === 'pending') : allData;
-  container.innerHTML = list.map(item => `
-    <div class="card" onclick="goDetail(${item.id})">
-      <div class="card-head">
-        <div class="status-tag ${statusClass(item.status)}"><span></span>${item.statusText}</div>
-      </div>
-      <div class="card-row"><div class="card-label">会议名称</div><div class="card-value">${item.name}</div></div>
-      <div class="card-row"><div class="card-label">会议类型</div><div class="card-value">${item.type || '-'}</div></div>
-      <div class="card-row"><div class="card-label">参会人数</div><div class="card-value">${item.members}</div></div>
-      <div class="card-row"><div class="card-label">会议时间</div><div class="card-value">${item.time}</div></div>
-      <div class="card-row"><div class="card-label">会议地点</div><div class="card-value">${item.place}</div></div>
-      ${item.status === 'pending' ? '<div style="overflow:hidden;"><span class="cancel-mini" onclick="event.stopPropagation();openCancelModal(' + item.id + ')">撤销预约</span></div>' : ''}
-    </div>
-  `).join('');
 }
 
 function switchListTab(tab) {
   currentTab = tab;
-  document.querySelectorAll('.tab-pill').forEach(t => t.classList.remove('active'));
-  document.querySelector(`.tab-pill[data-tab="${tab}"]`).classList.add('active');
-  renderList();
+  document.querySelectorAll('#page-meeting [data-tab]').forEach(p => p.classList.toggle('active', p.dataset.tab === tab));
+  renderMeeting();
 }
+function updateMeetingBadges() {
+  // 回执待办角标：挂在「我参加的」子标签；仅统计「我参加且非我发起」的待回执会议
+  const recN = allData.filter(d => d.status === 'approved'
+    && d.applicant !== currentUser
+    && (getAttendees(d).includes(currentUser) || d.convener === currentUser)
+    && !(d.receipts && d.receipts[currentUser])).length;
+  const rb = document.getElementById('joinedReceiptBadge');
+  if (rb) { rb.textContent = recN; rb.style.display = recN ? '' : 'none'; }
+}
+function renderMeeting() {
+  updateMeetingBadges();
+  const container = document.getElementById('meetingContainer');
+  if (!container) return;
+  let list, from, badge = '';
+  if (currentTab === 'initiated') {
+      list = allData.filter(d => d.applicant === currentUser);
+      from = 'mine';
+    } else {
+      // 「我参加的」= 别人组织、需我回执的会议；自己发起的会议统一在「我发起的」tab 管理
+      list = allData.filter(d => ((d.attendees && String(d.attendees).split(/[,，]/).map(s => s.trim()).includes(currentUser)) || d.convener === currentUser) && d.status === 'approved' && d.applicant !== currentUser);
+      from = 'mine';
+    }
+  if (!list.length) {
+    container.innerHTML = '<div style="padding:48px 0;text-align:center;color:#999;font-size:13px;">暂无数据</div>';
+    return;
+  }
+  container.innerHTML = list.map(item => {
+    // 参会人（非本人发起）无取消/撤销权限，仅本人发起的预约才展示占用操作
+    const isMine = item.applicant === currentUser;
+    let acts = '';
+    if (item.status === 'pending') {
+      if (isMine) {
+        acts = '<div class="mini-bar"><span class="cancel-mini" onclick="event.stopPropagation();openCancelModal(' + item.id + ')">取消会议</span></div>';
+      }
+      // 非本人发起（我参加的）：不展示取消会议/变更按钮（无权限，隐藏，不置灰）
+    } else if (item.status === 'approved') {
+      if (isMine) {
+        if (!mStarted(item) && item.occupancy === '已预订') {
+          acts = '<div class="mini-bar">'
+            + '<span class="cancel-mini" onclick="event.stopPropagation();openCancelModal(' + item.id + ')">取消会议</span>'
+            + '<span class="change-mini" onclick="event.stopPropagation();mChange(' + item.id + ')">变更</span>'
+            + '</div>';
+        }
+        // 进行中/已释放：取消会议与变更按钮隐藏（不做置灰）
+      }
+      // 非本人发起（我参加的）：不展示取消会议/变更按钮（无权限，隐藏，不置灰）
+    } else if (item.status === 'draft') {
+      if (isMine) {
+        acts = '<div class="mini-bar"><span class="edit-mini" onclick="event.stopPropagation();openEditDraft(' + item.id + ')">编辑</span></div>';
+      }
+    }
+    // 回执确认（F-NT-04）：仅「我参加的」列表、已通过、非我发起的会议，默认需要回执；人员级回执
+    // 决策⑤：回执截止=会议开始前，开始后不可回执
+    let receiptInline = '';
+    if (currentTab === 'joined'
+        && item.status === 'approved' && item.applicant !== currentUser) {
+      const myReply = item.receipts && item.receipts[currentUser];
+      if (myReply) {
+        // 列表中不展示已回执状态标签
+        receiptInline = '';
+      } else if (mStarted(item)) {
+        // 决策⑤：开始后不可回执；不展示按钮、不提示
+        receiptInline = '';
+      } else {
+        receiptInline = '<div class="mini-bar">'
+          + '<span class="receipt-btn attend" onclick="event.stopPropagation();appReceiptInline(' + item.id + ', \'attend\')">参加</span>'
+          + '<span class="receipt-btn absent" onclick="event.stopPropagation();appReceiptInline(' + item.id + ', \'absent\')">不参加</span>'
+          + '</div>';
+      }
+    }
+    return '<div class="card" onclick="goDetail(' + item.id + ', \'' + from + '\')">' +
+      '<div class="card-head"><div class="status-tag ' + statusClass(item.status) + '"><span></span>' + item.statusText + '</div>' + badge + '</div>' +
+      '<div class="card-row"><div class="card-label">会议名称</div><div class="card-value">' + item.name + '</div></div>' +
+      '<div class="card-row"><div class="card-label">会议类型</div><div class="card-value">' + (item.type || '-') + '</div></div>' +
+      '<div class="card-row"><div class="card-label">会议时间</div><div class="card-value">' + item.time + '</div></div>' +
+      '<div class="card-row"><div class="card-label">会议地点</div><div class="card-value">' + item.place + '</div></div>' +
+      acts + receiptInline + '</div>';
+  }).join('');
+}
+/* 会议管理 hub 渲染见 renderMeeting（上方）；原 renderMine/switchMineTab 已移除 */
 
-function goDetail(id) {
+let currentDetailFrom = 'list';
+/* 参会人员回执标注：每人 + 回执状态（参加/不参加/未回执） */
+function getAttendees(item) {
+  let list = item.attendees;
+  if (typeof list === 'string') list = list.split(/[,，]/).map(s => s.trim()).filter(Boolean);
+  if (!Array.isArray(list)) list = [];
+  return list;
+}
+function attListHTML(item, me) {
+  const list = getAttendees(item);
+  if (!list.length) return '—';
+  const rs = item.receipts || {};
+  return '<div class="att-list">' + list.map(function (n) {
+    const st = rs[n];
+    let tag = '<span class="att-tag pending">未回执</span>';
+    if (st === 'attend') tag = '<span class="att-tag attend">参加</span>';
+    else if (st === 'absent') tag = '<span class="att-tag absent">不参加</span>';
+    const meTag = (n === me) ? ' <span class="att-me">(我)</span>' : '';
+    return '<div class="att-row"><span class="att-name">' + n + meTag + '</span>' + tag + '</div>';
+  }).join('') + '</div>';
+}
+function getAttachments(inputId) {
+  const inp = document.getElementById(inputId);
+  if (!inp || !inp.files) return [];
+  return Array.from(inp.files).map(f => f.name);
+}
+function goDetail(id, from) {
+  currentDetailFrom = from || 'list';
   const item = allData.find(d => d.id === id);
   if (!item) return;
   currentDetailId = id;
@@ -812,60 +1027,244 @@ function goDetail(id) {
   set('dCategory', item.category || '-');
   set('dType', item.type || '-');
   set('dConvener', item.convener || '-');
-  set('dConfidential', item.confidential || '-');
   set('dDept', item.dept || '-');
   set('dApplicant', item.applicant || '-');
   set('dContact', item.contact || '-');
   set('dStatus', item.statusText || '-');
   set('dTime', item.time);
   set('dContent', item.content || '-');
+  set('dAttachments', (item.attachments && item.attachments.length) ? item.attachments.join('、') : '-');
   set('dRoom', item.room || '-');
   set('dScale', item.scale || '-');
   set('dLocation', item.location || '-');
   set('dSeats', item.seats || '-');
   const _fac = (item.facilities && item.facilities.length) ? item.facilities : ((rooms.find(r => r.name === item.room) || {}).facilities || []);
   set('dFacilities', _fac.length ? _fac.join('、') : '-');
-  set('dCost', item.cost || '-');
-  set('dOffsite', item.offsite || '否');
   set('dNeedService', item.needService || '-');
   set('dServiceType', item.serviceType || '-');
   set('dCostShare', item.costShare || '-');
   set('dShareGroup', item.shareGroup || '-');
+  // 费用分摊：仅「我发起的」会议展示；「我参加的」不展示（老板 2026-08-10 决策）
+  const showFee = item.applicant === currentUser;
+  ['costShareCard'].forEach(function (id) {
+    const el = document.getElementById(id);
+    if (el) el.style.display = showFee ? '' : 'none';
+  });
   set('dRemark', item.remark || '-');
-  set('dNotice', item.notice || '-');
-  set('dNoticeObj', item.noticeObj || '-');
-  set('dLeaders', item.leaders || '-');
+  set('dOccupancy', item.occupancy || '-');
+  set('dNoticeObj', (Array.isArray(item.noticeObj) ? item.noticeObj.join('、') : (item.noticeObj || '-')));
   set('dDeptAttend', item.deptAttend || '-');
-  set('dMembers', item.attendees || item.members);
-  set('dAllowProxy', item.allowProxy || '-');
-  set('dReceipt', item.receipt || '-');
-  const dAtt = document.getElementById('dAttachments');
-  if (dAtt) dAtt.innerHTML = (item.attachments && item.attachments.length)
-    ? item.attachments.map(n => '<div class="file-item"><span class="fname">' + escapeHtml(n) + '</span></div>').join('')
-    : '<span style="color:#999;">无</span>';
+  const _nb = document.getElementById('detailNoticeBlock');
+  if (_nb) _nb.style.display = (item.notify === '否') ? 'none' : '';
+  document.getElementById('dMembers').innerHTML = attListHTML(item, currentUser);
+  const rc = document.getElementById('receiptCard');
+  const rr = document.getElementById('dReceiptReply');
+  const joined = (getAttendees(item).includes(currentUser) || item.convener === currentUser) && item.applicant !== currentUser;
+  const myReply = item.receipts && item.receipts[currentUser];
+  // 详情页不展示「我的回执」状态（与 PC 一致收敛到列表/底栏操作）
+  rc.style.display = 'none';
   const tag = document.getElementById('detailStatus');
   tag.className = 'status-tag ' + statusClass(item.status);
   tag.innerHTML = '<span></span>' + item.statusText;
-  document.getElementById('detailCancelBtn').style.display = item.status === 'pending' ? 'block' : 'none';
+  renderDetailActions(item);
   switchPage('page-detail');
 }
 
 function openCancelModal(id) {
   if (id) currentDetailId = id;
+  const item = allData.find(d => d.id === currentDetailId);
+  const txt = document.getElementById('cancelModalText');
+  if (txt) {
+    const verb = (item && item.status === 'pending') ? '取消会议' : '取消会议';
+    const extra = item.status === 'pending' ? '（取消会议·撤回：转为会议草稿，可稍后在列表中编辑草稿重新提交）' : '（取消会议·释放会议室：房间将释放，审批结论「已通过」保留，不可撤回；如需改时间/房间，请使用「变更」带出历史信息重新发起';
+    txt.textContent = item
+      ? verb + '后「' + (item.room || item.place || '该会议室') + ' ' + item.time + '」时段将立即释放，其他人可预订' + extra + '。确定' + verb + '该预约？'
+      : verb + '后该会议室时段将立即释放，其他人可预订。确定' + verb + '？';
+  }
+  const titleEl = document.getElementById('cancelModalTitle');
+  if (titleEl) titleEl.textContent = (item && item.status === 'pending') ? '取消会议' : '取消会议';
+  const mCancelBtn = document.getElementById('mCancelBtn');
+  if (mCancelBtn) mCancelBtn.textContent = (item && item.status === 'pending') ? '取消会议' : '确认取消';
   document.getElementById('cancelModal').classList.add('show');
 }
 function closeCancelModal() {
   document.getElementById('cancelModal').classList.remove('show');
 }
+function renderDetailActions(item) {
+  const acts = document.getElementById('detailActions');
+  if (!acts) return;
+  const isPending = item.status === 'pending';
+  const isApproved = item.status === 'approved';
+  const isDraft = item.status === 'draft';
+  const started = mStarted(item);
+  const joined = (getAttendees(item).includes(currentUser) || item.convener === currentUser) && item.applicant !== currentUser;
+  const myReply = item.receipts && item.receipts[currentUser];
+  let html = '';
+  if (isDraft) {
+    html = '<div class="bottom-btn secondary" onclick="openEditDraft(' + item.id + ')">编辑草稿</div>';
+  } else if (isPending) {
+    if (!joined) {
+      // 我发起的：待审批可撤回（取消会议）
+      html = '<div class="bottom-btn secondary danger" onclick="openCancelModal()">取消会议</div>';
+    }
+    // 我参加的：无取消会议/变更按钮（无权限，隐藏，不置灰），仅保留回执
+  } else if (isApproved) {
+    if (!joined) {
+      // 我发起的：会前且已预订 → 取消会议 + 变更；进行中/已释放 → 按钮隐藏（不做置灰）
+      if (!started && item.occupancy === '已预订') {
+        // 取消会议 + 变更 两个一级操作并列（原单仅在新单提交成功时释放）
+        html = '<div class="bottom-btn secondary danger" style="flex:1;" onclick="openCancelModal()">取消会议</div>'
+             + '<div class="bottom-btn" style="flex:1;" onclick="mChange(' + item.id + ')">变更</div>';
+      }
+    }
+    // 我参加的：无取消会议/变更按钮（无权限，隐藏，不置灰），仅保留回执（决策⑤：回执截止=会议开始前）
+  }
+  // 回执按钮：仅「我参加的」且未回执且会前展示
+  const reply = (!joined) ? '' : (myReply ? '' : (started ? '' : '<div class="bottom-btn" style="background:#e8f5e9;color:#2e7d32;flex:1;" onclick="appReceiptReply(\'attend\')">参加会议</div>' + '<div class="bottom-btn danger" style="background:#fdecea;color:#c62828;flex:1;" onclick="appReceiptReply(\'absent\')">不参加</div>'));
+  html += reply;
+  acts.innerHTML = html;
+  acts.style.display = html ? 'flex' : 'none';
+}
+function appReceiptReply(val) {
+  const item = allData.find(d => d.id === currentDetailId);
+  if (!item) return;
+  item.receipts = item.receipts || {}; item.receipts[currentUser] = val;
+  const rr = document.getElementById('dReceiptReply');
+  if (rr) rr.textContent = val === 'attend' ? '参加' : '不参加';
+  renderDetailActions(item);
+  showToast(val === 'attend' ? '已回执：参加会议' : '已回执：不参加');
+}
+/* 列表内联回执（F-NT-04）：在「我参加的」卡片上直接参加/不参加，回写并刷新列表与角标 */
+function appReceiptInline(id, val) {
+  const item = allData.find(d => d.id === id);
+  if (!item) return;
+  item.receipts = item.receipts || {}; item.receipts[currentUser] = val;
+  showToast(val === 'attend' ? '已回执：参加会议' : '已回执：不参加');
+  renderMeeting();
+}
 function confirmCancel() {
   const item = allData.find(d => d.id === currentDetailId);
   if (item) {
-    item.status = 'revoked';
-    item.statusText = '已撤销';
+    const wasPending = item.status === 'pending';
+    if (wasPending) {
+      item.status = 'draft';
+      item.statusText = '草稿';
+      item.occupancy = '已释放'; // 撤销即释放占用
+      showToast('已取消会议（撤回），已转为会议草稿，可在列表中编辑后重新提交');
+    } else {
+      // 已通过会议取消：审批结论保留「已通过」(归档)，仅释放房间占用——两维度解耦
+      item.occupancy = '已释放';
+      showToast('已取消会议，房间已释放（审批结论「已通过」保留）');
+    }
   }
   closeCancelModal();
-  showToast('撤销成功');
   goList();
+}
+/* 变更：打开带历史信息的预约表单，原单暂不释放；
+   原单仅在新单提交成功（submitBooking 的 else 分支）时置「预订状态=已释放」并提示，
+   避免开了表单不提交导致原单丢失；新单重新触发审批流，不做原子换占 */
+function mChange(id) {
+  const item = allData.find(d => d.id === (id != null ? id : currentDetailId));
+  if (!item) { goList(); return; }
+  mRebookSourceId = item.id;   // 记录变更源，提交成功时释放
+  prefillForm(item);
+  editingId = null;            // 作为全新申请重提，重新触发审批流，不做原子换占
+  const ft = document.getElementById('formTitle');
+  if (ft) ft.textContent = '会议预约';
+  switchPage('page-form');
+  showToast('已带出历史信息，请确认后重新提交');
+}
+
+/* 编辑会议草稿：预填表单并进入表单页（editingId 置位，提交时原位更新） */
+function openEditDraft(id) {
+  const item = allData.find(d => d.id === id);
+  if (!item) return;
+  editingId = id;
+  prefillForm(item);
+  const ft = document.getElementById('formTitle');
+  if (ft) ft.textContent = '编辑草稿';
+  switchPage('page-form');
+  showToast('已打开会议草稿，编辑后重新提交');
+}
+
+/* 清空表单，回到新建预约的初始态 */
+function clearForm() {
+  const setVal = (id, v) => { const el = document.getElementById(id); if (el) el.value = v; };
+  ['fName','fConvener','fContact','fContent','fRemark','fShareGroup','fDeptAttend','fMembers'].forEach(id => setVal(id, ''));
+  { const _a = document.getElementById('fAttachments'); if (_a) { _a.value=''; const _l=document.getElementById('fAttachList'); if(_l) _l.innerHTML=''; } }
+  setVal('fCategory', ''); setVal('fType', ''); setVal('fNeedService', '否');
+  selectedRoom = null;
+  const fr = document.getElementById('fRoom');
+  if (fr) { fr.textContent = '请选择'; fr.classList.remove('has-value'); }
+  ['fScale','fSeats','fLocation','fCost','fFacilities','fRoomFee'].forEach(id => setVal(id, ''));
+  const r1 = document.querySelector('input[name="fCostShare"][value="否"]'); if (r1) r1.checked = true;
+  if (typeof toggleService === 'function') toggleService();
+  if (typeof toggleCostShare === 'function') toggleCostShare();
+  // 参会对象默认空：每次新建/清空表单时重置复选框，并刷新「参会部门/参会人员」联动显隐
+  document.querySelectorAll('input[name="fNoticeObj"]').forEach(c => c.checked = false);
+  if (typeof toggleNoticeObj === 'function') toggleNoticeObj();
+  const _fn = document.querySelector('input[name="fNotify"][value="否"]'); if (_fn) _fn.checked = true;
+  if (typeof toggleNotify === 'function') toggleNotify();
+  document.querySelectorAll('.error-msg').forEach(e => e.classList.remove('show'));
+}
+
+/* ===== 时段占用校验：同房间同日期时间重叠，且状态未释放 ===== */
+function toMin(t) { const p = (t || '').split(':'); return (parseInt(p[0], 10) || 0) * 60 + (parseInt(p[1], 10) || 0); }
+function findConflict(room, date, start, end, excludeId) {
+  const s = toMin(start), e = toMin(end);
+  return allData.find(d => {
+    if (d.id === excludeId) return false;
+    if (d.occupancy === '已释放') return false;   // 已释放的不占用（按占用维度判断，与审批结论解耦）
+    if (d.room !== room) return false;
+    const m = (d.time || '').match(/(\d{4}-\d{2}-\d{2})\s+(\d{1,2}:\d{2})-(\d{1,2}:\d{2})/);
+    if (!m || m[1] !== date) return false;
+    return s < toMin(m[3]) && e > toMin(m[2]);
+  });
+}
+
+// 固定演示基准时间（与 PC yyNow 对齐：2026-08-09 12:32），保证原型交互稳定可演示
+function mNowMs() { return new Date(2026, 7, 9, 12, 32, 0).getTime(); }
+// 解析会议开始时间(毫秒)：time 形如 "2026-08-09 19:02-20:00"
+function mStartMs(item) {
+  const m = (item.time || '').match(/(\d{4})-(\d{2})-(\d{2})\s+(\d{1,2}):(\d{2})-/);
+  if (!m) return null;
+  return new Date(+m[1], +m[2] - 1, +m[3], +m[4], +m[5], 0).getTime();
+}
+// 会议已开始（含进行中/已结束）：开始时间 <= 当前演示基准 → 不可取消、不可回执
+function mStarted(item) { const s = mStartMs(item); return s != null && mNowMs() >= s; }
+
+// 将历史预约信息回填到预约表单
+function prefillForm(item) {
+  const setVal = (id, v) => { const el = document.getElementById(id); if (el) el.value = (v == null ? '' : v); };
+  const setRadio = (name, v) => { const el = document.querySelector('input[name="' + name + '"][value="' + v + '"]'); if (el) el.checked = true; };
+  setVal('fName', item.name);
+  setVal('fCategory', item.category);
+  setVal('fType', item.type);
+  setVal('fConvener', item.convener);
+  setVal('fContact', item.contact);
+  setVal('fContent', item.content);
+  { const _a = document.getElementById('fAttachments'); if (_a) { _a.value=''; const _l=document.getElementById('fAttachList'); if(_l) _l.innerHTML=''; } }
+  const tm = (item.time || '').match(/(\d{4}-\d{2}-\d{2})\s+(\d{1,2}:\d{2})-(\d{1,2}:\d{2})/);
+  if (tm) {
+    setVal('fDate', tm[1]);
+    const sOpt = [...document.getElementById('fStartTime').options].find(o => o.value === tm[2]);
+    const eOpt = [...document.getElementById('fEndTime').options].find(o => o.value === tm[3]);
+    if (sOpt) setVal('fStartTime', tm[2]);
+    if (eOpt) setVal('fEndTime', tm[3]);
+  }
+  const ri = rooms.findIndex(r => r.name === item.room);
+  if (ri >= 0) selectRoom(ri);
+  if (item.needService) { setVal('fNeedService', item.needService); if (typeof toggleService === 'function') toggleService(); }
+  if (item.remark) setVal('fRemark', item.remark);
+  if (item.costShare) { setRadio('fCostShare', item.costShare); if (typeof toggleCostShare === 'function') toggleCostShare(); if (item.costShare === '是') setVal('fShareGroup', item.shareGroup); }
+  const objs = Array.isArray(item.noticeObj) ? item.noticeObj : [];
+  document.querySelectorAll('input[name="fNoticeObj"]').forEach(c => { c.checked = objs.includes(c.value); });
+  if (typeof toggleNoticeObj === 'function') toggleNoticeObj();
+  const _nv = item.notify || '是';
+  const _nr = document.querySelector('input[name="fNotify"][value="' + _nv + '"]'); if (_nr) _nr.checked = true;
+  if (typeof toggleNotify === 'function') toggleNotify();
+  setVal('fDeptAttend', item.deptAttend);
+  setVal('fMembers', Array.isArray(item.attendees) ? item.attendees.join('、') : (item.attendees || ''));
 }
 
 function setField(id, val) {
@@ -882,6 +1281,100 @@ function openRoomSelect() {
 function closeRoomSelect() {
   document.getElementById('roomModal').classList.remove('show');
 }
+/* ========== 会务服务字典 + 费用计算 ========== */
+const svcTypes = [
+  { name: '会务服务', price: 21 },
+  { name: '纸笔套装', price: 4.5 },
+  { name: '席卡', price: 1.5 },
+  { name: '矿泉水', price: 2.5 },
+  { name: '茶水', price: 6 }
+];
+function mTimeToHours(t){
+  if (!t || t.indexOf(':') < 0) return 0;
+  const p = t.split(':');
+  return parseInt(p[0], 10) + (parseInt(p[1], 10) || 0) / 60;
+}
+/* 会议室费用 = 单价 × 时长 */
+function mCalcRoomFee(){
+  const fRoomFee = document.getElementById('fRoomFee');
+  if (!selectedRoom) { if (fRoomFee) fRoomFee.value = ''; return 0; }
+  const price = parseFloat(selectedRoom.cost) || 0;
+  const sH = mTimeToHours(document.getElementById('fStartTime').value);
+  const eH = mTimeToHours(document.getElementById('fEndTime').value);
+  const hours = (eH > sH) ? (eH - sH) : 0;
+  const fee = +(price * hours).toFixed(2);
+  if (fRoomFee) fRoomFee.value = hours > 0 ? ('¥' + fee.toFixed(2)) : '';
+  return fee;
+}
+/* 渲染会务服务多选列表（含数量输入） */
+function renderSvcList(){
+  const box = document.getElementById('svcList');
+  if (!box) return;
+  box.innerHTML = svcTypes.map(s =>
+    '<div class="svc-row">' +
+      '<label class="svc-chk"><input type="checkbox" value="' + s.name + '" data-price="' + s.price + '" onchange="mCalcSvc()"> ' + s.name + '</label>' +
+      '<span class="svc-price">¥' + s.price.toFixed(2) + '/项</span>' +
+      '<span class="svc-qty">数量 <input type="number" min="1" value="1" oninput="mCalcSvc()"></span>' +
+    '</div>'
+  ).join('');
+  mCalcSvc();
+}
+/* 会务服务合计 = 勾选项 × 数量 */
+function mCalcSvc(){
+  const totalEl = document.getElementById('svcTotal');
+  if (!totalEl) return 0;
+  const rows = document.querySelectorAll('#svcList .svc-row');
+  let total = 0;
+  rows.forEach(row => {
+    const chk = row.querySelector('input[type="checkbox"]');
+    if (chk && chk.checked) {
+      const price = parseFloat(chk.getAttribute('data-price')) || 0;
+      const qty = parseInt(row.querySelector('input[type="number"]').value, 10) || 0;
+      total += price * qty;
+    }
+  });
+  total = +total.toFixed(2);
+  totalEl.textContent = '¥' + total.toFixed(2);
+  return total;
+}
+/* 从已有记录推导会议室费用（用于详情展示） */
+function mDeriveRoomFee(item){
+  if (item.roomFee != null) return '¥' + item.roomFee;
+  const price = parseFloat((item.cost || '').replace(/[^\d.]/g, '')) || 0;
+  const m = (item.time || '').match(/(\d{1,2}):(\d{2})-(\d{1,2}):(\d{2})/);
+  let hours = 0;
+  if (m) hours = (parseInt(m[3], 10) + parseInt(m[4], 10) / 60) - (parseInt(m[1], 10) + parseInt(m[2], 10) / 60);
+  const fee = +(price * hours).toFixed(2);
+  return hours > 0 ? ('¥' + fee.toFixed(2)) : '-';
+}
+/* 会议费用明细：会议室费用 = 单价 × 时长；会务服务费用 = Σ(服务单价 × 数量)。
+   服务明细优先取 item.services 明细，否则按 item.serviceType 字符串匹配字典派生（默认数量 1） */
+function mCalcFee(item) {
+  const price = parseFloat((item.cost || '').replace(/[^\d.]/g, '')) || 0;
+  const m = (item.time || '').match(/(\d{1,2}):(\d{2})-(\d{1,2}):(\d{2})/);
+  let hours = 0;
+  if (m) hours = (parseInt(m[3], 10) + parseInt(m[4], 10) / 60) - (parseInt(m[1], 10) + parseInt(m[2], 10) / 60);
+  hours = +hours.toFixed(2);
+  let services = [];
+  if (Array.isArray(item.services) && item.services.length) {
+    services = item.services.map(s => {
+      const d = svcTypes.find(x => x.name === s.name) || {};
+      const p = (s.unitPrice != null) ? s.unitPrice : (d.price || 0);
+      const q = s.qty || 1;
+      return { name: s.name, unitPrice: p, qty: q, amount: +(p * q).toFixed(2) };
+    });
+  } else if (item.serviceType) {
+    services = item.serviceType.split(/[、,，]/).map(n => n.trim()).filter(Boolean).map(n => {
+      const d = svcTypes.find(x => x.name === n);
+      const p = d ? d.price : 0;
+      return { name: n, unitPrice: p, qty: 1, amount: +(p).toFixed(2) };
+    });
+  }
+  const roomFee = +(price * hours).toFixed(2);
+  const serviceFee = +(services.reduce((s, x) => s + x.amount, 0)).toFixed(2);
+  const total = +(roomFee + serviceFee).toFixed(2);
+  return { roomUnitPrice: price, duration: hours, services, roomFee, serviceFee, total };
+}
 function selectRoom(idx) {
   const r = rooms[idx];
   selectedRoom = r;
@@ -889,21 +1382,20 @@ function selectRoom(idx) {
   document.getElementById('fScale').value = r.scale;
   document.getElementById('fSeats').value = r.seats;
   document.getElementById('fLocation').value = r.location;
-  document.getElementById('fCost').value = r.cost + '元/小时';
+  document.getElementById('fCost').value = r.cost + ' 元/小时';
   document.getElementById('fFacilities').value = (r.facilities || []).join('、');
+  mCalcRoomFee();
   closeRoomSelect();
 }
 
 function submitForm() {
   let ok = true;
-  const offsiteEl = document.querySelector('input[name="fOffsite"]:checked');
-  const offsiteVal = offsiteEl ? offsiteEl.value : '否';
   const fields = [
     ['fName', 'errName'], ['fCategory', 'errCategory'],
     ['fType', 'errType'], ['fConvener', 'errConvener'],
-    ['fConfidential', 'errConfidential'], ['fContact', 'errContact']
+    ['fContact', 'errContact']
   ];
-  if (offsiteVal !== '是') fields.push(['fRoom', 'errRoom']);
+  fields.push(['fRoom', 'errRoom']);
   fields.push(['fDate', 'errTime'], ['fStartTime', 'errTime'], ['fEndTime', 'errTime']);
   fields.forEach(([id, errId]) => {
     const el = document.getElementById(id);
@@ -916,73 +1408,99 @@ function submitForm() {
     if (empty) { err.classList.add('show'); ok = false; }
     else { err.classList.remove('show'); }
   });
-  const notice = document.querySelector('input[name="fNotice"]:checked');
-  const noticeObj = document.querySelector('input[name="fNoticeObj"]:checked');
-  if (notice && notice.value === '是' && noticeObj && noticeObj.value === '指定参会人') {
-    const m = document.getElementById('fMembers');
-    const me = document.getElementById('errMembers');
-    if (!m.value.trim()) { me.classList.add('show'); ok = false; }
-    else { me.classList.remove('show'); }
-  }
   if (!ok) return;
-  attachFiles = [];
-  renderAttach();
-  showToast('提交成功');
+  // 会务服务：汇总勾选项与合计
+  const svcRows = document.querySelectorAll('#svcList .svc-row');
+  let svcNames = [], svcTotal = 0;
+  svcRows.forEach(row => {
+    const chk = row.querySelector('input[type="checkbox"]');
+    if (chk && chk.checked) {
+      const price = parseFloat(chk.getAttribute('data-price')) || 0;
+      const qty = parseInt(row.querySelector('input[type="number"]').value, 10) || 0;
+      svcNames.push(chk.value + '×' + qty);
+      svcTotal += price * qty;
+    }
+  });
+  const roomFee = selectedRoom ? mCalcRoomFee() : 0;
+  const date = document.getElementById('fDate').value;
+  const start = document.getElementById('fStartTime').value;
+  const end = document.getElementById('fEndTime').value;
+  if (toMin(end) <= toMin(start)) { showToast('结束时间需晚于开始时间'); return; }
+
+  // 时段占用校验
+  const roomName = selectedRoom ? selectedRoom.name : '—';
+  const conflict = findConflict(roomName, date, start, end, editingId || mRebookSourceId);
+  if (conflict) {
+    showToast('该时段「' + roomName + '」已被占用（' + conflict.time + '），请重选');
+    return;
+  }
+
+  const membersRaw = (document.getElementById('fMembers') ? document.getElementById('fMembers').value.trim() : '');
+  const attendeesArr = membersRaw ? membersRaw.split(/[,，、]/).map(s => s.trim()).filter(Boolean) : [];
+  const newId = allData.reduce((m, d) => Math.max(m, d.id), 0) + 1;
+  const record = {
+    id: newId, status: 'pending', statusText: '待审批', occupancy: '已预订',
+    name: document.getElementById('fName').value.trim(),
+    time: date + ' ' + start + '-' + end,
+    place: selectedRoom ? selectedRoom.scale : '—',
+    members: membersRaw || '—',
+    attendees: attendeesArr,
+    notify: (document.querySelector('input[name="fNotify"]:checked')||{}).value || '否',
+    category: document.getElementById('fCategory').value, type: document.getElementById('fType').value,
+    convener: document.getElementById('fConvener').value.trim(), dept: document.getElementById('fDept').value,
+    applicant: document.getElementById('fApplicant').value, contact: document.getElementById('fContact').value.trim(),
+    content: document.getElementById('fContent') ? document.getElementById('fContent').value.trim() : '',
+    attachments: getAttachments('fAttachments'),
+    needService: document.getElementById('fNeedService').value,
+    serviceType: svcNames.join('、'),
+    remark: document.getElementById('fRemark') ? document.getElementById('fRemark').value.trim() : '',
+    room: roomName, scale: selectedRoom ? selectedRoom.scale : '—',
+    location: selectedRoom ? selectedRoom.location : '—', seats: selectedRoom ? selectedRoom.seats : '—',
+    cost: selectedRoom ? (selectedRoom.cost + '元/小时') : '—', roomFee: +roomFee.toFixed(2),
+    facilities: selectedRoom ? selectedRoom.facilities : []
+  };
+
+  if (editingId) {
+    // 编辑草稿：原位更新，保留原 id，状态回到待审批
+    const rec = allData.find(d => d.id === editingId);
+    if (rec) { Object.assign(rec, record); rec.id = editingId; rec.status = 'pending'; rec.statusText = '待审批'; }
+    else allData.unshift(record);
+    editingId = null;
+    showToast('草稿已更新并提交');
+  } else {
+    allData.unshift(record);
+    // 变更：新单提交成功，释放原单（取消会议并释放时段）
+    if (mRebookSourceId) {
+      const src = allData.find(d => d.id === mRebookSourceId);
+      if (src) { src.occupancy = '已释放'; } // 变更：新单提交成功，释放原单占用（审批结论保留，不动 status）
+      showToast('已提交变更，原会议已释放');
+    } else {
+      showToast('提交成功');
+    }
+  }
+  mRebookSourceId = null;   // 无论草稿/新建，提交后清空变更源
   setTimeout(goList, 800);
 }
 
-/* ========== 附件上传（不限类型，限制张数） ========== */
-let attachFiles = [];
-const MAX_ATTACH = 5;
-function handleAttachment(input) {
-  const picked = Array.from(input.files).map(f => f.name);
-  picked.forEach(name => {
-    if (attachFiles.length < MAX_ATTACH) attachFiles.push(name);
-  });
-  input.value = '';
-  if (picked.length > 0 && attachFiles.length >= MAX_ATTACH) {
-    showToast('最多上传 ' + MAX_ATTACH + ' 个文件');
-  }
-  renderAttach();
-}
-function removeAttachment(idx) {
-  attachFiles.splice(idx, 1);
-  renderAttach();
-}
-function renderAttach() {
-  const box = document.getElementById('attachList');
-  if (box) box.innerHTML = attachFiles.map((name, i) =>
-    '<div class="file-item"><span class="fname">' + escapeHtml(name) + '</span><span class="fremove" onclick="removeAttachment(' + i + ')">移除</span></div>'
-  ).join('');
-  const tip = document.getElementById('attachTip');
-  if (tip) tip.textContent = '已选 ' + attachFiles.length + '/' + MAX_ATTACH + ' 个文件（支持图片、文档等）';
-}
-function escapeHtml(s) {
-  return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-}
-
-function toggleOffsite() {
-  const el = document.querySelector('input[name="fOffsite"]:checked');
-  const val = el ? el.value : '否';
-  document.getElementById('roomInfoSection').style.display = val === '是' ? 'none' : '';
-  document.getElementById('costShareFormGroup').style.display = val === '是' ? 'none' : '';
-  if (document.getElementById('serviceFormGroup')) document.getElementById('serviceFormGroup').style.display = val === '是' ? 'none' : '';
-}
 function toggleService() {
   const el = document.getElementById('fNeedService');
-  document.getElementById('serviceDetail').style.display = el.value === '是' ? '' : 'none';
+  const show = el.value === '是';
+  document.getElementById('serviceDetail').style.display = show ? '' : 'none';
+  if (show) renderSvcList(); else { if (document.getElementById('svcTotal')) document.getElementById('svcTotal').textContent = '¥0.00'; }
 }
 function toggleCostShare() {
   const el = document.querySelector('input[name="fCostShare"]:checked');
   document.getElementById('shareGroupItem').style.display = el && el.value === '是' ? 'flex' : 'none';
 }
-function toggleNotice() {
-  const el = document.querySelector('input[name="fNotice"]:checked');
-  document.getElementById('noticeDetail').style.display = el && el.value === '是' ? '' : 'none';
-}
 function toggleNoticeObj() {
-  const el = document.querySelector('input[name="fNoticeObj"]:checked');
-  document.getElementById('attendeesItem').style.display = el && el.value === '指定参会人' ? 'flex' : 'none';
+  const objs = [...document.querySelectorAll('input[name="fNoticeObj"]:checked')].map(el => el.value);
+  document.getElementById('attendeesItem').style.display = objs.includes('指定参会人') ? 'flex' : 'none';
+  document.getElementById('deptAttendItem').style.display = objs.includes('部门联络人') ? 'flex' : 'none';
+}
+function toggleNotify() {
+  const el = document.querySelector('input[name="fNotify"]:checked');
+  const on = el && el.value === '是';
+  document.getElementById('noticeObjBlock').style.display = on ? '' : 'none';
 }
 
 let toastTimer;
@@ -994,7 +1512,7 @@ function showToast(msg) {
   toastTimer = setTimeout(() => t.classList.remove('show'), 2000);
 }
 
-renderList();
+renderMeeting();
 </script>
 </body>
 </html>
