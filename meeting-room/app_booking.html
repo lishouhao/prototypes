@@ -340,11 +340,6 @@
   .tab-item.active span { color: #4C7AE8; }
 
   /* ========== 会议管理 hub ========== */
-  .mt-badge {
-    display: inline-block; min-width: 16px; height: 16px; line-height: 16px;
-    text-align: center; background: #FF4D4F; color: #fff; font-size: 11px;
-    border-radius: 8px; padding: 0 4px; margin-left: 4px; vertical-align: middle;
-  }
   #page-meeting .tabs { margin-bottom: 12px; }
   #page-meeting .tabs .tab-pill { font-size: 14px; }
   .meeting-cta { bottom: 16px; display: flex; align-items: center; justify-content: center; gap: 4px; }
@@ -498,7 +493,7 @@
     <div class="content" style="padding-bottom: 90px;">
       <div class="tabs">
         <div class="tab-pill active" data-tab="initiated" onclick="switchListTab('initiated')">我发起的</div>
-        <div class="tab-pill" data-tab="joined" onclick="switchListTab('joined')">我参加的<span class="mt-badge" id="joinedReceiptBadge">0</span></div>
+        <div class="tab-pill" data-tab="joined" onclick="switchListTab('joined')">我参加的</div>
       </div>
       <div id="meetingContainer"></div>
       <div class="empty-tip">没有更多数据了</div>
@@ -910,20 +905,10 @@ function switchListTab(tab) {
   document.querySelectorAll('#page-meeting [data-tab]').forEach(p => p.classList.toggle('active', p.dataset.tab === tab));
   renderMeeting();
 }
-function updateMeetingBadges() {
-  // 回执待办角标：挂在「我参加的」子标签；仅统计「我参加且非我发起」的待回执会议
-  const recN = allData.filter(d => d.status === 'approved'
-    && d.applicant !== currentUser
-    && (getAttendees(d).includes(currentUser) || d.convener === currentUser)
-    && !(d.receipts && d.receipts[currentUser])).length;
-  const rb = document.getElementById('joinedReceiptBadge');
-  if (rb) { rb.textContent = recN; rb.style.display = recN ? '' : 'none'; }
-}
 function renderMeeting() {
-  updateMeetingBadges();
   const container = document.getElementById('meetingContainer');
   if (!container) return;
-  let list, from, badge = '';
+  let list, from;
   if (currentTab === 'initiated') {
       list = allData.filter(d => d.applicant === currentUser);
       from = 'mine';
@@ -981,7 +966,7 @@ function renderMeeting() {
       }
     }
     return '<div class="card" onclick="goDetail(' + item.id + ', \'' + from + '\')">' +
-      '<div class="card-head"><div class="status-tag ' + statusClass(item.status) + '"><span></span>' + item.statusText + '</div>' + badge + '</div>' +
+      '<div class="card-head"><div class="status-tag ' + statusClass(item.status) + '"><span></span>' + item.statusText + '</div></div>' +
       '<div class="card-row"><div class="card-label">会议名称</div><div class="card-value">' + item.name + '</div></div>' +
       '<div class="card-row"><div class="card-label">会议类型</div><div class="card-value">' + (item.type || '-') + '</div></div>' +
       '<div class="card-row"><div class="card-label">会议时间</div><div class="card-value">' + item.time + '</div></div>' +
