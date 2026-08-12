@@ -1076,7 +1076,7 @@ function openCancelModal(id) {
   const txt = document.getElementById('cancelModalText');
   if (txt) {
     const verb = (item && item.status === 'pending') ? '取消会议' : '取消会议';
-    const extra = item.status === 'pending' ? '（取消会议·撤回：转为会议草稿，可稍后在列表中编辑草稿重新提交）' : '（取消会议·释放会议室：房间将释放，审批结论「已通过」保留，不可撤回；如需改时间/房间，请使用「变更」带出历史信息重新发起';
+    const extra = item.status === 'pending' ? '' : '（取消会议·释放会议室：房间将释放，审批结论「已通过」保留，不可撤回；如需改时间/房间，请使用「变更」带出历史信息重新发起';
     txt.textContent = item
       ? verb + '后「' + (item.room || item.place || '该会议室') + ' ' + item.time + '」时段将立即释放，其他人可预订' + extra + '。确定' + verb + '该预约？'
       : verb + '后该会议室时段将立即释放，其他人可预订。确定' + verb + '？';
