@@ -576,7 +576,7 @@ tr:hover td { background: #F7F7FA; }
 .yy-cal-table td.slot:hover { background: #e6f7ff; }
 .yy-cal-table td.slot.expired { background: #F0F0F0; color: #C4C4C4; cursor: not-allowed; }
 .yy-cal-table td.slot.expired:hover { background: #F0F0F0; }
-.yy-cal-table td.slot.drag-sel { background: #BFD3FF; box-shadow: inset 0 0 0 2px #4165EC; }
+.yy-cal-table td.slot.drag-sel { background: #BFD3FF; box-shadow: 0 0 0 2px #4165EC; position: relative; z-index: 2; }
 .yy-cal-table td.busy { background: #fffbe6; }
 .yy-cell-title { font-size: 12px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 4px 5px 0; }
 .yy-cell-meta { font-size: 10px; line-height: 1.35; opacity: 0.92; padding: 0 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -732,7 +732,7 @@ tr:hover td { background: #F7F7FA; }
   border:6px solid transparent;
   border-top-color:#fff;
 }
-.mx-busy:hover { z-index:2; box-shadow: inset 0 0 0 2px #1d39c4; }
+.mx-busy:hover { z-index:2; box-shadow: 0 0 0 2px #1d39c4; }
 .mx-busy:hover .mx-tip { opacity:1; visibility:visible; }
 /* 矩阵行悬浮不遮盖占用/过期占用格底色（覆盖全局 tr:hover td 的浅灰） */
 #mx-table tr:hover td.mx-busy { background:#4165EC; }
@@ -3787,7 +3787,7 @@ function mxCancelMeeting(key){
   mxCancelKey = key;
   const isPending = (m.status === '待审批');
   const verb = isPending ? '取消会议' : '取消会议';
-  const hint = isPending ? '取消会议（撤回）：该预约将转为会议草稿，房间时段立即释放；可稍后在「我发起的」中编辑草稿、重新提交。' : '取消会议（释放会议室）：会议室将释放，该预约不可恢复，审批结论「已通过」保留归档；若需改时间/房间，请改用「变更」按钮。';
+  const hint = isPending ? '取消会议（撤回）：该预约将转为会议草稿，房间时段立即释放；可稍后在「我发起的」中编辑草稿、重新提交。' : '取消会议（释放会议室）：会议室将释放，该预约不可恢复，若需改时间/房间，请改用「变更」按钮。';
   document.getElementById('mx-cancel-text').textContent = '确认要' + verb + '「' + (m.title || '') + '」(' + m.date + ' ' + m.start + '-' + m.end + ') 吗？' + hint;
   const cancelBtn = document.getElementById('mx-cancelBtn');
   if (cancelBtn) cancelBtn.textContent = verb; // 待审批→取消会议；已通过→取消会议
