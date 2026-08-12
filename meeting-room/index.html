@@ -24,6 +24,11 @@ body {
   display: flex;
   flex-direction: column;
   overflow-y: auto;
+  position: sticky;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  z-index: 50;
 }
 .sidebar-logo {
   height: 64px;
@@ -91,6 +96,7 @@ body {
   transition: all .2s;
 }
 .tab:hover { color: #4165EC; border-color: #4165EC; }
+.menu-item[data-view="view-empty"], .tab[data-view="view-empty"] { opacity: .45; filter: grayscale(1); cursor: not-allowed; }
 .tab.active {
   background: #4165EC;
   color: #fff;
@@ -132,6 +138,14 @@ input[type="text"], input[type="number"], select, textarea {
 }
 input[type="text"]:focus, input[type="number"]:focus, select:focus, textarea:focus { border-color: #4165EC; }
 input[type="text"], input[type="number"], select { height: 40px; }
+input[type="date"] {
+  padding: 4px 12px; height: 40px;
+  border: 1px solid #D8D8D8; border-radius: 4px;
+  outline: none; transition: border .2s;
+  font-size: 14px; background: #F7F7FA; color: #36373B;
+  font-family: inherit;
+}
+input[type="date"]:focus { border-color: #4165EC; }
 
 /* 按钮 */
 .btn {
@@ -226,6 +240,13 @@ tr:hover td { background: #F7F7FA; }
 .tag-lg  { background: #FFF7E6; color: #FA8C16; }
 .tag-vip { background: #F9F0FF; color: #722ED1; }
 .mr-num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.mr-cell-check { width:40px; text-align:center; }
+.mr-cell-admins { max-width:230px; }
+.mr-adm-tag { display:inline-block; padding:2px 8px; margin:2px 4px 2px 0; background:#EEF2FE; color:#4165EC; border-radius:4px; font-size:12px; }
+.mr-adm-none { color:#999; font-size:12px; }
+.mr-batch-tip { margin-left:12px; color:#4165EC; font-size:13px; align-self:center; }
+.mr-batch-rooms { display:flex; flex-wrap:wrap; gap:6px; }
+.mr-batch-room { padding:3px 10px; background:#F7F7FA; border:1px solid #D8D8D8; border-radius:4px; font-size:12px; }
 
 /* 弹窗 */
 .modal-overlay {
@@ -235,6 +256,10 @@ tr:hover td { background: #F7F7FA; }
   display: none; align-items: center; justify-content: center;
 }
 .modal-overlay.show { display: flex; }
+/* 取消会议确认弹框（z-index:300）需浮于发起预约弹框（z-index:200）之上，
+   避免变更后打开发起表单被盖住；「我的会议」列表现为内联 Tab 面板，不遮挡弹框 */
+#mx-cancel-modal { z-index: 300; }
+#yy-formModal { z-index: 200; }
 .modal {
   background: #fff; border-radius: 8px;
   width: 600px; max-width: 90%; max-height: 90vh;
@@ -295,6 +320,7 @@ tr:hover td { background: #F7F7FA; }
   border-color: #4165EC; background: #EEF1FD; color: #4165EC; font-weight: 600;
 }
 .radio-group.rg-wide label input { flex-shrink: 0; margin: 0; padding: 0; }
+.radio-group.rg-wide label input[type="checkbox"] { width: 16px; height: 16px; accent-color: #4165EC; }
 .form-row .error { border-color: #ff4d4f !important; }
 .form-row-vertical { align-items: flex-start; }
 .form-row-vertical > label { padding-top: 8px; }
@@ -353,7 +379,7 @@ tr:hover td { background: #F7F7FA; }
 .home-wrap h2 { margin:0 0 12px; font-size:22px; }
 .home-wrap p { color:#36373B; line-height:1.8; margin:6px 0; }
 
-/* ========== 预约记录 ========== */
+/* ========== 预约审批 ========== */
 .status-tag {
   display: inline-block;
   padding: 2px 8px;
@@ -366,6 +392,14 @@ tr:hover td { background: #F7F7FA; }
 .status-tag.reject { background: #fff1f0; color: #ff4d4f; border: 1px solid #ffa39e; }
 .status-tag.revoke { background: #F7F7FA; color: #8F9098; border: 1px solid #D8D8D8; }
 .status-tag.expired { background: #fffbe6; color: #faad14; border: 1px solid #ffe58f; }
+.status-tag.changed { background: #F7F7FA; color: #8F9098; border: 1px solid #D8D8D8; }
+.status-tag.cancel { background: #F7F7FA; color: #8F9098; border: 1px solid #D8D8D8; }
+.status-tag.draft { background: #F7F7FA; color: #8F9098; border: 1px solid #D8D8D8; }
+.qk-st.changed { background: #F2F2F2; color: #8F9098; }
+.qk-st.cancel { background: #F2F2F2; color: #8F9098; }
+.qk-st.draft { background: #F2F2F2; color: #8F9098; }
+.mx-busy.pending { background: #4165EC; }
+.mx-busy.pending:hover { background: #4165EC; }
 
 .sp-detail-drawer {
   position: fixed; top: 0; right: 0; bottom: 0;
@@ -394,6 +428,7 @@ tr:hover td { background: #F7F7FA; }
 .sp-detail-section-title::before {
   content: ''; width: 3px; height: 14px; background: #4165EC; border-radius: 2px;
 }
+.sp-detail-receipt { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .sp-detail-grid {
   display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
 }
@@ -401,6 +436,15 @@ tr:hover td { background: #F7F7FA; }
 .sp-detail-item.full { grid-column: 1 / -1; }
 .sp-detail-label { color: #8F9098; font-size: 13px; }
 .sp-detail-value { color: #36373B; }
+.sp-detail-subtitle { color: #8F9098; font-size: 13px; margin: 16px 0 8px; }
+.fee-lines { border: 1px solid #F0F0F2; border-radius: 6px; overflow: hidden; }
+.fee-line { display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; font-size: 13px; border-bottom: 1px solid #F6F6F8; }
+.fee-line:last-child { border-bottom: none; }
+.fee-line .fl-name { color: #36373B; }
+.fee-line .fl-calc { color: #8F9098; flex: 1; text-align: center; }
+.fee-line .fl-amt { color: #36373B; font-weight: 600; min-width: 64px; text-align: right; }
+.fee-empty { color: #bbb; padding: 8px 12px; font-size: 13px; }
+.fee-total { color: #4165EC; font-weight: 700; }
 .sp-detail-attachment {
   width: 80px; height: 80px;
   border: 1px dashed #D8D8D8; border-radius: 4px;
@@ -417,8 +461,9 @@ tr:hover td { background: #F7F7FA; }
 .sp-detail-footer {
   padding: 12px 24px;
   border-top: 1px solid #F6F6F8;
-  display: flex; justify-content: flex-end; gap: 8px;
+  display: flex; justify-content: space-between; align-items: center; gap: 8px;
 }
+.sp-detail-receipt-bar { display: flex; align-items: center; gap: 8px; }
 .sp-detail-mask {
   position: fixed; inset: 0;
   background: rgba(0,0,0,0.45);
@@ -460,7 +505,7 @@ tr:hover td { background: #F7F7FA; }
   gap: 12px;
   flex-shrink: 0;
 }
-.yy-location select { width: 100%; }
+.yy-location select { width: 100%; height: 36px; border-color: #D8D8D8; color: #36373B; background: #F7F7FA; }
 .yy-room-list { flex: 1; overflow-y: auto; max-height: 620px; }
 .yy-room-card {
   border: 1px solid #F6F6F8;
@@ -473,13 +518,10 @@ tr:hover td { background: #F7F7FA; }
 }
 .yy-room-card:hover { border-color: #4165EC; }
 .yy-room-card.active { border-color: #4165EC; background: #f6ffed; }
-.yy-room-name { font-weight: 600; font-size: 15px; color: #36373B; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center; }
-.yy-room-tag {
-  font-size: 12px; padding: 1px 6px; border-radius: 2px;
-  background: #f6ffed; color: #52c41a; border: 1px solid #b7eb8f;
-}
-.yy-room-info { color: #8F9098; font-size: 12px; line-height: 1.6; }
-.yy-room-info div { display: flex; align-items: center; gap: 4px; }
+.yy-room-name { font-weight: 600; font-size: 16px; color: #36373B; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+.yy-room-info { color: #8F9098; font-size: 12px; line-height: 1.8; }
+.yy-room-info div { display: flex; align-items: center; gap: 6px; }
+.yy-room-info span { color: #8F9098; font-size: 13px; }
 .yy-empty { text-align: center; color: #8F9098; padding: 40px 0; }
 
 .yy-main { flex: 1; background: #fff; border-radius: 4px; padding: 16px 20px; display: flex; flex-direction: column; min-width: 0; }
@@ -487,24 +529,32 @@ tr:hover td { background: #F7F7FA; }
   display: flex; justify-content: space-between; align-items: center;
   margin-bottom: 12px; flex-wrap: wrap; gap: 10px;
 }
-.yy-title h3 { margin: 0; font-size: 18px; font-weight: 600; }
-.yy-title p { margin: 4px 0 0; color: #8F9098; font-size: 13px; }
+.yy-title { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.yy-title h3 { margin: 0; font-size: 20px; font-weight: 600; color: #36373B; }
+.yy-title p { margin: 4px 0 0; color: #8F9098; font-size: 13px; flex-basis: 100%; }
+.yy-detail-btn {
+  margin-top: 2px; padding: 4px 12px; height: 28px; line-height: 1;
+  font-size: 13px; color: #4165EC; background: #F7F7FA; border: 1px solid #D8D8D8;
+  border-radius: 4px; cursor: pointer; transition: all .15s;
+}
+.yy-detail-btn:hover { background: #EEF2FE; border-color: #4165EC; }
+.yy-actions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
 .yy-date-nav {
   display: flex; align-items: center; gap: 8px;
   border: 1px solid #D8D8D8; border-radius: 4px; padding: 2px;
   background: #fff;
 }
 .yy-date-nav button {
-  border: none; background: none; cursor: pointer; padding: 4px 8px; color: #36373B;
+  border: none; background: none; cursor: pointer; padding: 4px 8px; color: #36373B; font-size: 16px;
 }
 .yy-date-nav button:hover { color: #4165EC; }
-.yy-date-range { padding: 0 12px; font-weight: 500; color: #36373B; }
+.yy-date-range { padding: 0 12px; font-weight: 500; color: #36373B; font-size: 14px; }
 .yy-legend { display: flex; align-items: center; gap: 16px; }
 .yy-legend-item { display: flex; align-items: center; gap: 6px; color: #36373B; font-size: 13px; }
 .yy-dot { width: 8px; height: 8px; border-radius: 50%; }
-.yy-dot.free { background: #52c41a; }
-.yy-dot.busy { background: #faad14; }
-.yy-dot.mine { background: #4165EC; }
+.yy-dot.pass { background: #4165EC; }
+.yy-dot.wait { background: #4165EC; }
+.yy-dot.expired { background: #E8E8E8; border: 1px solid #C4C4C4; }
 
 /* 日历表格 */
 .yy-calendar { flex: 1; overflow: auto; border: 1px solid #F6F6F8; border-radius: 4px; }
@@ -521,9 +571,17 @@ tr:hover td { background: #F7F7FA; }
 .yy-cal-table th.time-col { background: #F7F7FA; width: 60px; }
 .yy-cal-table td { height: 50px; position: relative; }
 .yy-cal-table td.time-col { background: #F7F7FA; text-align: center; color: #8F9098; font-size: 12px; vertical-align: top; padding-top: 6px; }
+.yy-cal-table { user-select: none; }
 .yy-cal-table td.slot { cursor: pointer; }
 .yy-cal-table td.slot:hover { background: #e6f7ff; }
+.yy-cal-table td.slot.expired { background: #F0F0F0; color: #C4C4C4; cursor: not-allowed; }
+.yy-cal-table td.slot.expired:hover { background: #F0F0F0; }
+.yy-cal-table td.slot.drag-sel { background: #BFD3FF; box-shadow: inset 0 0 0 2px #4165EC; }
 .yy-cal-table td.busy { background: #fffbe6; }
+.yy-cell-title { font-size: 12px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 4px 5px 0; }
+.yy-cell-meta { font-size: 10px; line-height: 1.35; opacity: 0.92; padding: 0 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.yy-cell-meta .lbl { opacity: 0.65; margin-right: 2px; }
+.yy-cell-time { font-size: 11px; opacity: 0.9; padding: 1px 5px 3px; }
 .yy-current-line {
   position: absolute;
   left: 0; right: 0;
@@ -542,6 +600,31 @@ tr:hover td { background: #F7F7FA; }
 }
 .info-row { display: flex; margin-bottom: 8px; color: #36373B; }
 .info-row .info-label { width: 110px; color: #8F9098; }
+/* 会务服务多选计费 */
+.yy-svc-list { margin: 4px 0 8px; border: 1px solid #F0F0F0; border-radius: 6px; overflow: hidden; }
+.yy-svc-row { display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; border-bottom: 1px solid #F0F0F0; }
+.yy-svc-row:last-child { border-bottom: none; }
+.yy-svc-chk { display: flex; align-items: center; gap: 6px; font-size: 14px; color: #36373B; cursor: pointer; }
+.yy-svc-price { color: #8F9098; font-size: 12px; }
+.yy-svc-qty { color: #8F9098; font-size: 13px; display: flex; align-items: center; gap: 6px; }
+.yy-svc-qty .qty { width: 64px; height: 32px; border: 1px solid #D8D8D8; border-radius: 4px; padding: 0 8px; font-size: 14px; color: #36373B; box-sizing: border-box; }
+.svc-select { width: 150px; height: 32px; border: 1px solid #D8D8D8; border-radius: 4px; padding: 0 8px; font-size: 14px; color: #36373B; background: #fff; box-sizing: border-box; }
+.svc-select:focus { outline: none; border-color: #4165EC; box-shadow: 0 0 0 2px rgba(65,101,236,.15); }
+.yy-svc-total { text-align: right; font-size: 14px; color: #36373B; padding: 6px 2px 12px; }
+.yy-svc-total span { color: #4165EC; font-weight: 600; }
+/* 会议费用：编辑费用弹窗 */
+.fy-edit-grid { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+.fy-edit-grid .lbl { width: 110px; text-align: right; padding-right: 12px; color: #8F9098; flex-shrink: 0; }
+.fee-input { height: 38px; border: 1px solid #D8D8D8; border-radius: 4px; padding: 0 12px; font-size: 14px; color: #36373B; background: #F7F7FA; box-sizing: border-box; width: 160px; }
+.fee-input:focus { outline: none; border-color: #4165EC; box-shadow: 0 0 0 2px rgba(65,101,236,.15); background: #fff; }
+/* 新增服务类型按钮 */
+.fy-add-svc { margin: 8px 0 10px; padding: 6px 14px; border: 1px dashed #4165EC; background: #fff; color: #4165EC; border-radius: 4px; font-size: 13px; cursor: pointer; }
+.fy-add-svc:hover { background: #F2F5FE; }
+/* 费用是否确认：确认中 标签 */
+.tag-confirm-ing { display:inline-block; padding:2px 10px; border-radius:10px; font-size:12px; color:#C77700; background:#FFF4E0; }
+.fee-unit { color: #8F9098; font-size: 12px; }
+.fy-total-bar { margin-top: 8px; padding-top: 16px; border-top: 1px solid #F0F0F0; text-align: right; font-size: 14px; color: #36373B; }
+.fy-total-bar b { color: #4165EC; font-size: 18px; margin-left: 6px; }
 /* 会议室名称 模糊搜索下拉 */
 .combo { position: relative; flex: 1; }
 .combo-input {
@@ -584,35 +667,84 @@ tr:hover td { background: #F7F7FA; }
 .mx-bar { display:flex; align-items:center; gap:16px; flex-wrap:wrap; background:#fff; padding:16px 24px; border-radius:8px; margin-bottom:16px; }
 .mx-legend { display:flex; gap:16px; align-items:center; margin-left:auto; font-size:13px; color:#36373B; }
 .mx-legend .k { display:inline-block; width:12px; height:12px; border-radius:3px; margin-right:6px; vertical-align:-1px; }
-.mx-table { border-collapse:collapse; table-layout:fixed; width:max-content; min-width:100%; }
+.mx-table { border-collapse:separate; border-spacing:0; table-layout:fixed; width:max-content; min-width:100%; }
 .mx-table th, .mx-table td { border-bottom:1px solid #F6F6F8; border-right:1px solid #F6F6F8; }
 .mx-table thead th { background:#FAFAFA; font-weight:500; color:#8F9098; font-size:12px; padding:10px 4px; text-align:center; }
-.mx-table thead th:not(.mx-roomcell) { width:108px; }
-.mx-table thead th.mx-roomcell { background:#fff; }
-.mx-roomcell { width:200px; padding:12px 14px !important; text-align:left; background:#fff; position:sticky; left:0; z-index:3; }
+.mx-table thead th:not(.mx-roomcell) { width:54px; height:44px; box-sizing:border-box; }
+.mx-table thead th.mx-roomcell { background:#fff; height:44px; box-sizing:border-box; }
+.mx-roomcell { width:200px; height:80px; box-sizing:border-box; padding:10px 14px !important; text-align:left; background:#fff; position:sticky; left:0; z-index:3; border-right:none !important; box-shadow: 1px 0 0 0 #F6F6F8; }
 .mx-table thead th.mx-roomcell { z-index:4; }
 .mx-roomcell .rn { font-weight:600; color:#36373B; font-size:14px; }
 .mx-roomcell .rmeta { font-size:12px; color:#8F9098; margin-top:4px; }
 .mx-roomcell .rtag { display:inline-block; margin-top:6px; font-size:11px; padding:1px 8px; border-radius:10px; }
-.mx-slot { width:108px; height:auto; min-height:76px; text-align:center; vertical-align:middle; }
-.mx-scroll { overflow-x:auto; -webkit-overflow-scrolling:touch; scroll-snap-type:x proximity; }
-.mx-scroll .mx-table th, .mx-scroll .mx-table td { scroll-snap-align:start; }
+.mx-slot { width:54px; height:80px; min-height:80px; box-sizing:border-box; text-align:center; vertical-align:middle; }
+.mx-scroll { overflow-x:auto; -webkit-overflow-scrolling:touch; }
+.mx-scroll .mx-table th, .mx-scroll .mx-table td { }
 .mx-scroll::-webkit-scrollbar { height:8px; }
 .mx-scroll::-webkit-scrollbar-thumb { background:#cfd6e4; border-radius:4px; }
 .mx-scroll::-webkit-scrollbar-track { background:#f2f4f8; }
-.mx-free { background:#FBFBFC; color:#cfcfcf; font-size:12px; }
-.mx-free.mx-bookable { background:#F6FFED; color:#52C41A; font-size:12px; font-weight:600; cursor:pointer; border:1px solid #B7EB8F; }
+.mx-free { background:#FFFFFF; color:#cfcfcf; font-size:12px; }
+.mx-free.mx-bookable { background:#FFFFFF; color:#8F9098; font-size:12px; cursor:crosshair; border:1px solid #D8D8D8; }
 .mx-free.mx-bookable:hover { background:#E6F7D6; }
-.mx-hint { background:#F6FFED; border:1px solid #D9F7BE; color:#389E0D; padding:10px 16px; border-radius:8px; font-size:13px; margin-bottom:16px; }
-.mx-busy { color:#fff; cursor:pointer; padding:2px 3px; }
-.mx-busy .bt { font-weight:600; line-height:1.25; font-size:11px; padding:0 1px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.mx-busy .bi { font-size:11px; line-height:1.2; margin-top:1px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.mx-busy .bs { font-size:11px; line-height:1.2; margin-top:1px; }
-.mx-busy:hover { position:relative; z-index:2; outline:2px solid #fff; filter:brightness(1.06); }
-  .mx-grouprow td { background:#EEF1FD; font-weight:600; color:#4165EC; padding:8px 14px; font-size:13px; border-right:none; }
+.mx-free.mx-bookable .mx-drag { display:none; }
+.mx-free.mx-bookable:hover .mx-idle { display:none; }
+.mx-free.mx-bookable:hover .mx-drag { display:inline; color:#4165EC; }
+/* 会议预约：资源视图 / 我的会议 内层 Tab */
+.mx-tabs { display:flex; gap:24px; border-bottom:1px solid #EBEEF5; margin-bottom:16px; }
+.mx-tab { padding:10px 4px; font-size:14px; font-weight:500; color:#8F9098; cursor:pointer; position:relative; transition:color .2s; }
+.mx-tab:hover { color:#4165EC; }
+.mx-tab.active { color:#4165EC; font-weight:600; }
+.mx-tab.active::after { content:""; position:absolute; left:0; right:0; bottom:-1px; height:3px; background:#4165EC; border-radius:2px; }
+.mx-bar-mine { padding:14px 24px; }
+.mx-mine-count { margin-left:auto; font-size:13px; color:#8F9098; }
+.mx-rel { display:inline-block; font-size:12px; padding:2px 8px; border-radius:10px; }
+.mx-rel-mine { background:#EAF0FF; color:#4165EC; }
+.mx-rel-att { background:#F2F3F5; color:#8F9098; }
+.mx-busy { background:#4165EC; color:#fff; cursor:pointer; padding:0; position:relative; }
+.mx-busy .bs-label, .mx-busy .bs { display:none; }
+.mx-tip {
+  position:absolute;
+  left:50%; bottom:100%;
+  transform:translateX(-50%) translateY(-6px);
+  background:#fff;
+  color:#36373B;
+  padding:10px 12px;
+  border-radius:6px;
+  box-shadow:0 4px 16px rgba(0,0,0,.15);
+  font-size:12px;
+  line-height:1.6;
+  white-space:nowrap;
+  z-index:20;
+  opacity:0;
+  visibility:hidden;
+  transition:opacity .15s, visibility .15s;
+  pointer-events:none;
+  min-width:160px;
+  text-align:left;
+}
+.mx-tip strong { font-size:13px; color:#36373B; }
+.mx-tip div { color:#595959; }
+.mx-tip::after {
+  content:"";
+  position:absolute;
+  top:100%; left:50%;
+  transform:translateX(-50%);
+  border:6px solid transparent;
+  border-top-color:#fff;
+}
+.mx-busy:hover { z-index:2; box-shadow: inset 0 0 0 2px #1d39c4; }
+.mx-busy:hover .mx-tip { opacity:1; visibility:visible; }
+/* 矩阵行悬浮不遮盖占用/过期占用格底色（覆盖全局 tr:hover td 的浅灰） */
+#mx-table tr:hover td.mx-busy { background:#4165EC; }
+#mx-table tr:hover td.mx-busy.mx-expired { background:#E8E8E8; }
+  /* 分组表头：标题单元格固定 200px 并 sticky（与会议室列同机制），占位单元格补足剩余列宽；
+     纯色占位随滚动不可见，视觉上整条分组带保持冻结。colspan 整表单元格的 sticky 横向不生效，故拆分实现。 */
+  .mx-grouprow td { border-right:none; }
+  .mx-grouptitle { position:sticky; left:0; z-index:3; width:200px; background:#EEF1FD; color:#4165EC; font-weight:600; font-size:13px; padding:8px 14px !important; border-right:none !important; border-bottom:1px solid #E3E6ED; box-shadow:none !important; }
+  .mx-groupfill { background:#EEF1FD; border-bottom:1px solid #E3E6ED; }
   /* 过期时段 */
   .mx-free.mx-expired { background:#F5F5F5; color:#bbb; border:1px dashed #e0e0e0; cursor:not-allowed; font-size:11px; }
-  .mx-busy.mx-expired { filter:grayscale(.55) opacity(.62); }
+  .mx-busy.mx-expired { background:#E8E8E8 !important; }
   .mx-expired-h { color:#bbb !important; }
   .mx-expired-h .ex-hint { font-size:9px; font-weight:400; }
   /* 拖拽选择 */
@@ -631,7 +763,6 @@ tr:hover td { background: #F7F7FA; }
   .mx-quick { display:flex; gap:10px; align-items:center; }
   .quick-chip { display:inline-flex; align-items:center; gap:6px; border:1px solid #D8D8D8; background:#fff; border-radius:10px; padding:8px 16px; font-size:13px; font-weight:500; color:#36373B; cursor:pointer; transition:all .2s; box-shadow:0 1px 2px rgba(0,0,0,.04); }
   .quick-chip:hover { border-color:#4165EC; color:#4165EC; }
-  .quick-chip.active { background:#4165EC; border-color:#4165EC; color:#fff; box-shadow:0 2px 8px rgba(65,101,236,.28); }
   .qk-scroll { overflow-x:auto; }
   .qk-pager { display:flex; align-items:center; justify-content:flex-end; gap:6px; margin-top:14px; flex-wrap:wrap; }
   .qk-pager .pg-info { font-size:12px; color:#8F9098; margin-right:8px; }
@@ -649,15 +780,29 @@ tr:hover td { background: #F7F7FA; }
   .qk-st.pass { background:#E6F7E6; color:#389E0D; }
   .qk-st.wait { background:#FFF7E6; color:#D46B08; }
   .qk-st.reject { background:#FFF1F0; color:#CF1322; }
+  .qk-st.busy { background:#E8F0FE; color:#4165EC; }   /* 预订状态·已预订：统一主色蓝 */
+  .qk-st.released { background:#F2F2F2; color:#8F9098; } /* 预订状态·已释放：灰 */
   .qk-off { display:inline-block; font-size:11px; padding:1px 6px; border-radius:4px; background:#FFF7E6; color:#D46B08; margin-right:4px; }
   .qk-empty { padding:30px; text-align:center; color:#bbb; }
   .qk-table td.op { text-align:center; white-space:nowrap; }
   .lnk-btn { background:#fff; border:1px solid #4165EC; color:#4165EC; border-radius:6px; padding:4px 14px; font-size:13px; cursor:pointer; }
   .lnk-btn:hover { background:#4165EC; color:#fff; }
-  .as-meeting { background:#F7F9FF; border:1px solid #E6EDFF; border-radius:8px; padding:10px 14px; font-size:13px; color:#333; margin-bottom:14px; }
-  .as-meeting b { color:#1d39c4; }
-  .as-current { margin-top:12px; font-size:13px; color:#36373B; line-height:1.6; }
-  .as-current .as-label { color:#8F9098; }
+  .lnk-btn.danger { border-color:#F5222D; color:#F5222D; }
+  .lnk-btn.danger:hover { background:#F5222D; color:#fff; }
+  .lnk-btn.disabled, .lnk-btn[disabled] { border-color:#e0e0e0 !important; color:#bbb !important; background:#f7f7f7 !important; cursor:not-allowed; }
+  .lnk-btn.disabled:hover, .lnk-btn[disabled]:hover { background:#f7f7f7; color:#bbb; }
+  .btn-disabled { color:#bbb !important; border-color:#e0e0e0 !important; background:#f7f7f7 !important; cursor:not-allowed; }
+  .op .lnk-btn { margin:2px 4px 2px 0; }
+  /* 会议费用：状态标签 / 取消行置灰 */
+  .tag-valid { display:inline-block; padding:2px 10px; border-radius:10px; font-size:12px; color:#2e7d32; background:#e8f5e9; }
+  .tag-cancel { display:inline-block; padding:2px 10px; border-radius:10px; font-size:12px; color:#9e9e9e; background:#f0f0f0; }
+  .row-cancel td { color:#9e9e9e; }
+  .row-cancel .btn-link[disabled] { color:#bbb; cursor:not-allowed; }
+  /* 费用是否确认 列标签（C10） */
+  .tag-confirm-yes { display:inline-block; padding:2px 10px; border-radius:10px; font-size:12px; color:#2E7D32; background:#E8F5E9; }
+  .tag-confirm-no { display:inline-block; padding:2px 10px; border-radius:10px; font-size:12px; color:#9E9E9E; background:#F0F0F0; }
+  /* 弹窗只读态（sponsor/completed 锁定输入） */
+  .fee-input:disabled, .svc-select:disabled, .qty:disabled { background:#F7F7FA; color:#9E9E9E; cursor:not-allowed; }
   /* 配套设施 下拉多选 */
   .ms { position:relative; }
   .ms-trigger { display:flex; align-items:center; justify-content:space-between; min-height:38px; padding:7px 12px; border:1px solid #E3E6ED; border-radius:8px; background:#F7F7FA; cursor:pointer; font-size:14px; color:#36373B; box-sizing:border-box; }
@@ -675,6 +820,16 @@ tr:hover td { background: #F7F7FA; }
   .mr-fac-tag { display:inline-block; padding:2px 8px; background:#EEF2FC; color:#4165EC; border-radius:10px; font-size:12px; }
   .fac-line { display:flex; flex-wrap:wrap; gap:6px; }
   .fac-tag { display:inline-block; padding:2px 8px; background:#EEF2FC; color:#4165EC; border-radius:10px; font-size:12px; }
+  /* 房间详情 */
+  /* 参会人员回执标注（人员级） */
+  .att-list { display:flex; flex-direction:column; gap:6px; }
+  .att-row { display:flex; align-items:center; justify-content:space-between; gap:8px; padding:6px 10px; background:#F7F7FA; border-radius:6px; }
+  .att-name { font-size:13px; color:#36373B; }
+  .att-me { font-size:11px; color:#4165EC; margin-left:2px; }
+  .att-tag { font-size:12px; padding:2px 10px; border-radius:10px; white-space:nowrap; }
+  .att-tag.attend { background:#E8F5E9; color:#2E7D32; }
+  .att-tag.absent { background:#FDECEA; color:#C62828; }
+  .att-tag.pending { background:#F2F3F5; color:#8F9098; }
 </style>
 </head>
 <body>
@@ -690,7 +845,7 @@ tr:hover td { background: #F7F7FA; }
     <div class="menu-item"><span class="menu-icon">&#x1F343;</span> 智慧灌溉</div>
     <div class="menu-item active"><span class="menu-icon">&#x1F4C5;</span> 会议管理</div>
     <div class="submenu">
-      <div class="menu-item" data-view="view-sp" data-label="预约记录">预约记录</div>
+      <div class="menu-item" data-view="view-sp" data-label="预约审批">预约审批</div>
       <div class="menu-item" data-view="view-fy" data-label="会议费用">会议费用</div>
       <div class="menu-item" data-view="view-hy" data-label="会务需求">会务需求</div>
       <div class="menu-item" data-view="view-mr" data-label="会议室管理">会议室管理</div>
@@ -707,7 +862,7 @@ tr:hover td { background: #F7F7FA; }
     <!-- 顶部栏 -->
     <header class="topbar">
       <div class="breadcrumb">
-        <span>会议管理</span><span class="slash">/</span><span class="current" id="crumbCurrent">预约记录</span>
+        <span>会议管理</span><span class="slash">/</span><span class="current" id="crumbCurrent">预约审批</span>
       </div>
       <div class="user-area">
         <span>下载中...</span>
@@ -728,7 +883,7 @@ tr:hover td { background: #F7F7FA; }
       <div class="tab" data-view="view-empty" data-label="通行设置">通行设置</div>
       <div class="tab" data-view="view-empty" data-label="车辆黑名单">车辆黑名单</div>
       <div class="tab" data-view="view-empty" data-label="车辆通行权限">车辆通行权限</div>
-      <div class="tab" data-view="view-sp" data-label="预约记录">预约记录</div>
+      <div class="tab" data-view="view-sp" data-label="预约审批">预约审批</div>
       <div class="tab" data-view="view-mr" data-label="会议室管理">会议室管理</div>
     </div>
 
@@ -739,7 +894,7 @@ tr:hover td { background: #F7F7FA; }
       <div class="view" id="view-home">
         <div class="home-wrap">
           <h2>会议管理</h2>
-          <p>本平台提供会议室管理、预约记录、会议费用、会议预约、会务需求等一体化管理能力。</p>
+          <p>本平台提供会议室管理、预约审批、会议费用、会议预约、会务需求等一体化管理能力。</p>
           <p>点击上方标签页或左侧菜单，进入对应模块。</p>
         </div>
       </div>
@@ -778,14 +933,18 @@ tr:hover td { background: #F7F7FA; }
         <div class="card">
           <div class="toolbar">
             <button class="btn btn-primary" onclick="mrOpenAdd()"><span>+</span> 新增会议室</button>
+            <button class="btn btn-default" onclick="mrOpenBatchAdmin()"><span>&#x1F465;</span> 批量设置管理员</button>
+            <span class="mr-batch-tip" id="mr-batchTip"></span>
           </div>
           <table>
             <thead>
             <tr>
+              <th style="width:40px;"><input type="checkbox" id="mr-checkAll" title="全选" onclick="mrCheckAll(this)"></th>
               <th style="width:340px;">会议室</th>
               <th style="width:80px;">位置</th>
               <th class="sortable" style="width:130px;" onclick="mrSort('seats')">容纳人数（个）<span class="sort-arrow" id="mr-sort-seats">&#x2195;</span></th>
-              <th class="sortable" style="width:150px;" onclick="mrSort('cost')">成本（元/小时）<span class="sort-arrow" id="mr-sort-cost">&#x2195;</span></th>
+              <th class="sortable" style="width:150px;" onclick="mrSort('cost')">使用费（元/小时）<span class="sort-arrow" id="mr-sort-cost">&#x2195;</span></th>
+              <th style="width:170px;">管理员</th>
               <th style="width:150px;">操作</th>
             </tr>
             </thead>
@@ -827,9 +986,9 @@ tr:hover td { background: #F7F7FA; }
 
       <!-- 会议预约页已用资源矩阵(按空闲找房)预订视图替代 -->
 
-      <!-- 预约记录 -->
+      <!-- 预约审批 -->
       <div class="view" id="view-sp">
-        <div class="page-title">预约记录</div>
+        <div class="page-title">预约审批</div>
         <div class="search-bar">
           <div class="form-item">
             <label>申请人</label>
@@ -842,7 +1001,6 @@ tr:hover td { background: #F7F7FA; }
               <option value="待审批">待审批</option>
               <option value="已通过">已通过</option>
               <option value="已撤销">已撤销</option>
-              <option value="过期未审批">过期未审批</option>
             </select>
           </div>
           <button class="btn btn-primary" onclick="spSearch()"><span>&#x1F50D;</span> 搜索</button>
@@ -861,7 +1019,7 @@ tr:hover td { background: #F7F7FA; }
                 <th style="width:90px;">申请人</th>
                 <th style="width:110px;">发起部门</th>
                 <th style="width:100px;">审批状态</th>
-                <th style="width:80px;">操作</th>
+                <th style="width:140px;">操作</th>
               </tr>
             </thead>
             <tbody id="sp-tableBody"></tbody>
@@ -883,6 +1041,22 @@ tr:hover td { background: #F7F7FA; }
             <input type="text" id="fy-searchBooker" placeholder="请输入" style="width: 220px;">
           </div>
           <div class="form-item">
+            <label>部门</label>
+            <select id="fy-dept" style="width: 180px;"></select>
+          </div>
+          <div class="form-item">
+            <label>项目组</label>
+            <input type="text" id="fy-group" placeholder="请输入" style="width: 180px;">
+          </div>
+          <div class="form-item">
+            <label>状态</label>
+            <select id="fy-status" style="width: 120px;">
+              <option value="">全部</option>
+              <option value="有效">有效</option>
+              <option value="已取消">已取消</option>
+            </select>
+          </div>
+          <div class="form-item">
             <label>发起时间</label>
             <input type="date" id="fy-createStart" style="width: 150px;"> <span>~</span>
             <input type="date" id="fy-createEnd" style="width: 150px;">
@@ -902,9 +1076,13 @@ tr:hover td { background: #F7F7FA; }
                 <th style="width:120px;">会议室地点</th>
                 <th style="width:100px;">预约人</th>
                 <th style="width:120px;">所属部门</th>
+                <th style="width:120px;">项目组</th>
+                <th style="width:90px;">状态</th>
+                <th style="width:110px;">费用是否确认</th>
                 <th style="width:100px;">总费用</th>
                 <th style="width:120px;">会议室费用</th>
                 <th style="width:140px;">会务服务费用</th>
+                <th style="width:80px;">操作</th>
               </tr>
             </thead>
             <tbody id="fy-tableBody"></tbody>
@@ -915,39 +1093,56 @@ tr:hover td { background: #F7F7FA; }
 
       <!-- 占位视图 -->
       <div class="view" id="view-empty">
-        <div class="placeholder">该模块（<span id="emptyLabel">-</span>）待建设</div>
+        <div class="placeholder">该模块（<span id="emptyLabel">-</span>）非本期开放（二期）</div>
       </div>
 
-      <!-- 资源矩阵 -->
+      <!-- 会议预约：资源视图 + 我的会议（Tab 切换，默认资源视图） -->
       <div class="view active" id="view-matrix">
         <div class="page-title" id="mx-pageTitle">会议预约</div>
-        <div class="mx-hint" id="mx-hint">点击或<strong>按住鼠标拖动</strong>连续空闲时段可直接预填房间与时段；占用/过期时段不可选。</div>
-        <div class="mx-bar">
-          <div class="form-item">
-            <label>位置</label>
-            <div class="loc-tree">
-              <button class="loc-trigger" id="locTrigger" onclick="mxToggleTree(event)">全部位置 ▾</button>
-              <div class="loc-pop" id="locPop" style="display:none;"></div>
+        <div class="mx-tabs">
+          <div class="mx-tab active" data-mxtab="resource" onclick="mxSwitchTab('resource')">资源视图</div>
+          <div class="mx-tab" data-mxtab="mine" onclick="mxSwitchTab('mine')">我的会议</div>
+        </div>
+
+        <!-- 资源视图（默认） -->
+        <div class="mx-tabpane" id="mx-pane-resource">
+          <div class="mx-bar">
+            <div class="form-item">
+              <label>位置</label>
+              <div class="loc-tree">
+                <button class="loc-trigger" id="locTrigger" onclick="mxToggleTree(event)">全部位置 ▾</button>
+                <div class="loc-pop" id="locPop" style="display:none;"></div>
+              </div>
+            </div>
+            <div class="form-item">
+              <label>日期</label>
+              <input type="date" id="mx-date" onchange="mxSetDate(this.value)">
+            </div>
+            <button class="btn btn-default" style="margin-left:auto;" onclick="mxOpenBooking()" title="或在下方矩阵中按住鼠标拖动空白时段发起预约"><span>&#x2795;</span> 发起预约</button>
+            <div class="mx-legend">
+              <span><span class="k" style="background:#4165EC;"></span>已预订</span>
+              <span><span class="k" style="background:#F5F5F5;border:1px dashed #e0e0e0;"></span>已过期</span>
             </div>
           </div>
-          <div class="form-item">
-            <label>日期</label>
-            <input type="date" id="mx-date" value="2026-08-04" onchange="mxSetDate(this.value)">
-          </div>
-          <div class="mx-quick">
-            <button class="quick-chip" data-type="mine" onclick="mxQuickQuery('mine')">我发起的</button>
-            <button class="quick-chip" data-type="attend" onclick="mxQuickQuery('attend')">我参加的</button>
-          </div>
-          <button class="btn btn-primary" style="margin-left:auto;" onclick="mxOpenBooking()"><span>&#x2795;</span> 发起预约</button>
-          <div class="mx-legend">
-            <span><span class="k" style="background:#4165EC;"></span>已通过</span>
-            <span><span class="k" style="background:#FAAD14;"></span>待审批</span>
-            <span><span class="k" style="background:#F6FFED;border:1px solid #B7EB8F;"></span>空闲</span>
-            <span><span class="k" style="background:#F5F5F5;border:1px dashed #e0e0e0;"></span>已过期</span>
+          <div class="card mx-scroll" style="padding:0; overflow-x:auto;">
+            <table class="mx-table" id="mx-table"></table>
           </div>
         </div>
-        <div class="card mx-scroll" style="padding:0; overflow-x:auto;">
-          <table class="mx-table" id="mx-table"></table>
+
+        <!-- 我的会议：整合「我发起的 / 我参加的」 -->
+        <div class="mx-tabpane" id="mx-pane-mine" style="display:none;">
+          <div class="mx-bar mx-bar-mine">
+            <div class="mx-quick">
+              <button class="quick-chip active" data-minefilter="all" onclick="mxMineFilter('all')">全部</button>
+              <button class="quick-chip" data-minefilter="mine" onclick="mxMineFilter('mine')">我发起的</button>
+              <button class="quick-chip" data-minefilter="attend" onclick="mxMineFilter('attend')">我参加的</button>
+            </div>
+            <span class="mx-mine-count" id="mx-mine-count"></span>
+          </div>
+          <div class="card" style="padding:0;">
+            <div class="qk-scroll" id="qk-list-mine"></div>
+            <div class="qk-pager" id="qk-page-mine"></div>
+          </div>
         </div>
       </div>
 
@@ -996,7 +1191,7 @@ tr:hover td { background: #F7F7FA; }
         <div class="input-wrap"><input type="number" id="mr-roomSeats" placeholder="请输入"></div>
       </div>
       <div class="form-row">
-        <label><span class="required">*</span>成本（元/小时）</label>
+        <label><span class="required">*</span>使用费（元/小时）</label>
         <div class="input-wrap"><input type="number" id="mr-roomCost" placeholder="请输入"></div>
       </div>
       <div class="form-row form-row-vertical">
@@ -1027,10 +1222,67 @@ tr:hover td { background: #F7F7FA; }
           <div class="img-tip">支持上传多张图片，单张不超过 5MB</div>
         </div>
       </div>
+      <div class="form-row form-row-vertical">
+        <label>使用状态</label>
+        <div class="input-wrap">
+          <select id="mr-roomEnabled">
+            <option value="1">启用</option>
+            <option value="0">停用</option>
+          </select>
+          <div class="img-tip">停用后该会议室不再参与预约与资源矩阵展示</div>
+        </div>
+      </div>
+      <div class="form-row form-row-vertical">
+        <label>管理员（可多选）</label>
+        <div class="input-wrap">
+          <div class="ms" id="mr-admMS">
+            <div class="ms-trigger" id="mr-admTrigger" onclick="mrToggleAdmDropdown(event)">
+              <span class="ms-placeholder" id="mr-admPlaceholder">请选择管理员</span>
+              <span class="ms-arrow">▾</span>
+            </div>
+            <div class="ms-panel" id="mr-admPanel" style="display:none"></div>
+            <div class="ms-tags" id="mr-admTags"></div>
+          </div>
+          <div class="img-tip">可设置多名管理员，用于会议室管理与审批协同</div>
+        </div>
+      </div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-default" onclick="mrCloseModal()">取消</button>
       <button class="btn btn-primary" onclick="mrSave()">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- ========== 会议室管理：批量设置管理员弹窗 ========== -->
+<div class="modal-overlay" id="mr-batchModal">
+  <div class="modal">
+    <div class="modal-header">
+      <span>批量设置管理员</span>
+      <button class="modal-close" onclick="mrBatchClose()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row form-row-vertical">
+        <label>已选会议室</label>
+        <div class="input-wrap"><div class="mr-batch-rooms" id="mr-batchRooms"></div></div>
+      </div>
+      <div class="form-row form-row-vertical">
+        <label>管理员（可多选）</label>
+        <div class="input-wrap">
+          <div class="ms" id="mr-badmMS">
+            <div class="ms-trigger" id="mr-badmTrigger" onclick="mrToggleBadmDropdown(event)">
+              <span class="ms-placeholder" id="mr-badmPlaceholder">请选择管理员</span>
+              <span class="ms-arrow">▾</span>
+            </div>
+            <div class="ms-panel" id="mr-badmPanel" style="display:none"></div>
+            <div class="ms-tags" id="mr-badmTags"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-default" onclick="mrBatchClose()">取消</button>
+      <button class="btn btn-primary" onclick="mrBatchApply()">确定</button>
     </div>
   </div>
 </div>
@@ -1058,7 +1310,6 @@ tr:hover td { background: #F7F7FA; }
     </div>
   </div>
 </div>
-
 <!-- ========== 会议预约：预约弹窗 ========== -->
 <div class="modal-overlay" id="yy-formModal">
   <div class="modal">
@@ -1105,13 +1356,12 @@ tr:hover td { background: #F7F7FA; }
           </div>
         </div>
         <div class="form-row">
-          <label><span class="required">*</span>是否涉密</label>
-          <div class="input-wrap">
-            <select id="yy-confidential">
-              <option value="否" selected>否</option>
-              <option value="是">是</option>
-            </select>
-          </div>
+          <label>申请人</label>
+          <div class="input-wrap"><input type="text" id="yy-applicant" readonly style="background:#F7F7FA;color:#8F9098;"></div>
+        </div>
+        <div class="form-row">
+          <label>部门</label>
+          <div class="input-wrap"><input type="text" id="yy-dept" readonly style="background:#F7F7FA;color:#8F9098;"></div>
         </div>
         <div class="form-row">
           <label><span class="required">*</span>联系电话</label>
@@ -1140,20 +1390,16 @@ tr:hover td { background: #F7F7FA; }
         </div>
         <div class="form-row full" style="align-items:flex-start;">
           <label>附件上传</label>
-          <div class="input-wrap"><div class="uploader">+</div></div>
+          <div class="input-wrap">
+            <input type="file" id="yy-attachments" multiple style="font-size:13px;padding:6px 0;width:100%;">
+            <div id="yy-attachList" style="margin-top:6px;font-size:12px;color:#8F9098;line-height:1.8;"></div>
+          </div>
         </div>
-        </div>
-      </div>
-      <div class="form-row" style="padding-bottom:8px;border-bottom:1px solid #F0F0F0;margin-bottom:16px;">
-        <label>外出开会</label>
-        <div class="input-wrap radio-group">
-          <label><input type="radio" name="yy-offsite" value="是" onchange="yyToggleOffsite()"> 是</label>
-          <label><input type="radio" name="yy-offsite" value="否" checked onchange="yyToggleOffsite()"> 否</label>
         </div>
       </div>
       <div class="modal-section" id="yy-roomInfoSection">
         <div class="modal-section-title">会议室信息</div>
-        <div class="info-row"><div class="info-label"><span class="required">*</span>会议室名称：</div>
+        <div class="info-row"><div class="info-label">会议室名称：</div>
           <div class="combo" id="yy-roomCombo">
             <input type="text" id="yy-roomInput" class="combo-input" placeholder="搜索名称/规模/位置…" autocomplete="off" onclick="yyOpenRoomCombo()" onfocus="yyOpenRoomCombo()" oninput="yyFilterRoomCombo(this.value)">
             <span class="combo-caret">▼</span>
@@ -1164,6 +1410,8 @@ tr:hover td { background: #F7F7FA; }
         <div class="info-row"><div class="info-label">容纳人数：</div><div id="yy-modalRoomSeats">178人</div></div>
         <div class="info-row"><div class="info-label">会议室位置：</div><div id="yy-modalRoomLocation">1F</div></div>
         <div class="info-row"><div class="info-label">配套设施：</div><div id="yy-modalRoomFacilities">投影仪、视频会议、白板、麦克风、同声传译</div></div>
+        <div class="info-row"><div class="info-label">单价（元/小时）：</div><div id="yy-modalRoomPrice">—</div></div>
+        <div class="info-row"><div class="info-label">会议室费用：</div><div id="yy-roomFee">—</div></div>
       </div>
       <div class="modal-section" id="yy-serviceSection">
         <div class="modal-section-title">会务服务</div>
@@ -1177,19 +1425,8 @@ tr:hover td { background: #F7F7FA; }
           </div>
         </div>
         <div id="yy-serviceDetail" style="display:none;">
-          <div class="form-row">
-            <label>服务类型</label>
-            <div class="input-wrap">
-              <select id="yy-serviceType">
-                <option value="">请选择服务类型</option>
-                <option value="会务服务">会务服务</option>
-                <option value="纸笔套装">纸笔套装</option>
-                <option value="席卡">席卡</option>
-                <option value="矿泉水">矿泉水</option>
-                <option value="茶水">茶水</option>
-              </select>
-            </div>
-          </div>
+          <div id="yy-serviceList" class="yy-svc-list"></div>
+          <div class="yy-svc-total">会务服务费用合计：<span id="yy-serviceTotal">¥0.00</span></div>
           <div class="form-row" style="align-items:flex-start;">
             <label>会务说明</label>
             <div class="input-wrap"><textarea id="yy-note" rows="3" placeholder="请输入具体要求..."></textarea></div>
@@ -1213,61 +1450,36 @@ tr:hover td { background: #F7F7FA; }
         </div>
       </div>
       <div class="modal-section" id="yy-noticeSection">
-        <div class="modal-section-title">会议通知</div>
-        <div class="form-row" style="padding-bottom:8px;border-bottom:1px solid #F0F0F0;margin-bottom:16px;">
-          <label>是否通知会议</label>
-          <div class="input-wrap radio-group">
-            <label><input type="radio" name="yy-notice" value="是" onchange="yyToggleNotice()"> 是</label>
-            <label><input type="radio" name="yy-notice" value="否" checked onchange="yyToggleNotice()"> 否</label>
-          </div>
-        </div>
-        <div id="yy-noticeDetail" style="display:none;">
+        <div class="modal-section-title">参会通知</div>
         <div class="form-row">
-          <label>通知对象</label>
+          <label>是否通知</label>
           <div class="input-wrap radio-group rg-wide">
-            <label><input type="radio" name="yy-noticeObj" value="部门联络人" checked onchange="yyToggleNoticeObj()"> 部门联络人</label>
-            <label><input type="radio" name="yy-noticeObj" value="指定参会人" onchange="yyToggleNoticeObj()"> 指定参会人</label>
+            <label><input type="radio" name="yy-notify" value="是" onchange="yyToggleNotify()"> 是</label>
+            <label><input type="radio" name="yy-notify" value="否" checked onchange="yyToggleNotify()"> 否</label>
           </div>
         </div>
-        <div class="form-row">
-          <label>参会领导</label>
-          <div class="input-wrap" style="position:relative;">
-            <input type="text" id="yy-leaders" placeholder="请选择参会领导" style="padding-left:32px;">
-            <svg style="position:absolute;left:10px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:#8F9098;pointer-events:none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.35-4.35"></path></svg>
+        <div id="yy-noticeObjBlock" style="display:none;">
+          <div class="form-row">
+            <label>参会对象</label>
+            <div class="input-wrap radio-group rg-wide">
+              <label><input type="checkbox" name="yy-noticeObj" value="部门联络人" onchange="yyToggleNoticeObj()"> 部门联络人</label>
+              <label><input type="checkbox" name="yy-noticeObj" value="指定参会人" onchange="yyToggleNoticeObj()"> 指定参会人</label>
+            </div>
           </div>
-        </div>
-        <div class="form-row" id="yy-deptAttendRow">
-          <label>参会部门</label>
-          <div class="input-wrap" style="position:relative;">
-            <input type="text" id="yy-deptAttend" placeholder="请选择参会部门" style="padding-left:32px;">
-            <svg style="position:absolute;left:10px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:#8F9098;pointer-events:none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18"></path><path d="M5 21V7l8-4v18"></path><path d="M19 21V11l-6-4"></path></svg>
+          <div class="form-row" id="yy-deptAttendRow">
+            <label>参会部门</label>
+            <div class="input-wrap" style="position:relative;">
+              <input type="text" id="yy-deptAttend" placeholder="请选择参会部门" style="padding-left:32px;">
+              <svg style="position:absolute;left:10px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:#8F9098;pointer-events:none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18"></path><path d="M5 21V7l8-4v18"></path><path d="M19 21V11l-6-4"></path></svg>
+            </div>
           </div>
-        </div>
-        <div class="form-row" id="yy-attendeesRow" style="display:none;">
-          <label>参会人员</label>
-          <div class="input-wrap" style="position:relative;">
-            <input type="text" id="yy-attendees" placeholder="请选择参会人员" style="padding-left:32px;">
-            <svg style="position:absolute;left:10px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:#8F9098;pointer-events:none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.35-4.35"></path></svg>
+          <div class="form-row" id="yy-attendeesRow" style="display:none;">
+            <label>参会人员</label>
+            <div class="input-wrap" style="position:relative;">
+              <input type="text" id="yy-attendees" placeholder="请选择参会人员" style="padding-left:32px;">
+              <svg style="position:absolute;left:10px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:#8F9098;pointer-events:none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.35-4.35"></path></svg>
+            </div>
           </div>
-        </div>
-        <div class="form-row">
-          <label>允许另派他人</label>
-          <div class="input-wrap radio-group">
-            <label><input type="radio" name="yy-allowProxy" value="是"> 是</label>
-            <label><input type="radio" name="yy-allowProxy" value="否" checked> 否</label>
-          </div>
-        </div>
-        <div class="form-row" style="align-items:flex-start;">
-          <label>会议材料</label>
-          <div class="input-wrap"><div class="uploader">+</div></div>
-        </div>
-        <div class="form-row">
-          <label>是否回执</label>
-          <div class="input-wrap radio-group">
-            <label><input type="radio" name="yy-receipt" value="是"> 是</label>
-            <label><input type="radio" name="yy-receipt" value="否" checked> 否</label>
-          </div>
-        </div>
         </div>
       </div>
     </div>
@@ -1278,7 +1490,55 @@ tr:hover td { background: #F7F7FA; }
   </div>
 </div>
 
-<!-- ========== 预约记录：详情抽屉 ========== -->
+<!-- ========== 会议费用：编辑费用弹窗 ========== -->
+<div class="modal-overlay" id="fy-editModal">
+  <div class="modal">
+    <div class="modal-header">
+      <span id="fy-editTitle">编辑会议费用</span>
+      <button class="modal-close" onclick="fyCloseEdit()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-section">
+        <div class="modal-section-title">会议信息</div>
+        <div class="info-row"><div class="info-label">会议名称：</div><div id="fy-editName">—</div></div>
+        <div class="info-row"><div class="info-label">会议时间：</div><div id="fy-editTime">—</div></div>
+        <div class="info-row"><div class="info-label">会议室地点：</div><div id="fy-editLocation">—</div></div>
+        <div class="info-row"><div class="info-label">预约人：</div><div id="fy-editBooker">—</div></div>
+      </div>
+      <div class="modal-section">
+        <div class="modal-section-title">会议室费用</div>
+        <div class="info-row"><div class="info-label">单价（元/小时）：</div><div id="fy-editUnitPrice">—</div></div>
+        <div class="fy-edit-grid">
+          <span class="lbl">实际使用时长</span>
+          <input type="number" id="fy-editDuration" class="fee-input" min="0" step="0.5" oninput="fyRecalcRoom()">
+          <span class="fee-unit">小时（按实际结算）</span>
+        </div>
+        <div class="fy-edit-grid">
+          <span class="lbl">会议室费用</span>
+          <input type="number" id="fy-editRoomFee" class="fee-input" min="0" step="0.01" readonly>
+          <span class="fee-unit">元（按单价×时长自动计算）</span>
+        </div>
+      </div>
+      <div class="modal-section">
+        <div class="modal-section-title">会务服务费用</div>
+        <div class="yy-svc-list" id="fy-editServiceList"></div>
+        <button type="button" class="fy-add-svc" onclick="fyAddServiceRow()">+ 新增服务</button>
+        <div class="fy-edit-grid">
+          <span class="lbl">会务服务费用</span>
+          <input type="number" id="fy-editServiceFee" class="fee-input" min="0" step="0.01" readonly>
+          <span class="fee-unit">元（按服务单价×数量自动计算）</span>
+        </div>
+      </div>
+      <div class="fy-total-bar">费用合计<b id="fy-editTotal">¥0.00</b></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-default" onclick="fyCloseEdit()">关闭</button>
+      <button class="btn btn-primary" id="fy-btnSubmit" onclick="fySubmitToSponsor()" style="display:none;">提交</button>
+    </div>
+  </div>
+</div>
+
+<!-- ========== 预约审批：详情抽屉 ========== -->
 <div class="sp-detail-mask" id="sp-detailMask" onclick="spCloseDetail()"></div>
 <div class="sp-detail-drawer" id="sp-detailDrawer">
   <div class="sp-detail-header">
@@ -1295,14 +1555,14 @@ tr:hover td { background: #F7F7FA; }
         <div class="sp-detail-item"><div class="sp-detail-label">会议类别</div><div class="sp-detail-value" id="sp-detailCategory">管理类</div></div>
         <div class="sp-detail-item"><div class="sp-detail-label">会议类型</div><div class="sp-detail-value" id="sp-detailType">其他</div></div>
         <div class="sp-detail-item"><div class="sp-detail-label">会议召集人</div><div class="sp-detail-value" id="sp-detailConvener">张三</div></div>
-        <div class="sp-detail-item"><div class="sp-detail-label">是否涉密</div><div class="sp-detail-value" id="sp-detailConfidential">否</div></div>
         <div class="sp-detail-item"><div class="sp-detail-label">发起部门</div><div class="sp-detail-value" id="sp-detailDept">系统管理员</div></div>
         <div class="sp-detail-item"><div class="sp-detail-label">申请人</div><div class="sp-detail-value" id="sp-detailApplicant">admin</div></div>
         <div class="sp-detail-item"><div class="sp-detail-label">联系电话</div><div class="sp-detail-value" id="sp-detailContact">176221189702</div></div>
         <div class="sp-detail-item"><div class="sp-detail-label">审批状态</div><div class="sp-detail-value" id="sp-detailStatus">待审批</div></div>
+        <div class="sp-detail-item"><div class="sp-detail-label">预订状态</div><div class="sp-detail-value" id="sp-detailOccupancy">—</div></div>
         <div class="sp-detail-item full"><div class="sp-detail-label">会议时间</div><div class="sp-detail-value" id="sp-detailMeetingTime">2026-08-05 08:30-09:00</div></div>
         <div class="sp-detail-item full"><div class="sp-detail-label">会议内容</div><div class="sp-detail-value" id="sp-detailContent">—</div></div>
-        <div class="sp-detail-item full"><div class="sp-detail-label">附件</div><div class="sp-detail-value" id="sp-detailAttachment">加载失败</div></div>
+        <div class="sp-detail-item full"><div class="sp-detail-label">附件</div><div class="sp-detail-value" id="sp-detailAttachments">—</div></div>
       </div>
     </div>
     <div class="sp-detail-section">
@@ -1313,8 +1573,6 @@ tr:hover td { background: #F7F7FA; }
         <div class="sp-detail-item"><div class="sp-detail-label">会议室位置</div><div class="sp-detail-value" id="sp-detailLocation">3F</div></div>
         <div class="sp-detail-item"><div class="sp-detail-label">容纳人数</div><div class="sp-detail-value" id="sp-detailSeats">263</div></div>
         <div class="sp-detail-item"><div class="sp-detail-label">配套设施</div><div class="sp-detail-value" id="sp-detailFacilities">—</div></div>
-        <div class="sp-detail-item"><div class="sp-detail-label">是否外出开会</div><div class="sp-detail-value" id="sp-detailOffsite">否</div></div>
-        <div class="sp-detail-item"><div class="sp-detail-label">外出地点</div><div class="sp-detail-value" id="sp-detailOutLocation">—</div></div>
       </div>
     </div>
     <div class="sp-detail-section">
@@ -1325,7 +1583,7 @@ tr:hover td { background: #F7F7FA; }
         <div class="sp-detail-item full"><div class="sp-detail-label">会务说明</div><div class="sp-detail-value" id="sp-detailNote">请按时准备</div></div>
       </div>
     </div>
-    <div class="sp-detail-section">
+    <div class="sp-detail-section" id="sp-detailCostShareSection">
       <div class="sp-detail-section-title">费用分摊</div>
       <div class="sp-detail-grid">
         <div class="sp-detail-item"><div class="sp-detail-label">是否分摊</div><div class="sp-detail-value" id="sp-detailCostShare">否</div></div>
@@ -1333,25 +1591,19 @@ tr:hover td { background: #F7F7FA; }
       </div>
     </div>
     <div class="sp-detail-section">
-      <div class="sp-detail-section-title">会议通知</div>
-      <div class="sp-detail-grid">
-        <div class="sp-detail-item"><div class="sp-detail-label">是否通知会议</div><div class="sp-detail-value" id="sp-detailNotice">是</div></div>
-        <div class="sp-detail-item"><div class="sp-detail-label">通知对象</div><div class="sp-detail-value" id="sp-detailNoticeObj">部门联络人</div></div>
-        <div class="sp-detail-item"><div class="sp-detail-label">参会领导</div><div class="sp-detail-value" id="sp-detailLeaders">—</div></div>
-        <div class="sp-detail-item"><div class="sp-detail-label">参会部门</div><div class="sp-detail-value" id="sp-detailDeptAttend">—</div></div>
-        <div class="sp-detail-item"><div class="sp-detail-label">参会人员</div><div class="sp-detail-value" id="sp-detailAttendees">bmct</div></div>
-        <div class="sp-detail-item"><div class="sp-detail-label">允许另派他人</div><div class="sp-detail-value" id="sp-detailAllowProxy">否</div></div>
-        <div class="sp-detail-item"><div class="sp-detail-label">是否回执</div><div class="sp-detail-value" id="sp-detailReceipt">否</div></div>
+      <div class="sp-detail-section-title">参会通知</div>
+      <div id="sp-detailNoticeBlock">
+        <div class="sp-detail-grid">
+          <div class="sp-detail-item"><div class="sp-detail-label">参会对象</div><div class="sp-detail-value" id="sp-detailNoticeObj">部门联络人</div></div>
+          <div class="sp-detail-item"><div class="sp-detail-label">参会部门</div><div class="sp-detail-value" id="sp-detailDeptAttend">—</div></div>
+          <div class="sp-detail-item" style="grid-column:1 / -1;"><div class="sp-detail-label">参会人员</div><div class="sp-detail-value" id="sp-detailAttendees"></div></div>
+        </div>
       </div>
     </div>
-    <div class="sp-detail-section">
-      <div class="sp-detail-section-title">操作日志</div>
-      <div class="sp-detail-log">
-        <div class="sp-detail-log-title">发起流程引擎审批</div>
-        <div class="sp-detail-log-meta">操作时间：2026-08-04 14:03:49</div>
-        <div class="sp-detail-log-meta">操作人员：admin</div>
-      </div>
-    </div>
+  </div>
+  <div class="sp-detail-footer" id="sp-detailFooter">
+    <div class="sp-detail-receipt-bar" id="sp-detailReceiptBar" style="display:none;"></div>
+    <button class="btn btn-primary" onclick="spCloseDetail()">关闭</button>
   </div>
 </div>
 
@@ -1369,7 +1621,7 @@ tr:hover td { background: #F7F7FA; }
     <div class="ri-thumb" id="ri-thumb">暂无图片</div>
     <div class="sp-detail-grid">
       <div class="sp-detail-item"><div class="sp-detail-label">会议室名称</div><div class="sp-detail-value" id="ri-name"></div></div>
-      <div class="sp-detail-item"><div class="sp-detail-label">楼层位置</div><div class="sp-detail-value" id="ri-location"></div></div>
+      <div class="sp-detail-item"><div class="sp-detail-label">会议室位置</div><div class="sp-detail-value" id="ri-location"></div></div>
       <div class="sp-detail-item"><div class="sp-detail-label">会议室规模</div><div class="sp-detail-value" id="ri-scale"></div></div>
       <div class="sp-detail-item"><div class="sp-detail-label">容纳人数</div><div class="sp-detail-value" id="ri-seats"></div></div>
       <div class="sp-detail-item"><div class="sp-detail-label">使用费</div><div class="sp-detail-value" id="ri-cost"></div></div>
@@ -1381,10 +1633,6 @@ tr:hover td { background: #F7F7FA; }
     <div class="sp-detail-section">
       <div class="sp-detail-section-title">会议室简介</div>
       <div class="sp-detail-value" id="ri-intro" style="line-height:1.7;"></div>
-    </div>
-    <div class="sp-detail-section">
-      <div class="sp-detail-section-title">当日预约情况</div>
-      <div class="sp-detail-value" id="ri-bookings" style="line-height:1.7;"></div>
     </div>
   </div>
   <div class="sp-detail-footer">
@@ -1404,59 +1652,47 @@ tr:hover td { background: #F7F7FA; }
   </div>
 </div>
 
-<!-- ========== 快速查询：我发起的 ========== -->
-<div class="modal-overlay" id="qk-modal-mine">
-  <div class="modal" style="max-width:1280px; width:92%;">
+<!-- ========== 预约审批：通过/拒绝确认弹窗 ========== -->
+<div class="modal-overlay" id="sp-confirm-modal" onclick="spCloseConfirmModal(event)">
+  <div class="modal" style="width:420px;max-width:90%;" onclick="event.stopPropagation()">
     <div class="modal-header">
-      <span>我发起的</span>
-      <button class="modal-close" onclick="document.getElementById('qk-modal-mine').classList.remove('show')">&times;</button>
+      <span>提示</span>
+      <button class="modal-close" onclick="spCloseConfirmModal()">&times;</button>
     </div>
-    <div class="modal-body">
-      <div class="qk-scroll" id="qk-list-mine"></div>
-      <div class="qk-pager" id="qk-page-mine"></div>
-    </div>
-  </div>
-</div>
-
-<!-- ========== 快速查询：我参加的 ========== -->
-<div class="modal-overlay" id="qk-modal-attend">
-  <div class="modal" style="max-width:1280px; width:92%;">
-    <div class="modal-header">
-      <span>我参加的</span>
-      <button class="modal-close" onclick="document.getElementById('qk-modal-attend').classList.remove('show')">&times;</button>
-    </div>
-    <div class="modal-body">
-      <div class="qk-scroll" id="qk-list-attend"></div>
-      <div class="qk-pager" id="qk-page-attend"></div>
-    </div>
-  </div>
-</div>
-
-<!-- ========== 指派参会人 ========== -->
-<div class="modal-overlay" id="as-modal">
-  <div class="modal" style="max-width:480px; width:92%;">
-    <div class="modal-header">
-      <span>指派参会人</span>
-      <button class="modal-close" onclick="document.getElementById('as-modal').classList.remove('show')">&times;</button>
-    </div>
-    <div class="modal-body">
-      <div class="as-meeting" id="as-meetingInfo"></div>
-      <div class="form-row" style="align-items:center;">
-        <label style="width:84px;">指派人员</label>
-        <div class="input-wrap" style="position:relative; flex:1;">
-          <input type="text" id="as-input" placeholder="搜索并选择人员" style="padding-left:32px;" onfocus="mxAssignOpenPanel()" oninput="mxAssignFilter(this.value)">
-          <svg style="position:absolute;left:10px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:#8F9098;pointer-events:none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.35-4.35"></path></svg>
-          <div class="combo-panel" id="as-panel"></div>
-        </div>
+    <div class="modal-body" style="padding:24px;">
+      <div style="display:flex;align-items:center;gap:12px;font-size:14px;color:#36373B;">
+        <span style="color:#faad14;font-size:22px;">&#x26A0;</span>
+        <span id="sp-confirm-text">确认要通过该条预约么？</span>
       </div>
-      <div class="as-current" id="as-current"></div>
     </div>
-    <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="document.getElementById('as-modal').classList.remove('show')">取消</button>
-      <button class="btn btn-primary" onclick="mxAssignConfirm()">确定</button>
+    <div style="padding:12px 24px 24px;display:flex;justify-content:flex-end;gap:8px;">
+      <button class="btn btn-default" style="height:32px;padding:0 16px;" onclick="spCloseConfirmModal()">取消</button>
+      <button class="btn btn-primary" style="height:32px;padding:0 16px;" onclick="spConfirmAction()">确定</button>
     </div>
   </div>
 </div>
+
+<!-- ========== 取消会议确认弹框 ========== -->
+<div class="modal-overlay" id="mx-cancel-modal" onclick="mxCancelClose(event)">
+  <div class="modal" style="width:420px;max-width:90%;" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <span>提示</span>
+      <button class="modal-close" onclick="mxCancelClose()">&times;</button>
+    </div>
+    <div class="modal-body" style="padding:24px;">
+      <div style="display:flex;align-items:center;gap:12px;font-size:14px;color:#36373B;">
+        <span style="color:#faad14;font-size:22px;">&#x26A0;</span>
+        <span id="mx-cancel-text">确认要取消该条预约么？</span>
+      </div>
+    </div>
+    <div style="padding:12px 24px 24px;display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap;">
+      <button class="btn btn-ghost" style="height:32px;padding:0 16px;" onclick="mxCancelClose()">关闭</button>
+      <button id="mx-cancelBtn" class="btn btn-default" style="height:32px;padding:0 16px;color:#cf1322;border-color:#ffccc7;" onclick="mxCancelConfirm()">取消会议</button>
+    </div>
+  </div>
+</div>
+
+<!-- ========== 快速查询弹框已整合至「会议预约 > 我的会议」Tab ========== -->
 
 <!-- ========== 会议详情弹框（占用格点击） ========== -->
 <div class="modal-mask" id="md-mask" onclick="mdClose()"></div>
@@ -1465,7 +1701,6 @@ tr:hover td { background: #F7F7FA; }
     <div class="modal-header">
       <div>
         <div class="modal-title" id="md-title">会议详情</div>
-        <div class="modal-sub" id="md-note"></div>
       </div>
       <button class="modal-close" onclick="mdClose()">&times;</button>
     </div>
@@ -1475,19 +1710,24 @@ tr:hover td { background: #F7F7FA; }
         <div class="sp-detail-item"><div class="sp-detail-label">会议时间</div><div class="sp-detail-value" id="md-time"></div></div>
         <div class="sp-detail-item"><div class="sp-detail-label">申请人</div><div class="sp-detail-value" id="md-applicant"></div></div>
         <div class="sp-detail-item"><div class="sp-detail-label">申请人部门</div><div class="sp-detail-value" id="md-dept"></div></div>
+        <div class="sp-detail-item"><div class="sp-detail-label">联系电话</div><div class="sp-detail-value" id="md-phone"></div></div>
         <div class="sp-detail-item"><div class="sp-detail-label">审批状态</div><div class="sp-detail-value" id="md-status"></div></div>
+        <div class="sp-detail-item"><div class="sp-detail-label">预订状态</div><div class="sp-detail-value" id="md-occupancy"></div></div>
         <div class="sp-detail-item"><div class="sp-detail-label">参会人数</div><div class="sp-detail-value" id="md-people"></div></div>
       </div>
       <div class="sp-detail-section">
         <div class="sp-detail-section-title">参会人员</div>
         <div class="sp-detail-value" id="md-attendees" style="line-height:1.7;"></div>
       </div>
+      <div class="sp-detail-section">
+        <div class="sp-detail-section-title">附件</div>
+        <div class="sp-detail-value" id="md-attachments" style="line-height:1.7;">—</div>
+      </div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="mdClose()">关闭</button>
-      <button class="btn btn-default" id="md-assignBtn" onclick="">指派</button>
+      <button class="btn btn-default" id="md-changeBtn" style="display:none;color:#4165EC;border-color:#4165EC;">变更</button>
       <button class="btn btn-default" id="md-cancelBtn" onclick="">取消会议</button>
-      <button class="btn btn-primary" id="md-editBtn" onclick="">编辑</button>
     </div>
   </div>
 </div>
@@ -1552,15 +1792,16 @@ function confirmDelete() {
 /* ================= 会议室管理 ================= */
 const FACILITY_DICT = ['投影仪', '视频会议', '白板', '麦克风', '同声传译'];
 let mrData = [
-  { id: 1, name: '103', location: '1F', scale: '中会议室', seats: 64, cost: 87, intro: '标准中小型会议，配投影与视频会议终端。', images: [], locked: false, facilities: ['投影仪','视频会议','白板','麦克风'] },
-  { id: 2, name: '106', location: '1F', scale: '会见室', seats: 14, cost: 30, intro: '适合接待与一对一洽谈。', images: [], locked: false, facilities: ['视频会议','白板'] },
-  { id: 3, name: '107', location: '1F', scale: '大报告厅', seats: 178, cost: 205, intro: '大型报告与发布会，含舞台与同声传译席。', images: [], locked: false, facilities: ['投影仪','视频会议','白板','麦克风','同声传译'] },
-  { id: 4, name: '301', location: '3F', scale: '大报告厅', seats: 263, cost: 205, intro: '园区最大报告厅，支持千人级活动。', images: [], locked: false, facilities: ['投影仪','视频会议','白板','麦克风'] },
-  { id: 5, name: '306', location: '3F', scale: '中会议室', seats: 40, cost: 72, intro: '中型研讨与评审会议。', images: [], locked: false, facilities: ['投影仪','白板'] },
-  { id: 6, name: '307', location: '3F', scale: '小会议室', seats: 22, cost: 30, intro: '小型团队讨论室。', images: [], locked: false, facilities: ['白板','麦克风'] },
-  { id: 7, name: '308', location: '3F', scale: '小会议室', seats: 22, cost: 30, intro: '小型团队讨论室。', images: [], locked: false, facilities: ['白板','麦克风'] },
-  { id: 8, name: '309', location: '3F', scale: '中会议室', seats: 40, cost: 72, intro: '中型研讨与评审会议。', images: [], locked: false, facilities: ['投影仪','白板'] },
-  { id: 9, name: '310', location: '3F', scale: '中会议室', seats: 38, cost: 72, intro: '中型研讨与评审会议。', images: [], locked: false, facilities: ['投影仪','白板'] },
+  { id: 1, name: '103', location: '1F', building: '综合楼', scale: '中会议室', seats: 64, cost: 87, intro: '标准中小型会议，配投影与视频会议终端。', images: [], locked: false, enabled: true, admins: [], facilities: ['投影仪','视频会议','白板','麦克风'] },
+  { id: 2, name: '106', location: '1F', building: '综合楼', scale: '会见室', seats: 14, cost: 30, intro: '适合接待与一对一洽谈。', images: [], locked: false, enabled: true, admins: [], facilities: ['视频会议','白板'] },
+  { id: 3, name: '107', location: '1F', building: '综合楼', scale: '大报告厅', seats: 178, cost: 205, intro: '大型报告与发布会，含舞台与同声传译席。', images: [], locked: false, enabled: true, admins: [], facilities: ['投影仪','视频会议','白板','麦克风','同声传译'] },
+  { id: 4, name: '301', location: '3F', building: '综合楼', scale: '大报告厅', seats: 263, cost: 205, intro: '园区最大报告厅，支持千人级活动。', images: [], locked: false, enabled: true, admins: [], facilities: ['投影仪','视频会议','白板','麦克风'] },
+  { id: 5, name: '306', location: '3F', building: '综合楼', scale: '中会议室', seats: 40, cost: 72, intro: '中型研讨与评审会议。', images: [], locked: false, enabled: true, admins: [], facilities: ['投影仪','白板'] },
+  { id: 6, name: '307', location: '3F', building: '综合楼', scale: '小会议室', seats: 22, cost: 30, intro: '小型团队讨论室。', images: [], locked: false, enabled: true, admins: [], facilities: ['白板','麦克风'] },
+  { id: 7, name: '308', location: '3F', building: '综合楼', scale: '小会议室', seats: 22, cost: 30, intro: '小型团队讨论室。', images: [], locked: false, enabled: true, admins: [], facilities: ['白板','麦克风'] },
+  { id: 8, name: '309', location: '3F', building: '综合楼', scale: '中会议室', seats: 40, cost: 72, intro: '中型研讨与评审会议。', images: [], locked: false, enabled: true, admins: [], facilities: ['投影仪','白板'] },
+  { id: 9, name: '310', location: '3F', building: '综合楼', scale: '中会议室', seats: 38, cost: 72, intro: '中型研讨与评审会议。', images: [], locked: false, enabled: true, admins: [], facilities: ['投影仪','白板'] },
+  { id: 10, name: '302', location: '3F', building: '综合楼', scale: '中会议室', seats: 40, cost: 80, intro: '中型研讨与评审会议。', images: [], locked: false, enabled: true, admins: [], facilities: ['投影仪','白板'] },
 ];
 let mrFiltered = [...mrData];
 let mrSortKey = '';
@@ -1582,7 +1823,7 @@ function mrRender() {
   const tb = document.getElementById('mr-tableBody');
   tb.innerHTML = '';
   if (mrFiltered.length === 0) {
-    tb.innerHTML = '<tr><td colspan="5" class="empty">暂无会议室数据</td></tr>';
+    tb.innerHTML = '<tr><td colspan="7" class="empty">暂无会议室数据</td></tr>';
   } else {
     mrFiltered.forEach(item => {
       const thumb = (item.images && item.images.length)
@@ -1591,13 +1832,16 @@ function mrRender() {
       const scaleCls = MR_SCALE_CLASS[item.scale] || 'tag-md';
       const intro = item.intro ? item.intro : '暂无简介';
       const tr = document.createElement('tr');
+      if (item.enabled === false) tr.style.opacity = '0.55';
       tr.innerHTML = `
+        <td class="mr-cell-check"><input type="checkbox" class="mr-rowcheck" data-id="${item.id}" onchange="mrRowCheck(${item.id}, this)"></td>
         <td class="mr-cell-room">
           <div class="mr-thumb">${thumb}</div>
           <div class="mr-room-meta">
             <div class="mr-room-line1">
               <span class="mr-room-name">${item.name}</span>
               <span class="mr-scale-tag ${scaleCls}">${item.scale}</span>
+              ${item.enabled === false ? '<span style="color:#c62828;font-size:12px;margin-left:6px;">已停用</span>' : ''}
             </div>
             <div class="mr-room-intro" title="${intro}">${intro}</div>
             <div class="mr-facilities">${(item.facilities||[]).map(f=>`<span class="mr-fac-tag">${f}</span>`).join('')}</div>
@@ -1606,9 +1850,11 @@ function mrRender() {
         <td>${item.location}</td>
         <td class="mr-num">${item.seats} 人</td>
         <td class="mr-num">¥${item.cost}</td>
+        <td class="mr-cell-admins">${mrAdminsHtml(item.admins)}</td>
         <td>
           <div class="actions">
             <button class="btn btn-link" onclick="mrOpenEdit(${item.id})">编辑</button>
+            <button class="btn btn-link" onclick="mrToggleEnabled(${item.id})">${item.enabled === false ? '启用' : '停用'}</button>
             <button class="btn btn-danger" onclick="openDeleteConfirm(event, () => mrRemove(${item.id}))">删除</button>
           </div>
         </td>`;
@@ -1675,6 +1921,7 @@ function mrOpenAdd() {
   mrTempImages = [];
   mrRenderImgPreview();
   mrSetFacilities([]);
+  mrSetAdmins([]);
   mrClearErr();
   document.getElementById('mr-formModal').classList.add('show');
 }
@@ -1691,6 +1938,8 @@ function mrOpenEdit(id) {
   mrTempImages = it.images ? it.images.slice() : [];
   mrRenderImgPreview();
   mrSetFacilities(it.facilities || []);
+  mrSetAdmins(it.admins || []);
+  document.getElementById('mr-roomEnabled').value = (it.enabled === false ? '0' : '1');
   mrClearErr();
   document.getElementById('mr-formModal').classList.add('show');
 }
@@ -1709,7 +1958,9 @@ function mrSave() {
     cost: document.getElementById('mr-roomCost').value.trim(),
     intro: document.getElementById('mr-roomIntro').value.trim(),
     images: mrTempImages.slice(),
-    facilities: mrGetFacilities()
+    facilities: mrGetFacilities(),
+    admins: mrGetAdmins(),
+    enabled: document.getElementById('mr-roomEnabled').value === '1'
   };
   mrClearErr();
   const req = ['mr-roomName','mr-roomLocation','mr-roomScale','mr-roomSeats','mr-roomCost'];
@@ -1727,6 +1978,13 @@ function mrSave() {
   mrRender();
   mrCloseModal();
   showToast(mrEditingId ? '保存成功' : '新增成功');
+}
+function mrToggleEnabled(id) {
+  const it = mrData.find(d => d.id === id);
+  if (!it) return;
+  it.enabled = (it.enabled === false);
+  mrRender();
+  showToast(it.enabled === false ? '已停用' : '已启用');
 }
 
 let mrFacSelected = [];
@@ -1802,6 +2060,161 @@ function mrDelImg(i) {
   mrTempImages.splice(i, 1);
   mrRenderImgPreview();
 }
+
+/* ================= 会议室管理员（多用户 + 批量维护） ================= */
+const MR_USER_DIR = ['陈琼梦','李守浩','王伟','赵敏','刘洋','孙倩','周强','吴婷','郑昊','黄蕾'];
+let mrAdminSelected = [];
+let mrBadmSelected = [];
+let mrBatchIds = [];
+
+function mrAdminsHtml(arr) {
+  const a = (arr || []);
+  if (!a.length) return '<span class="mr-adm-none">未设置</span>';
+  return a.map(v => '<span class="mr-adm-tag">' + v + '</span>').join('');
+}
+
+/* 单房间管理员多选（复用 .ms 组件） */
+function mrRenderAdmOptions() {
+  const panel = document.getElementById('mr-admPanel');
+  if (!panel) return;
+  panel.innerHTML = MR_USER_DIR.map(v =>
+    `<div class="ms-option" data-val="${v}" onclick="mrAdmToggle('${v}', event)">` +
+      `<span class="ms-check${mrAdminSelected.includes(v) ? ' on' : ''}">${mrAdminSelected.includes(v) ? '✓' : ''}</span>` +
+      `<span>${v}</span>` +
+    `</div>`
+  ).join('');
+}
+function mrAdmToggle(val, e) {
+  e.stopPropagation();
+  const idx = mrAdminSelected.indexOf(val);
+  if (idx >= 0) mrAdminSelected.splice(idx, 1); else mrAdminSelected.push(val);
+  mrRenderAdmTags();
+  mrRenderAdmOptions();
+}
+function mrRenderAdmTags() {
+  const box = document.getElementById('mr-admTags');
+  const ph = document.getElementById('mr-admPlaceholder');
+  if (!box) return;
+  box.innerHTML = mrAdminSelected.map(v =>
+    `<span class="ms-tag">${v}<span class="ms-tag-x" onclick="mrAdmRemove('${v}', event)">×</span></span>`
+  ).join('');
+  if (ph) ph.style.display = mrAdminSelected.length ? 'none' : '';
+}
+function mrAdmRemove(val, e) {
+  e.stopPropagation();
+  const idx = mrAdminSelected.indexOf(val);
+  if (idx >= 0) mrAdminSelected.splice(idx, 1);
+  mrRenderAdmTags();
+  mrRenderAdmOptions();
+}
+function mrToggleAdmDropdown(e) {
+  if (e) e.stopPropagation();
+  const panel = document.getElementById('mr-admPanel');
+  if (!panel) return;
+  panel.style.display = (panel.style.display === 'block') ? 'none' : 'block';
+}
+function mrSetAdmins(arr) {
+  mrAdminSelected = (arr || []).slice();
+  mrRenderAdmTags();
+  mrRenderAdmOptions();
+}
+function mrGetAdmins() { return mrAdminSelected.slice(); }
+
+/* 列表行勾选 + 批量设置管理员 */
+function mrRowCheck(id, el) {
+  if (el.checked) { if (!mrBatchIds.includes(id)) mrBatchIds.push(id); }
+  else { mrBatchIds = mrBatchIds.filter(x => x !== id); }
+  mrRefreshBatchTip();
+}
+function mrCheckAll(el) {
+  mrBatchIds = [];
+  document.querySelectorAll('.mr-rowcheck').forEach(c => {
+    c.checked = el.checked;
+    if (el.checked) mrBatchIds.push(parseInt(c.getAttribute('data-id')));
+  });
+  mrRefreshBatchTip();
+}
+function mrRefreshBatchTip() {
+  const tip = document.getElementById('mr-batchTip');
+  if (tip) tip.innerText = mrBatchIds.length ? ('已选 ' + mrBatchIds.length + ' 间会议室') : '';
+}
+function mrOpenBatchAdmin() {
+  if (mrBatchIds.length === 0) { showToast('请先在列表中勾选会议室'); return; }
+  mrSetBadmins([]);
+  const rooms = mrData.filter(d => mrBatchIds.includes(d.id));
+  document.getElementById('mr-batchRooms').innerHTML = rooms.map(d => '<span class="mr-batch-room">' + d.name + '</span>').join('');
+  document.getElementById('mr-batchModal').classList.add('show');
+}
+function mrBatchApply() {
+  if (mrBatchIds.length === 0) { showToast('请先勾选会议室'); return; }
+  const set = mrGetBadmins();
+  mrData.forEach(d => { if (mrBatchIds.includes(d.id)) d.admins = set.slice(); });
+  mrFiltered = [...mrData];
+  mrRender();
+  mrBatchClose();
+  showToast('已为 ' + mrBatchIds.length + ' 间会议室设置管理员');
+  mrBatchIds = [];
+  mrRefreshBatchTip();
+}
+function mrBatchClose() { document.getElementById('mr-batchModal').classList.remove('show'); }
+
+/* 批量弹窗管理员多选（复用 .ms 组件） */
+function mrRenderBadmOptions() {
+  const panel = document.getElementById('mr-badmPanel');
+  if (!panel) return;
+  panel.innerHTML = MR_USER_DIR.map(v =>
+    `<div class="ms-option" data-val="${v}" onclick="mrBadmToggle('${v}', event)">` +
+      `<span class="ms-check${mrBadmSelected.includes(v) ? ' on' : ''}">${mrBadmSelected.includes(v) ? '✓' : ''}</span>` +
+      `<span>${v}</span>` +
+    `</div>`
+  ).join('');
+}
+function mrBadmToggle(val, e) {
+  e.stopPropagation();
+  const idx = mrBadmSelected.indexOf(val);
+  if (idx >= 0) mrBadmSelected.splice(idx, 1); else mrBadmSelected.push(val);
+  mrRenderBadmTags();
+  mrRenderBadmOptions();
+}
+function mrRenderBadmTags() {
+  const box = document.getElementById('mr-badmTags');
+  const ph = document.getElementById('mr-badmPlaceholder');
+  if (!box) return;
+  box.innerHTML = mrBadmSelected.map(v =>
+    `<span class="ms-tag">${v}<span class="ms-tag-x" onclick="mrBadmRemove('${v}', event)">×</span></span>`
+  ).join('');
+  if (ph) ph.style.display = mrBadmSelected.length ? 'none' : '';
+}
+function mrBadmRemove(val, e) {
+  e.stopPropagation();
+  const idx = mrBadmSelected.indexOf(val);
+  if (idx >= 0) mrBadmSelected.splice(idx, 1);
+  mrRenderBadmTags();
+  mrRenderBadmOptions();
+}
+function mrToggleBadmDropdown(e) {
+  if (e) e.stopPropagation();
+  const panel = document.getElementById('mr-badmPanel');
+  if (!panel) return;
+  panel.style.display = (panel.style.display === 'block') ? 'none' : 'block';
+}
+function mrSetBadmins(arr) {
+  mrBadmSelected = (arr || []).slice();
+  mrRenderBadmTags();
+  mrRenderBadmOptions();
+}
+function mrGetBadmins() { return mrBadmSelected.slice(); }
+
+/* 点击空白关闭管理员下拉 */
+document.addEventListener('click', function (e) {
+  ['mr-admMS','mr-badmMS'].forEach(id => {
+    const ms = document.getElementById(id);
+    if (ms && !ms.contains(e.target)) {
+      const panel = ms.querySelector('.ms-panel');
+      if (panel) panel.style.display = 'none';
+    }
+  });
+});
 
 /* ================= 会务需求 ================= */
 let hyData = [
@@ -1898,52 +2311,61 @@ function hySave() {
 }
 
 /* ================= 会议预约 ================= */
-let yyRooms = [
-  { id: 301, name: '301', seats: 263, location: '3F', building: '一号楼', floor: '3层', scale: '大报告厅', status: '空闲', facilities: ['投影仪','视频会议','白板','麦克风'] },
-  { id: 106, name: '106', seats: 14, location: '1F', building: '一号楼', floor: '1层', scale: '会见室', status: '空闲', facilities: ['视频会议','白板'] },
-  { id: 107, name: '107', seats: 178, location: '1F', building: '一号楼', floor: '1层', scale: '大报告厅', status: '空闲', facilities: ['投影仪','视频会议','白板','麦克风','同声传译'] },
-  { id: 306, name: '306', seats: 40, location: '3F', building: '一号楼', floor: '3层', scale: '中会议室', status: '空闲', facilities: ['投影仪','白板'] },
-  { id: 307, name: '307', seats: 22, location: '3F', building: '一号楼', floor: '3层', scale: '小会议室', status: '空闲', facilities: ['白板','麦克风'] },
-  { id: 308, name: '308', seats: 22, location: '3F', building: '一号楼', floor: '3层', scale: '小会议室', status: '空闲', facilities: ['白板','麦克风'] },
-  { id: 927, name: '927', seats: 42, location: '9F', building: '综合楼', floor: '9层', scale: '中会议室', status: '空闲', facilities: ['投影仪','视频会议','白板'] },
-  { id: 928, name: '928', seats: 10, location: '9F', building: '综合楼', floor: '9层', scale: '会见室', status: '空闲', facilities: ['视频会议','白板'] },
-  { id: 929, name: '929', seats: 20, location: '9F', building: '综合楼', floor: '9层', scale: '小会议室', status: '空闲', facilities: ['白板','麦克风'] },
-  { id: 'A1-102', name: 'A1-102', seats: 18, location: '1F', building: '1号楼', floor: '1层', scale: '小会议室', status: '空闲', facilities: ['白板','麦克风'] },
-  { id: 'A1-103', name: 'A1-103', seats: 34, location: '1F', building: '1号楼', floor: '1层', scale: '中会议室', status: '空闲', facilities: ['投影仪','白板'] },
-];
-let yyCurrentRoom = yyRooms[2]; // 107
+let yyCurrentRoom = null;
 var yyEditTarget = null; // 正在编辑的会议对象（null=新建）
-let yyWeekOffset = 0; // 0 = 当前周 8/4-9
+let yyWeekOffset = 0; // 0 = 数据所在周（锚定），可通过翻页切换
+const yyAnchorDate = '2026-08-10'; // 周基准锚定到示例数据所在周（周一），保证会议可见
+let yyCalBound = false; // 拖动事件是否已绑定
+let yyDrag = null; // 拖动选区状态 {col,date,lo,hi,cells}
 
 function yyInit() {
+  if (!yyCurrentRoom) yyCurrentRoom = mrData[0] || null;
   yyRenderRooms();
   yyRenderCalendar();
+  if (!yyCalBound) {
+    const tbl = document.getElementById('yy-calTable');
+    tbl.addEventListener('mousedown', yyCalMouseDown);
+    tbl.addEventListener('mouseover', yyCalMouseOver);
+    document.addEventListener('mouseup', yyCalMouseUp);
+    yyCalBound = true;
+  }
 }
+
+function yyRoomMatchesFilter(r) {
+  const filter = document.getElementById('yy-location').value;
+  if (filter && filter !== 'all') {
+    const b = r.building || '综合楼';
+    if (filter === '综合楼') { if (b !== '综合楼') return false; }
+    else if (filter === '1号楼') { if (!(b === '一号楼' || b === '1号楼')) return false; }
+    else if (filter === '3号楼') { if (!(b === '三号楼' || b === '3号楼')) return false; }
+  }
+  if (r.enabled === false) return false;
+  return true;
+}
+
 function yyRenderRooms() {
   const filter = document.getElementById('yy-location').value;
   const list = document.getElementById('yy-roomList');
   list.innerHTML = '';
-  const filtered = yyRooms.filter(r => {
-    if (!filter || filter === 'all') return true;
-    if (filter === '苏州实验室 > 综合楼 > 5') return false; // 演示无数据
-    if (filter === '1号楼') return r.building === '1号楼' || r.building === '一号楼';
-    if (filter === '3号楼') return r.building === '3号楼';
-    return true;
-  });
+  const filtered = mrData.filter(r => yyRoomMatchesFilter(r));
   if (filtered.length === 0) {
     list.innerHTML = '<div class="yy-empty">暂无会议室数据</div>';
     return;
   }
+  if (!yyCurrentRoom || !filtered.find(r => r.id === yyCurrentRoom.id)) {
+    yyCurrentRoom = filtered[0];
+  }
   filtered.forEach(r => {
     const div = document.createElement('div');
-    div.className = 'yy-room-card' + (yyCurrentRoom.id === r.id ? ' active' : '');
+    div.className = 'yy-room-card' + (yyCurrentRoom && yyCurrentRoom.id === r.id ? ' active' : '');
     div.onclick = () => { yyCurrentRoom = r; yyRenderRooms(); yyRenderCalendar(); };
+    div.onmouseenter = () => { yyCurrentRoom = r; yyRenderRooms(); yyRenderCalendar(); };
     div.innerHTML = `
-      <div class="yy-room-name"><span>${r.name}</span><span class="yy-room-tag">${r.status}</span></div>
+      <div class="yy-room-name"><span>${r.name}</span></div>
       <div class="yy-room-info">
-        <div>&#x1F465; ${r.seats}人</div>
-        <div>&#x1F3E2; ${r.location}</div>
-        <div>&#x1F4CB; ${r.scale}</div>
+        <div><span>&#x1F465;</span> ${r.seats}人</div>
+        <div><span>&#x1F3E2;</span> ${r.location}</div>
+        <div><span>&#x1F4CB;</span> ${r.scale}</div>
       </div>`;
     list.appendChild(div);
   });
@@ -1952,27 +2374,64 @@ function yyFilterLocation() {
   yyRenderRooms();
   yyRenderCalendar();
 }
+
+function yyFormatDate(d) {
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+
+function yyFindBooking(room, date, slot) {
+  return matrixBookings.find(b => b.room === room.name && b.date === date && b.start <= slot && slot < b.end);
+}
+// 当前日历可见周的日期列表（与 yyRenderCalendar 锚定逻辑一致）
+function yyWeekDates() {
+  const anchor = yySlotDateTime(yyAnchorDate, '00:00');
+  const start = new Date(anchor);
+  start.setDate(anchor.getDate() + yyWeekOffset * 7);
+  const days = [];
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(start);
+    d.setDate(start.getDate() + i);
+    days.push({ full: d, date: yyFormatDate(d) });
+  }
+  return days;
+}
+function yySlotDateTime(dateStr, timeStr) {
+  const [Y, M, D] = dateStr.split('-').map(Number);
+  const [h, m] = timeStr.split(':').map(Number);
+  return new Date(Y, M - 1, D, h, m, 0, 0);
+}
+// 当前时刻：使用真实系统时间，使资源视图过期判定与日期默认当天一致
+function yyNow() {
+  return Date.now();
+}
+function yyIsExpired(dateStr, timeStr) {
+  return yySlotDateTime(dateStr, timeStr).getTime() < yyNow();
+}
+
 function yyRenderCalendar() {
+  if (!yyCurrentRoom) return;
   document.getElementById('yy-roomTitle').innerText = yyCurrentRoom.name;
-  document.getElementById('yy-roomSub').innerText = `容纳人数：${yyCurrentRoom.seats}人 | 位置：${yyCurrentRoom.building}${yyCurrentRoom.floor}`;
-  // 日期范围：以 2026-08-04 为基准，按周偏移
-  const base = new Date(2026, 7, 4); // 8月4日周二
-  const start = new Date(base);
-  start.setDate(base.getDate() + yyWeekOffset * 7);
+  document.getElementById('yy-roomSub').innerText = `容纳人数：${yyCurrentRoom.seats}人 | 位置：${(yyCurrentRoom.building || '综合楼') + (yyCurrentRoom.location || '')}`;
+
+  // 周基准锚定到数据所在周，保证示例会议可见；过期判定以真实当前时间为准
+  const anchor = yySlotDateTime(yyAnchorDate, '00:00');
+  const start = new Date(anchor);
+  start.setDate(anchor.getDate() + yyWeekOffset * 7);
   const end = new Date(start);
-  end.setDate(start.getDate() + 5); // 周二到周日 6天
+  end.setDate(start.getDate() + 6);
   const fmt = d => `${d.getMonth() + 1}/${d.getDate()}`;
   const fmtFull = d => `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日`;
-  document.getElementById('yy-dateRange').innerText = `${fmtFull(start)} - ${fmt(end)}`;
+  document.getElementById('yy-dateRange').innerText = `${fmtFull(start)} - ${fmt(end)}日`;
 
   const days = [];
   const weekday = ['周一','周二','周三','周四','周五','周六','周日'];
-  for (let i = 0; i < 6; i++) {
+  for (let i = 0; i < 7; i++) {
     const d = new Date(start);
     d.setDate(start.getDate() + i);
-    days.push({ label: `${fmt(d)}${weekday[(d.getDay() + 6) % 7]}`, full: d });
+    days.push({ label: `${fmt(d)}${weekday[(d.getDay() + 6) % 7]}`, full: d, date: yyFormatDate(d) });
   }
-  const times = ['08:00','09:00','10:00','11:00','12:00','13:00','14:00','15:00','16:00'];
+  const times = matrixSlots;
+  const now = yyNow();
 
   const table = document.getElementById('yy-calTable');
   let html = '<thead><tr><th class="time-col"></th>';
@@ -1981,86 +2440,167 @@ function yyRenderCalendar() {
   times.forEach((t, ti) => {
     html += `<tr><td class="time-col">${t}</td>`;
     days.forEach((d, di) => {
-      // 演示：当前周（yyWeekOffset===0）且 8/4 周二（di=0）全天 busy；其余空闲
-      const isBusy = yyWeekOffset === 0 && di === 0;
-      const busyCls = isBusy ? ' busy' : '';
-      html += `<td class="slot${busyCls}" onclick="yySlotClick(event)"></td>`;
+      const b = yyFindBooking(yyCurrentRoom, d.date, t);
+      if (b) {
+        const isStart = b.start === t;
+        const isPast = yySlotDateTime(d.date, b.end).getTime() < now;
+        const bg = isPast ? '#E8E8E8' : '#4165EC';
+        const fg = isPast ? '#9A9A9A' : '#fff';
+        const content = isStart ? `<div class="yy-cell-title">${b.title}</div><div class="yy-cell-meta"><span class="lbl">申请人</span>${b.applicant}</div><div class="yy-cell-meta"><span class="lbl">部门</span>${b.dept}</div><div class="yy-cell-time">${b.start}-${b.end}</div>` : '';
+        const cls = 'slot busy' + (isPast ? ' expired' : '');
+        html += `<td class="${cls}" data-date="${d.date}" data-slot="${b.start}" data-col="${di}" data-row="${ti}" style="background:${bg};color:${fg};" onclick="yyBusyClick('${d.date}','${b.start}','${b.end}')">${content}</td>`;
+      } else {
+        const expired = yyIsExpired(d.date, t);
+        const cls = 'slot' + (expired ? ' expired' : '');
+        html += `<td class="${cls}" data-date="${d.date}" data-slot="${t}" data-col="${di}" data-row="${ti}"></td>`;
+      }
     });
     html += '</tr>';
   });
   html += '</tbody>';
   table.innerHTML = html;
 }
-function yySlotClick(event) {
-  const cell = event.target;
-  if (cell.classList.contains('busy')) {
-    showToast('该时间段已被占用');
-    return;
-  }
-  cell.style.background = '#e6f7ff';
-  setTimeout(() => { cell.style.background = ''; }, 400);
+function yySlotClick(date, slot) {
+  if (!yyCurrentRoom) return;
+  yyBookSlot(yyCurrentRoom.name, date, slot);
+}
+function yyBusyClick(date, start, end) {
+  if (!yyCurrentRoom) return;
+  mxShowDetail(yyCurrentRoom.name, date, start, end);
+}
+function yyBookSlot(roomName, date, slot) {
+  yyEditTarget = null;
+  const room = mrData.find(r => r.name === roomName);
+  if (room) yyCurrentRoom = room;
+  yyOpenModal();
+  document.getElementById('yy-date').value = date;
+  document.getElementById('yy-startTime').value = slot;
+  const idx = matrixSlots.indexOf(slot);
+  const endSlot = matrixSlots[idx + 1] || '24:00';
+  document.getElementById('yy-endTime').value = endSlot;
+}
+function yyBookRange(roomName, date, start, end) {
+  yyEditTarget = null;
+  const room = mrData.find(r => r.name === roomName);
+  if (room) yyCurrentRoom = room;
+  yyOpenModal();
+  document.getElementById('yy-date').value = date;
+  document.getElementById('yy-startTime').value = start;
+  document.getElementById('yy-endTime').value = end;
 }
 function yyPrevWeek() { yyWeekOffset--; yyRenderCalendar(); }
 function yyNextWeek() { yyWeekOffset++; yyRenderCalendar(); }
 function yyToday() { yyWeekOffset = 0; yyRenderCalendar(); }
+
+/* ---------- 鼠标拖动选择时段发起预约（仅限同一列/同一天，遇占用或过期格自动截断） ---------- */
+function yyCalMouseDown(e) {
+  if (e.button !== 0) return;
+  const td = e.target.closest('td.slot');
+  if (!td || !yyCurrentRoom) return;
+  if (td.classList.contains('busy') || td.classList.contains('expired')) return; // 仅从空闲格发起
+  e.preventDefault();
+  const col = +td.dataset.col;
+  const cells = Array.from(document.querySelectorAll('#yy-calTable td.slot[data-col="' + col + '"]'))
+                     .sort((a, b) => (+a.dataset.row) - (+b.dataset.row));
+  yyDrag = { col, date: td.dataset.date, lo: +td.dataset.row, hi: +td.dataset.row, cells };
+  yyPaintDrag();
+}
+function yyCalMouseOver(e) {
+  if (!yyDrag) return;
+  const td = e.target.closest('td.slot');
+  if (!td || +td.dataset.col !== yyDrag.col) return;
+  const r = +td.dataset.row;
+  if (r >= yyDrag.lo && r <= yyDrag.hi) return; // 已在选区内
+  if (r > yyDrag.hi) {
+    let h = yyDrag.hi;
+    while (h + 1 <= r && yyDrag.cells[h + 1] &&
+           !yyDrag.cells[h + 1].classList.contains('busy') &&
+           !yyDrag.cells[h + 1].classList.contains('expired')) h++;
+    yyDrag.hi = h;
+  } else if (r < yyDrag.lo) {
+    let l = yyDrag.lo;
+    while (l - 1 >= r && yyDrag.cells[l - 1] &&
+           !yyDrag.cells[l - 1].classList.contains('busy') &&
+           !yyDrag.cells[l - 1].classList.contains('expired')) l--;
+    yyDrag.lo = l;
+  }
+  yyPaintDrag();
+}
+function yyCalMouseUp() {
+  if (!yyDrag) return;
+  const d = yyDrag; yyDrag = null;
+  yyClearDrag();
+  if (d.lo === d.hi) {
+    yyBookSlot(yyCurrentRoom.name, d.date, matrixSlots[d.lo]);
+  } else {
+    const start = matrixSlots[d.lo];
+    const end = matrixSlots[d.hi + 1] || '24:00';
+    yyBookRange(yyCurrentRoom.name, d.date, start, end);
+  }
+}
+function yyPaintDrag() {
+  yyDrag.cells.forEach(c => {
+    const r = +c.dataset.row;
+    if (r >= yyDrag.lo && r <= yyDrag.hi) c.classList.add('drag-sel');
+    else c.classList.remove('drag-sel');
+  });
+}
+function yyClearDrag() {
+  document.querySelectorAll('#yy-calTable td.slot.drag-sel').forEach(c => c.classList.remove('drag-sel'));
+}
 function yyOpenModal() {
   document.getElementById('yy-meetingName').value = '';
   document.getElementById('yy-category').value = '';
   document.getElementById('yy-type').value = '';
   document.getElementById('yy-convener').value = '';
-  document.getElementById('yy-confidential').value = '';
   document.getElementById('yy-contact').value = '';
-  document.querySelector('input[name="yy-offsite"][value="否"]').checked = true;
+  document.getElementById('yy-applicant').value = ME;
+  document.getElementById('yy-dept').value = '主任办公室';
   document.getElementById('yy-date').value = '2026-08-04';
   document.getElementById('yy-startTime').value = '15:00';
   document.getElementById('yy-endTime').value = '15:30';
   document.getElementById('yy-content').value = '';
+  { const _att = document.getElementById('yy-attachments'); if (_att) { _att.value = ''; const _al = document.getElementById('yy-attachList'); if (_al) _al.innerHTML = ''; } }
   document.getElementById('yy-needService').value = '否';
-  const serviceTypeEl = document.getElementById('yy-serviceType');
-  serviceTypeEl.value = '';
-  serviceTypeEl.disabled = true;
+  yyRenderServiceList();
   document.getElementById('yy-note').value = '';
   yyToggleService();
   document.getElementById('yy-modalRoomScale').textContent = yyCurrentRoom.scale;
   document.getElementById('yy-modalRoomSeats').textContent = yyCurrentRoom.seats + '人';
   document.getElementById('yy-modalRoomLocation').textContent = yyCurrentRoom.location;
+  // 初始化单价 / 会议室费用
+  yyCalcRoomFee();
   // 填充会议室模糊搜索下拉
   const rin = document.getElementById('yy-roomInput');
   if (rin) rin.value = yyRoomDisplay(yyCurrentRoom);
   yyRenderRoomCombo('');
-  document.getElementById('yy-leaders').value = '';
   document.getElementById('yy-deptAttend').value = '';
   document.getElementById('yy-attendees').value = '';
-  document.querySelector('input[name="yy-noticeObj"][value="部门联络人"]').checked = true;
+  const _ny = document.querySelector('input[name="yy-notify"][value="否"]'); if (_ny) _ny.checked = true;
+  document.querySelector('input[name="yy-noticeObj"][value="部门联络人"]').checked = false;
   document.querySelector('input[name="yy-noticeObj"][value="指定参会人"]').checked = false;
-  document.querySelector('input[name="yy-notice"][value="否"]').checked = true;
-  document.querySelector('input[name="yy-allowProxy"][value="否"]').checked = true;
-  document.querySelector('input[name="yy-receipt"][value="否"]').checked = true;
-  yyToggleOffsite();
-  yyToggleNotice();
   yyToggleNoticeObj();
+  yyToggleNotify();
   document.querySelector('input[name="yy-costShare"][value="否"]').checked = true;
   yyToggleCostShare();
   yyClearErr();
   document.getElementById('yy-formModal').classList.add('show');
 }
-function yyCloseModal() { document.getElementById('yy-formModal').classList.remove('show'); }
-function yyToggleOffsite() {
-  const offsite = document.querySelector('input[name="yy-offsite"]:checked').value;
-  const isOff = offsite === '是';
-  document.getElementById('yy-roomInfoSection').style.display = isOff ? 'none' : '';
-  document.getElementById('yy-serviceSection').style.display = isOff ? 'none' : '';
-  // 外出开会 为「否」时才显示费用分摊
-  document.getElementById('yy-costShareSection').style.display = isOff ? 'none' : '';
-}
-function yyToggleNotice() {
-  const notice = document.querySelector('input[name="yy-notice"]:checked').value;
-  document.getElementById('yy-noticeDetail').style.display = notice === '是' ? '' : 'none';
+function yyCloseModal() {
+  mxRebookSource = null; // 放弃变更表单，原单不释放
+  document.getElementById('yy-formModal').classList.remove('show');
 }
 function yyToggleNoticeObj() {
-  const obj = document.querySelector('input[name="yy-noticeObj"]:checked').value;
-  document.getElementById('yy-deptAttendRow').style.display = obj === '部门联络人' ? '' : 'none';
-  document.getElementById('yy-attendeesRow').style.display = obj === '指定参会人' ? '' : 'none';
+  const objs = [...document.querySelectorAll('input[name="yy-noticeObj"]:checked')].map(el => el.value);
+  const isDept = objs.includes('部门联络人');
+  const isAtt = objs.includes('指定参会人');
+  document.getElementById('yy-deptAttendRow').style.display = isDept ? '' : 'none';
+  document.getElementById('yy-attendeesRow').style.display = isAtt ? '' : 'none';
+}
+function yyToggleNotify() {
+  const el = document.querySelector('input[name="yy-notify"]:checked');
+  const on = el && el.value === '是';
+  document.getElementById('yy-noticeObjBlock').style.display = on ? '' : 'none';
 }
 function yyToggleCostShare() {
   const share = document.querySelector('input[name="yy-costShare"]:checked').value;
@@ -2070,15 +2610,71 @@ function yyToggleService() {
   const need = document.getElementById('yy-needService').value;
   document.getElementById('yy-serviceDetail').style.display = need === '是' ? '' : 'none';
 }
+/* 将 "HH:MM" 转为小数小时，支持 :30 等半点 */
+function yyTimeToHours(t){
+  if (!t || t.indexOf(':') < 0) return 0;
+  const p = t.split(':');
+  return parseInt(p[0], 10) + (parseInt(p[1], 10) || 0) / 60;
+}
+/* 单价 + 会议室费用：单价取房间维护值，费用 = 单价 × 时长 */
+function yyCalcRoomFee(){
+  const priceEl = document.getElementById('yy-modalRoomPrice');
+  const feeEl = document.getElementById('yy-roomFee');
+  if (!yyCurrentRoom) { priceEl.textContent = '—'; feeEl.textContent = '—'; return 0; }
+  const price = parseFloat(yyCurrentRoom.cost) || 0;
+  const sH = yyTimeToHours(document.getElementById('yy-startTime').value);
+  const eH = yyTimeToHours(document.getElementById('yy-endTime').value);
+  const hours = (eH > sH) ? (eH - sH) : 0;
+  const fee = +(price * hours).toFixed(2);
+  priceEl.textContent = price ? ('¥' + price.toFixed(2)) : '—';
+  feeEl.textContent = hours > 0 ? ('¥' + fee.toFixed(2) + '（' + hours + '小时）') : '—';
+  return fee;
+}
+/* 渲染会务服务多选列表（含数量输入） */
+function yyRenderServiceList(){
+  const box = document.getElementById('yy-serviceList');
+  if (!box) return;
+  box.innerHTML = hyData.map(s => {
+    return '<div class="yy-svc-row">' +
+      '<label class="yy-svc-chk"><input type="checkbox" value="' + s.id + '" onchange="yyCalcService()"> ' + s.name + '</label>' +
+      '<span class="yy-svc-price">¥' + parseFloat(s.cost).toFixed(2) + '/项</span>' +
+      '<span class="yy-svc-qty">数量 <input type="number" min="1" value="1" style="width:54px;" oninput="yyCalcService()"></span>' +
+    '</div>';
+  }).join('');
+  yyCalcService();
+}
+/* 计算会务服务合计：勾选的服务 × 数量 */
+function yyCalcService(){
+  const totalEl = document.getElementById('yy-serviceTotal');
+  if (!totalEl) return 0;
+  const rows = document.querySelectorAll('#yy-serviceList .yy-svc-row');
+  let total = 0;
+  rows.forEach(row => {
+    const chk = row.querySelector('input[type="checkbox"]');
+    if (chk && chk.checked) {
+      const item = hyData.find(s => String(s.id) === String(chk.value));
+      const price = item ? (parseFloat(item.cost) || 0) : 0;
+      const qty = parseInt(row.querySelector('input[type="number"]').value, 10) || 0;
+      total += price * qty;
+    }
+  });
+  total = +total.toFixed(2);
+  totalEl.textContent = '¥' + total.toFixed(2);
+  return total;
+}
 function yyClearErr() {
-  ['yy-meetingName','yy-category','yy-type','yy-convener','yy-confidential','yy-contact','yy-date'].forEach(id => { const el = document.getElementById(id); if (el) el.classList.remove('error'); });
+  ['yy-meetingName','yy-category','yy-type','yy-convener','yy-contact','yy-date'].forEach(id => { const el = document.getElementById(id); if (el) el.classList.remove('error'); });
+}
+function yyGetAttachments() {
+  const inp = document.getElementById('yy-attachments');
+  if (!inp || !inp.files) return [];
+  return Array.from(inp.files).map(f => f.name);
 }
 function yySubmit() {
   const nameEl = document.getElementById('yy-meetingName');
   const catEl = document.getElementById('yy-category');
   const typeEl = document.getElementById('yy-type');
   const convEl = document.getElementById('yy-convener');
-  const confEl = document.getElementById('yy-confidential');
   const contactEl = document.getElementById('yy-contact');
   const dEl = document.getElementById('yy-date');
   let ok = true; yyClearErr();
@@ -2086,80 +2682,78 @@ function yySubmit() {
   if (!catEl.value.trim()) { catEl.classList.add('error'); ok = false; }
   if (!typeEl.value.trim()) { typeEl.classList.add('error'); ok = false; }
   if (!convEl.value.trim()) { convEl.classList.add('error'); ok = false; }
-  if (!confEl.value.trim()) { confEl.classList.add('error'); ok = false; }
   if (!contactEl.value.trim()) { contactEl.classList.add('error'); ok = false; }
   if (!dEl.value.trim()) { dEl.classList.add('error'); ok = false; }
   if (!ok) return;
 
-  const offsite = document.querySelector('input[name="yy-offsite"]:checked').value === '是';
   const date = dEl.value;
   const start = document.getElementById('yy-startTime').value;
   const end = document.getElementById('yy-endTime').value;
 
   // 时间合法性
-  if (!offsite && start >= end) {
+  if (start >= end) {
     showToast('结束时间需晚于开始时间');
     return;
   }
 
-  // 占用冲突校验（仅占会议室的会议需校验）
-  if (!offsite) {
-    const room = yyCurrentRoom;
-    if (!room) { showToast('请先选择会议室'); return; }
-    const conflict = matrixBookings.find(b =>
-      b !== yyEditTarget &&
-      b.room === room.name && b.date === date &&
-      start < b.end && end > b.start
-    );
-    if (conflict) {
-      showToast('该会议室 ' + date + ' ' + conflict.start + '-' + conflict.end +
-        ' 已被「' + conflict.title + '」(' + conflict.status + ') 占用，请另选时段');
-      return;
-    }
-    if (room.locked) {
-      showToast('会议室 ' + room.name + ' 已锁定，暂不可预约');
-      return;
-    }
+  // 占用冲突校验
+  const room = yyCurrentRoom;
+  if (!room) { showToast('请先选择会议室'); return; }
+  const editExclude = yyEditTarget;
+  const conflict = matrixBookings.find(b =>
+    b !== editExclude && b !== mxRebookSource &&
+    b.occupancy === '已预订' &&
+    b.room === room.name && b.date === date &&
+    start < b.end && end > b.start
+  );
+  if (conflict) {
+    showToast('该会议室 ' + date + ' ' + conflict.start + '-' + conflict.end +
+      ' 已被「' + conflict.title + '」(' + conflict.status + ') 占用，请另选时段');
+    return;
+  }
+  if (room.locked) {
+    showToast('会议室 ' + room.name + ' 已锁定，暂不可预约');
+    return;
   }
 
   const title = nameEl.value.trim();
+
+  // 费用计算：会议室单价×时长；会务服务按勾选项×数量
+  const roomFee = yyCalcRoomFee();
+  const serviceNeed = document.getElementById('yy-needService').value === '是';
+  const serviceFee = serviceNeed ? yyCalcService() : 0;
   if (yyEditTarget) {
     yyEditTarget.category = catEl.value;
-    // 编辑：原地更新
-    if (offsite) {
-      yyEditTarget.title = title;
-      yyEditTarget.date = date;
-      yyEditTarget.start = start;
-      yyEditTarget.end = end;
-    } else {
-      yyEditTarget.room = yyCurrentRoom.name;
-      yyEditTarget.date = date;
-      yyEditTarget.start = start;
-      yyEditTarget.end = end;
-      yyEditTarget.title = title;
-    }
+    yyEditTarget.room = yyCurrentRoom.name;
+    yyEditTarget.date = date;
+    yyEditTarget.start = start;
+    yyEditTarget.end = end;
+    yyEditTarget.title = title;
+    yyEditTarget.roomFee = +roomFee.toFixed(2); yyEditTarget.serviceFee = +serviceFee.toFixed(2);
     yyEditTarget.applicant = ME;
     yyEditTarget.dept = yyEditTarget.dept || '主任办公室';
+    yyEditTarget.attachments = yyGetAttachments();
+    yyEditTarget.status = '待审批'; // 草稿/编辑后重新提交 → 回到审批中
+    yyEditTarget.notify = (document.querySelector('input[name="yy-notify"]:checked')||{}).value || '否';
     showToast('已更新会议「' + title + '」');
   } else {
-    // 新建
-    if (offsite) {
-      const loc = document.getElementById('yy-offsiteLocation') ? document.getElementById('yy-offsiteLocation').value : '外部地点';
-      offsiteMeetings.push({
-        title, date, start, end, applicant: ME, dept: '主任办公室',
-        status: '待审批', attendees: [ME], location: loc || '外部地点', category: catEl.value
-      });
-      showToast('已提交外出开会「' + title + '」，待审批');
-    } else {
-      matrixBookings.push({
-        room: yyCurrentRoom.name, date, start, end, title, category: catEl.value,
-        applicant: ME, dept: '主任办公室', status: '待审批',
-        people: parseInt(document.getElementById('yy-people') ? document.getElementById('yy-people').value : '0', 10) || 0,
-        attendees: [ME],
-        facilities: yyCurrentRoom.facilities || []
-      });
-      showToast('已提交「' + title + '」预约，待审批');
-    }
+    matrixBookings.push({
+      room: yyCurrentRoom.name, date, start, end, title, category: catEl.value,
+      applicant: ME, dept: '主任办公室', status: '待审批', occupancy: '已预订',
+      roomFee: +roomFee.toFixed(2), serviceFee: +serviceFee.toFixed(2),
+      people: parseInt(document.getElementById('yy-people') ? document.getElementById('yy-people').value : '0', 10) || 0,
+      attendees: [ME],
+      notify: (document.querySelector('input[name="yy-notify"]:checked')||{}).value || '否',
+      facilities: yyCurrentRoom.facilities || [],
+      attachments: yyGetAttachments()
+    });
+    if (!mxRebookSource) showToast('已提交「' + title + '」预约，待审批');
+  }
+  if (mxRebookSource) {
+    mxRebookSource.occupancy = '已释放'; // 变更：新单提交成功，释放原单占用（审批结论保留，不动 status）
+    const oldTitle = mxRebookSource.title || '';
+    mxRebookSource = null;
+    showToast('变更成功：原会议「' + oldTitle + '」已释放，新预约「' + title + '」待审批');
   }
   yyEditTarget = null;
   yyCloseModal();
@@ -2177,18 +2771,18 @@ document.getElementById('fy-searchBooker').addEventListener('keydown', e => { if
 document.getElementById('sp-searchName').addEventListener('keydown', e => { if (e.key === 'Enter') spSearch(); });
 document.getElementById('sp-searchStatus').addEventListener('change', () => spSearch());
 
-/* ================= 预约记录 ================= */
+/* ================= 预约审批 ================= */
 let spData = [
-  { id: 1, title: '测试', category: '管理类', type: '其他', convener: '张三', confidential: '否', dept: '系统管理员', applicant: 'admin', contact: '176221189702', date: '2026-08-05', start: '08:30', end: '09:00', content: '年度工作会议', room: '301', scale: '大报告厅', location: '3F', seats: '263', offsite: '否', outLocation: '', needService: '是', serviceType: '茶水、席卡、纸笔套装', note: '请按时准备', costShare: '否', shareGroup: '', notice: '是', noticeObj: '部门联络人', leaders: '', deptAttend: '', attendees: 'bmct', allowProxy: '否', receipt: '否', attachment: '加载失败', status: '待审批' },
-  { id: 2, title: 'T 会议预定052802', category: '管理类', type: '主任办公会', convener: '李四', confidential: '否', dept: '系统管理员', applicant: 'admin', contact: '176221189702', date: '2026-05-29', start: '08:00', end: '08:30', content: '主任办公例会', room: '103', scale: '中会议室', location: '1F', seats: '64', offsite: '否', outLocation: '', needService: '是', serviceType: '纸笔套装', note: '无', costShare: '否', shareGroup: '', notice: '是', noticeObj: '部门联络人', leaders: '', deptAttend: '', attendees: 'admin', allowProxy: '否', receipt: '否', attachment: '加载失败', status: '已撤销' },
-  { id: 3, title: 'T 会议预定052801', category: '科研类', type: '专题办公会', convener: '王五', confidential: '否', dept: '系统管理员', applicant: 'admin', contact: '176221189702', date: '2026-05-28', start: '19:02', end: '20:02', content: '科研专题研讨', room: '103', scale: '中会议室', location: '1F', seats: '64', offsite: '否', outLocation: '', needService: '是', serviceType: '纸笔套装', note: '无', costShare: '否', shareGroup: '', notice: '是', noticeObj: '部门联络人', leaders: '', deptAttend: '', attendees: 'admin', allowProxy: '否', receipt: '否', attachment: '加载失败', status: '已通过' },
-  { id: 4, title: '526预约2', category: '管理类', type: '部门例会', convener: '赵六', confidential: '否', dept: '系统管理员', applicant: 'admin', contact: '176221189702', date: '2026-05-26', start: '11:30', end: '12:00', content: '部门周例会', room: '301', scale: '大报告厅', location: '3F', seats: '263', offsite: '否', outLocation: '', needService: '是', serviceType: '茶水、席卡、纸笔套装', note: '请按时准备', costShare: '否', shareGroup: '', notice: '是', noticeObj: '部门联络人', leaders: '', deptAttend: '', attendees: 'admin,bmct', allowProxy: '否', receipt: '否', attachment: '加载失败', status: '已通过' },
-  { id: 5, title: '526预约2', category: '科研类', type: '部门例会', convener: '赵六', confidential: '否', dept: '系统管理员', applicant: 'admin', contact: '176221189702', date: '2026-05-26', start: '11:00', end: '11:30', content: '部门周例会', room: '301', scale: '大报告厅', location: '3F', seats: '263', offsite: '否', outLocation: '', needService: '是', serviceType: '茶水、席卡、纸笔套装', note: '请按时准备', costShare: '否', shareGroup: '', notice: '是', noticeObj: '部门联络人', leaders: '', deptAttend: '', attendees: 'admin,bmct', allowProxy: '否', receipt: '否', attachment: '加载失败', status: '已通过' },
-  { id: 6, title: '526预约1', category: '管理类', type: '部门例会', convener: '赵六', confidential: '否', dept: '系统管理员', applicant: 'admin', contact: '176221189702', date: '2026-05-26', start: '10:30', end: '11:00', content: '部门周例会', room: '301', scale: '大报告厅', location: '3F', seats: '263', offsite: '否', outLocation: '', needService: '是', serviceType: '茶水、席卡、纸笔套装', note: '请按时准备', costShare: '否', shareGroup: '', notice: '是', noticeObj: '部门联络人', leaders: '', deptAttend: '', attendees: 'admin,bmct', allowProxy: '否', receipt: '否', attachment: '加载失败', status: '已通过' },
-  { id: 7, title: '部门周会', category: '管理类', type: '部门例会', convener: '孙七', confidential: '否', dept: '系统管理员', applicant: 'admin', contact: '176221189702', date: '2026-05-23', start: '15:51', end: '16:51', content: '部门周会', room: '301', scale: '大报告厅', location: '3F', seats: '263', offsite: '否', outLocation: '', needService: '是', serviceType: '矿泉水', note: '无', costShare: '否', shareGroup: '', notice: '是', noticeObj: '部门联络人', leaders: '', deptAttend: '', attendees: 'admin', allowProxy: '否', receipt: '否', attachment: '加载失败', status: '过期未审批' },
-  { id: 8, title: '测试会议522', category: '科研类', type: '其他', convener: '周八', confidential: '否', dept: '系统管理员', applicant: 'admin', contact: '176221189702', date: '2026-05-22', start: '16:00', end: '16:30', content: '测试会议', room: '301', scale: '大报告厅', location: '3F', seats: '263', offsite: '否', outLocation: '', needService: '是', serviceType: '矿泉水', note: '无', costShare: '否', shareGroup: '', notice: '是', noticeObj: '部门联络人', leaders: '', deptAttend: '', attendees: 'admin', allowProxy: '否', receipt: '否', attachment: '加载失败', status: '过期未审批' },
-  { id: 9, title: '521521', category: '管理类', type: '其他', convener: '吴九', confidential: '否', dept: '系统管理员', applicant: 'admin', contact: '176221189702', date: '2026-05-21', start: '17:00', end: '18:00', content: '专题讨论', room: '301', scale: '大报告厅', location: '3F', seats: '263', offsite: '否', outLocation: '', needService: '是', serviceType: '矿泉水', note: '无', costShare: '否', shareGroup: '', notice: '是', noticeObj: '部门联络人', leaders: '', deptAttend: '', attendees: 'admin', allowProxy: '否', receipt: '否', attachment: '加载失败', status: '已通过' },
-  { id: 10, title: '外出调研会', category: '科研类', type: '其他', convener: '郑十', confidential: '否', dept: '系统管理员', applicant: 'admin', contact: '176221189702', date: '2026-05-22', start: '17:54', end: '18:54', content: '外出调研交流', room: '—', scale: '—', location: '—', seats: '—', offsite: '是', outLocation: '苏州工业园区展示中心', needService: '否', serviceType: '', note: '', costShare: '否', shareGroup: '', notice: '是', noticeObj: '指定参会人', leaders: '', deptAttend: '', attendees: 'admin', allowProxy: '否', receipt: '否', attachment: '加载失败', status: '已通过' }
+  { id: 1, title: '测试', category: '管理类', type: '其他', convener: '张三', confidential: '否', dept: '系统管理员', applicant: 'admin', contact: '176221189702', date: '2026-08-05', start: '08:30', end: '09:00', content: '年度工作会议', room: '301', scale: '大报告厅', location: '3F', seats: '263', offsite: '否', outLocation: '', needService: '是', serviceType: '茶水、席卡、纸笔套装', note: '请按时准备', costShare: '否', shareGroup: '', notice: '是', noticeObj: '部门联络人', leaders: '', deptAttend: '', attendees: 'bmct', receipt: '否', attachment: '加载失败', status: '待审批' },
+  { id: 2, title: 'T 会议预定052802', category: '管理类', type: '主任办公会', convener: '李四', confidential: '否', dept: '系统管理员', applicant: 'admin', contact: '176221189702', date: '2026-05-29', start: '08:00', end: '08:30', content: '主任办公例会', room: '103', scale: '中会议室', location: '1F', seats: '64', offsite: '否', outLocation: '', needService: '是', serviceType: '纸笔套装', note: '无', costShare: '否', shareGroup: '', notice: '是', noticeObj: '部门联络人', leaders: '', deptAttend: '', attendees: 'admin', receipt: '否', attachment: '加载失败', status: '已撤销' },
+  { id: 3, title: 'T 会议预定052801', category: '科研类', type: '专题办公会', convener: '王五', confidential: '否', dept: '系统管理员', applicant: 'admin', contact: '176221189702', date: '2026-05-28', start: '19:02', end: '20:02', content: '科研专题研讨', room: '103', scale: '中会议室', location: '1F', seats: '64', offsite: '否', outLocation: '', needService: '是', serviceType: '纸笔套装', note: '无', costShare: '否', shareGroup: '', notice: '是', noticeObj: '部门联络人', leaders: '', deptAttend: '', attendees: 'admin', receipt: '是', attachment: '加载失败', status: '已通过' },
+  { id: 4, title: '526预约2', category: '管理类', type: '部门例会', convener: '赵六', confidential: '否', dept: '系统管理员', applicant: 'admin', contact: '176221189702', date: '2026-05-26', start: '11:30', end: '12:00', content: '部门周例会', room: '301', scale: '大报告厅', location: '3F', seats: '263', offsite: '否', outLocation: '', needService: '是', serviceType: '茶水、席卡、纸笔套装', note: '请按时准备', costShare: '否', shareGroup: '', notice: '是', noticeObj: '部门联络人', leaders: '', deptAttend: '', attendees: 'admin,bmct', receipt: '否', attachment: '加载失败', status: '已通过' },
+  { id: 5, title: '526预约2', category: '科研类', type: '部门例会', convener: '赵六', confidential: '否', dept: '系统管理员', applicant: 'admin', contact: '176221189702', date: '2026-05-26', start: '11:00', end: '11:30', content: '部门周例会', room: '301', scale: '大报告厅', location: '3F', seats: '263', offsite: '否', outLocation: '', needService: '是', serviceType: '茶水、席卡、纸笔套装', note: '请按时准备', costShare: '否', shareGroup: '', notice: '是', noticeObj: '部门联络人', leaders: '', deptAttend: '', attendees: 'admin,bmct', receipt: '否', attachment: '加载失败', status: '已通过' },
+  { id: 6, title: '526预约1', category: '管理类', type: '部门例会', convener: '赵六', confidential: '否', dept: '系统管理员', applicant: 'admin', contact: '176221189702', date: '2026-05-26', start: '10:30', end: '11:00', content: '部门周例会', room: '301', scale: '大报告厅', location: '3F', seats: '263', offsite: '否', outLocation: '', needService: '是', serviceType: '茶水、席卡、纸笔套装', note: '请按时准备', costShare: '否', shareGroup: '', notice: '是', noticeObj: '部门联络人', leaders: '', deptAttend: '', attendees: 'admin,bmct', receipt: '否', attachment: '加载失败', status: '已通过' },
+  { id: 7, title: '部门周会', category: '管理类', type: '部门例会', convener: '孙七', confidential: '否', dept: '系统管理员', applicant: 'admin', contact: '176221189702', date: '2026-05-23', start: '15:51', end: '16:51', content: '部门周会', room: '301', scale: '大报告厅', location: '3F', seats: '263', offsite: '否', outLocation: '', needService: '是', serviceType: '矿泉水', note: '无', costShare: '否', shareGroup: '', notice: '是', noticeObj: '部门联络人', leaders: '', deptAttend: '', attendees: 'admin', receipt: '否', attachment: '加载失败', status: '已过期' },
+  { id: 8, title: '测试会议522', category: '科研类', type: '其他', convener: '周八', confidential: '否', dept: '系统管理员', applicant: 'admin', contact: '176221189702', date: '2026-05-22', start: '16:00', end: '16:30', content: '测试会议', room: '301', scale: '大报告厅', location: '3F', seats: '263', offsite: '否', outLocation: '', needService: '是', serviceType: '矿泉水', note: '无', costShare: '否', shareGroup: '', notice: '是', noticeObj: '部门联络人', leaders: '', deptAttend: '', attendees: 'admin', receipt: '否', attachment: '加载失败', status: '已过期' },
+  { id: 9, title: '521521', category: '管理类', type: '其他', convener: '吴九', confidential: '否', dept: '系统管理员', applicant: 'admin', contact: '176221189702', date: '2026-05-21', start: '17:00', end: '18:00', content: '专题讨论', room: '301', scale: '大报告厅', location: '3F', seats: '263', offsite: '否', outLocation: '', needService: '是', serviceType: '矿泉水', note: '无', costShare: '否', shareGroup: '', notice: '是', noticeObj: '部门联络人', leaders: '', deptAttend: '', attendees: 'admin', receipt: '否', attachment: '加载失败', status: '已通过' },
+  { id: 10, title: '外出调研会', category: '科研类', type: '其他', convener: '郑十', confidential: '否', dept: '系统管理员', applicant: 'admin', contact: '176221189702', date: '2026-05-22', start: '17:54', end: '18:54', content: '外出调研交流', room: '—', scale: '—', location: '—', seats: '—', offsite: '是', outLocation: '苏州工业园区展示中心', needService: '否', serviceType: '', note: '', costShare: '否', shareGroup: '', notice: '是', noticeObj: '指定参会人', leaders: '', deptAttend: '', attendees: 'admin', receipt: '否', attachment: '加载失败', status: '已通过' }
 ];
 let spFiltered = [...spData];
 let spCurrentItem = null;
@@ -2196,9 +2790,13 @@ let spCurrentItem = null;
 const statusMap = {
   '待审批': { cls: 'pending', label: '待审批' },
   '已通过': { cls: 'pass', label: '已通过' },
+  '已拒绝': { cls: 'reject', label: '已拒绝' },
   '已撤销': { cls: 'revoke', label: '已撤销' },
-  '过期未审批': { cls: 'expired', label: '过期未审批' }
+  '已取消': { cls: 'cancel', label: '已取消' },
+  '草稿': { cls: 'draft', label: '草稿' },
+  '已过期': { cls: 'expired', label: '已过期' }
 };
+const RELEASED = ['已过期', '已取消', '已拒绝', '已撤销', '草稿']; // 已释放/已过期，资源矩阵不再占用
 
 function spRender() {
   const tb = document.getElementById('sp-tableBody');
@@ -2208,7 +2806,7 @@ function spRender() {
   } else {
     spFiltered.forEach((item, index) => {
       const st = statusMap[item.status] || statusMap['待审批'];
-      const roomText = item.offsite === '是' ? item.outLocation : item.room;
+      const roomText = item.room;
       const tr = document.createElement('tr');
       tr.innerHTML = `
         <td>${index + 1}</td>
@@ -2222,6 +2820,8 @@ function spRender() {
         <td><span class="status-tag ${st.cls}">${st.label}</span></td>
         <td>
           <div class="actions">
+            <button class="btn btn-link" onclick="spOpenApproveModal(${item.id})">通过</button>
+            <button class="btn btn-danger" onclick="spOpenRejectModal(${item.id})">拒绝</button>
             <button class="btn btn-link" onclick="spOpenDetail(${item.id})">详情</button>
           </div>
         </td>`;
@@ -2254,9 +2854,32 @@ function spReset() {
   spFiltered = [...spData];
   spRender();
 }
+/* 参会人员回执标注：每人 + 回执状态（参加/不参加/未回执） */
+function spAttendeeList(it) {
+  let list = it.attendees;
+  if (typeof list === 'string') list = list.split(/[,，]/).map(s => s.trim()).filter(Boolean);
+  if (!Array.isArray(list)) list = [];
+  return list;
+}
+function spRenderAttendees(it) {
+  const list = spAttendeeList(it);
+  if (!list.length) return '—';
+  const rs = it.receipts || {};
+  return '<div class="att-list">' + list.map(function (n) {
+    const st = rs[n];
+    let tag = '<span class="att-tag pending">未回执</span>';
+    if (st === 'attend') tag = '<span class="att-tag attend">参加</span>';
+    else if (st === 'absent') tag = '<span class="att-tag absent">不参加</span>';
+    const me = (n === ME) ? ' <span class="att-me">(我)</span>' : '';
+    return '<div class="att-row"><span class="att-name">' + n + me + '</span>' + tag + '</div>';
+  }).join('') + '</div>';
+}
 function spOpenDetail(id) {
   const it = spData.find(d => d.id === id);
   if (!it) return;
+  spRenderDetail(it);
+}
+function spRenderDetail(it) {
   spCurrentItem = it;
   const meetingTime = it.date + ' ' + it.start + '-' + it.end;
   const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
@@ -2265,64 +2888,194 @@ function spOpenDetail(id) {
   set('sp-detailCategory', it.category);
   set('sp-detailType', it.type);
   set('sp-detailConvener', it.convener);
-  set('sp-detailConfidential', it.confidential);
   set('sp-detailDept', it.dept);
   set('sp-detailApplicant', it.applicant);
   set('sp-detailContact', it.contact);
   set('sp-detailMeetingTime', meetingTime);
   set('sp-detailContent', it.content || '—');
+  set('sp-detailAttachments', (it.attachments && it.attachments.length) ? it.attachments.join('、') : '—');
   set('sp-detailStatus', it.status);
-  set('sp-detailAttachment', it.attachment);
+  set('sp-detailOccupancy', it.occupancy || '—');
   set('sp-detailRoom', it.offsite === '是' ? '—' : it.room);
   set('sp-detailScale', it.scale);
   set('sp-detailLocation', it.location);
   set('sp-detailSeats', it.seats);
   const _fac = (it.facilities && it.facilities.length) ? it.facilities : ((mrData.find(r => r.name === it.room) || {}).facilities || []);
   set('sp-detailFacilities', _fac.length ? _fac.join('、') : '—');
-  set('sp-detailOffsite', it.offsite);
-  set('sp-detailOutLocation', it.offsite === '是' ? it.outLocation : '—');
   set('sp-detailNeedService', it.needService);
   set('sp-detailServiceType', it.serviceType || '—');
   set('sp-detailNote', it.note || '—');
   set('sp-detailCostShare', it.costShare);
   set('sp-detailShareGroup', it.shareGroup || '—');
-  set('sp-detailNotice', it.notice);
+  // 费用分摊：仅「我发起的」会议展示；「我参加的」不展示
+  const csSec = document.getElementById('sp-detailCostShareSection');
+  if (csSec) csSec.style.display = (it.applicant === ME) ? '' : 'none';
   set('sp-detailNoticeObj', it.noticeObj);
-  set('sp-detailLeaders', it.leaders || '—');
   set('sp-detailDeptAttend', it.deptAttend || '—');
-  set('sp-detailAttendees', it.attendees);
-  set('sp-detailAllowProxy', it.allowProxy);
-  set('sp-detailReceipt', it.receipt);
+  const _nb = document.getElementById('sp-detailNoticeBlock');
+  if (_nb) _nb.style.display = (it.notify === '否') ? 'none' : '';
+  document.getElementById('sp-detailAttendees').innerHTML = spRenderAttendees(it);
+  // 回执确认（F-NT-04）：「我参加的」会议（我作为参会人）底部固定栏展示参加/不参加；发起人本人若是参会人同样展示（point2）；会前可回执、会后锁定、锁定前可改（已回执可切换）
+  const rcBar = document.getElementById('sp-detailReceiptBar');
+  const isMyAttend = Array.isArray(it.attendees) && it.attendees.includes(ME) && it.status === '已通过' && it.occupancy === '已预订';
+  if (rcBar) {
+    if (isMyAttend) {
+      const myReply = it.receipts && it.receipts[ME];
+      const started = yySlotDateTime(it.date, it.start).getTime() <= yyNow();
+      const key = it.room + '|' + it.date + '|' + it.start + '|' + it.end;
+      if (myReply === 'attend') {
+        rcBar.innerHTML = mxOpBtn(key, '参加', {disabled:true, reason:'您已回执：参加'}) + mxOpBtn(key, '不参加', {fn:'spReceiptInline', arg:'absent'});
+      } else if (myReply === 'absent') {
+        rcBar.innerHTML = mxOpBtn(key, '参加', {fn:'spReceiptInline', arg:'attend'}) + mxOpBtn(key, '不参加', {disabled:true, reason:'您已回执：不参加'});
+      } else if (started) {
+        rcBar.innerHTML = mxOpBtn(key, '参加', {disabled:true, reason:'会议已开始，回执已锁定'}) + mxOpBtn(key, '不参加', {disabled:true, reason:'会议已开始，回执已锁定'});
+      } else {
+        rcBar.innerHTML = mxOpBtn(key, '参加', {fn:'spReceiptInline', arg:'attend'}) + mxOpBtn(key, '不参加', {fn:'spReceiptInline', arg:'absent'});
+      }
+      rcBar.style.display = '';
+    } else {
+      rcBar.style.display = 'none';
+    }
+  }
   document.getElementById('sp-detailMask').classList.add('show');
   document.getElementById('sp-detailDrawer').classList.add('show');
+}
+/* 会议时长（小时）：由 start/end 推算 */
+function mxHours(s, e) {
+  if (!s || !e) return 0;
+  const [h1, m1] = s.split(':').map(Number);
+  const [h2, m2] = e.split(':').map(Number);
+  return +((h2 + m2 / 60) - (h1 + m1 / 60)).toFixed(2);
+}
+/* 会议费用明细：会议室费用 = 单价 × 时长；会务服务费用 = Σ(服务单价 × 数量)
+   服务明细优先取 b.services 明细，否则按 b.serviceType 字符串匹配会务字典派生（用于审批数据） */
+function mxMeetingFee(b) {
+  const rm = mrData.find(r => r.name === b.room);
+  const roomUnitPrice = (b.unitPrice != null) ? b.unitPrice : (rm ? rm.cost : 0);
+  const duration = mxHours(b.start, b.end);
+  let services = [];
+  if (Array.isArray(b.services) && b.services.length) {
+    services = b.services.map(s => {
+      const d = hyData.find(h => h.id === s.id) || {};
+      const price = d.cost || 0;
+      const qty = s.qty || 1;
+      return { name: d.name || ('服务' + s.id), unitPrice: price, qty: qty, amount: +(price * qty).toFixed(2) };
+    });
+  } else if (b.serviceType) {
+    services = b.serviceType.split(/[、,，]/).map(n => n.trim()).filter(Boolean).map(n => {
+      const d = hyData.find(h => h.name === n);
+      const price = d ? d.cost : 0;
+      return { name: n, unitPrice: price, qty: 1, amount: +(price).toFixed(2) };
+    });
+  }
+  const roomFee = +(roomUnitPrice * duration).toFixed(2);
+  const serviceFee = +(services.reduce((s, x) => s + x.amount, 0)).toFixed(2);
+  const total = +(roomFee + serviceFee).toFixed(2);
+  return { roomUnitPrice, duration, services, roomFee, serviceFee, total };
 }
 function spCloseDetail() {
   document.getElementById('sp-detailMask').classList.remove('show');
   document.getElementById('sp-detailDrawer').classList.remove('show');
 }
-/* 预约审批已调整为只读记录列表，审批动作由流程引擎处理，故移除通过/拒绝相关逻辑 */
+/* 审批详情为管理员审批视角，不提供用户侧变更/取消入口；用户变更、取消仅在「会议预约」界面（资源矩阵 / 我发起的）进行 */
+let spConfirmItem = null;
+let spConfirmType = null;
+function spOpenApproveModal(id) {
+  spConfirmItem = spData.find(d => d.id === id) || null;
+  spConfirmType = 'approve';
+  document.getElementById('sp-confirm-text').textContent = '确认要通过该条预约么？';
+  document.getElementById('sp-confirm-modal').classList.add('show');
+}
+function spOpenRejectModal(id) {
+  spConfirmItem = spData.find(d => d.id === id) || null;
+  spConfirmType = 'reject';
+  document.getElementById('sp-confirm-text').textContent = '确认要拒绝该条预约么？';
+  document.getElementById('sp-confirm-modal').classList.add('show');
+}
+function spCloseConfirmModal(event) {
+  if (event && event.target !== event.currentTarget) return;
+  document.getElementById('sp-confirm-modal').classList.remove('show');
+  spConfirmItem = null;
+  spConfirmType = null;
+}
+function spConfirmAction() {
+  if (!spConfirmItem || !spConfirmType) return;
+  if (spConfirmType === 'approve') {
+    spConfirmItem.status = '已通过';
+    showToast('已通过该预约');
+  } else {
+    spConfirmItem.status = '已拒绝';
+    showToast('已拒绝该预约');
+  }
+  spRender();
+  if (spCurrentItem && spCurrentItem.id === spConfirmItem.id) {
+    document.getElementById('sp-detailStatus').textContent = spConfirmItem.status;
+  }
+  spCloseConfirmModal();
+}
 
 /* ================= 会议费用 ================= */
 let fyData = [
-  { id: 1, name: 'T 会议预定052801', createTime: '2026-05-20 09:15', time: '2026-05-28 19:02-20:02', location: '--', booker: 'admin', dept: '系统管理员', total: 108, roomFee: 87, serviceFee: 21 },
-  { id: 2, name: '526预约2', createTime: '2026-05-18 14:30', time: '2026-05-26 11:30-12:00', location: '--', booker: 'admin', dept: '系统管理员', total: 120.5, roomFee: 102.5, serviceFee: 18 },
-  { id: 3, name: '526预约2', createTime: '2026-05-18 14:30', time: '2026-05-26 11:00-11:30', location: '--', booker: 'admin', dept: '系统管理员', total: 110.5, roomFee: 102.5, serviceFee: 8 },
-  { id: 4, name: '526预约1', createTime: '2026-05-18 10:05', time: '2026-05-26 10:30-11:00', location: '--', booker: 'admin', dept: '系统管理员', total: 119.5, roomFee: 102.5, serviceFee: 17 },
-  { id: 5, name: '521521', createTime: '2026-05-14 08:40', time: '2026-05-22 17:54-18:54', location: '--', booker: 'admin', dept: '系统管理员', total: 205, roomFee: 205, serviceFee: 0 },
-  { id: 6, name: '521521', createTime: '2026-05-13 16:20', time: '2026-05-21 17:00-18:00', location: '--', booker: 'admin', dept: '系统管理员', total: 256, roomFee: 205, serviceFee: 51 },
-  { id: 7, name: '测试会议1', createTime: '2026-05-06 11:10', time: '2026-05-12 16:00-16:30', location: '--', booker: 'admin', dept: '系统管理员', total: 102.5, roomFee: 102.5, serviceFee: 0 },
-  { id: 8, name: 'T 会议预定041501', createTime: '2026-04-10 09:50', time: '2026-04-15 22:30-23:07', location: '--', booker: 'admin', dept: '系统管理员', total: 23, roomFee: 18.5, serviceFee: 4.5 }
+  { id: 1, name: 'T 会议预定052801', createTime: '2026-05-20 09:15', time: '2026-05-28 19:02-20:02', location: '--', booker: 'admin', dept: '系统管理员', group: '智慧园区项目组', status: '有效', approval: '已通过', feeFlow: 'completed', fee_confirmed: '是', total: 108, roomFee: 87, serviceFee: 21, unitPrice: 87, duration: 1, services: [{ id: 1, qty: 1 }] },
+  { id: 2, name: '526预约2', createTime: '2026-05-18 14:30', time: '2026-05-26 11:30-12:00', location: '--', booker: 'admin', dept: '系统管理员', group: '实验室改造项目组', status: '有效', approval: '已通过', feeFlow: 'meeting', fee_confirmed: '确认中', total: 120.5, roomFee: 102.5, serviceFee: 18, unitPrice: 205, duration: 0.5, services: [{ id: 2, qty: 4 }] },
+  { id: 3, name: '526预约2', createTime: '2026-05-18 14:30', time: '2026-05-26 11:00-11:30', location: '--', booker: 'admin', dept: '系统管理员', group: '实验室改造项目组', status: '已取消', approval: '已拒绝', feeFlow: 'draft', fee_confirmed: '否', total: 110.5, roomFee: 102.5, serviceFee: 8, unitPrice: 205, duration: 0.5, services: [{ id: 4, qty: 2 }, { id: 3, qty: 2 }] },
+  { id: 4, name: '526预约1', createTime: '2026-05-18 10:05', time: '2026-05-26 10:30-11:00', location: '--', booker: 'admin', dept: '系统管理员', group: '智慧园区项目组', status: '有效', approval: '已通过', feeFlow: 'sponsor', fee_confirmed: '确认中', total: 119.5, roomFee: 102.5, serviceFee: 17, unitPrice: 205, duration: 0.5, services: [{ id: 5, qty: 2 }, { id: 4, qty: 2 }] },
+  { id: 5, name: '521521', createTime: '2026-05-14 08:40', time: '2026-05-22 17:54-18:54', location: '--', booker: 'admin', dept: '系统管理员', group: '安防升级项目组', status: '有效', approval: '已通过', feeFlow: 'draft', fee_confirmed: '否', total: 205, roomFee: 205, serviceFee: 0, unitPrice: 205, duration: 1, services: [] },
+  { id: 6, name: '521521', createTime: '2026-05-13 16:20', time: '2026-05-21 17:00-18:00', location: '--', booker: 'admin', dept: '系统管理员', group: '安防升级项目组', status: '已取消', approval: '已拒绝', feeFlow: 'draft', fee_confirmed: '否', total: 256, roomFee: 205, serviceFee: 51, unitPrice: 205, duration: 1, services: [{ id: 1, qty: 1 }, { id: 5, qty: 5 }] },
+  { id: 7, name: '测试会议1', createTime: '2026-05-06 11:10', time: '2026-05-12 16:00-16:30', location: '--', booker: 'admin', dept: '系统管理员', group: '智慧园区项目组', status: '有效', approval: '已通过', feeFlow: 'draft', fee_confirmed: '否', total: 102.5, roomFee: 102.5, serviceFee: 0, unitPrice: 205, duration: 0.5, services: [] },
+  { id: 8, name: 'T 会议预定041501', createTime: '2026-04-10 09:50', time: '2026-04-15 22:30-23:07', location: '--', booker: 'admin', dept: '系统管理员', group: '实验室改造项目组', status: '已取消', approval: '已拒绝', feeFlow: 'draft', fee_confirmed: '否', total: 23, roomFee: 18.5, serviceFee: 4.5, unitPrice: 37, duration: 0.5, services: [{ id: 2, qty: 1 }] }
 ];
+let fyEditId = null;        // 当前编辑的费用行 id
+let fyEditUnitPrice = 0;    // 当前编辑行的会议室单价（元/小时）
 let fyFiltered = [...fyData];
 
+/* 费用确认流：原型内部固定演示角色为会务（实际系统按登录用户角色鉴权） */
+let FY_ROLE = '会务';
+function fySetRole(role) {
+  FY_ROLE = role;
+  fyRender(); // 操作列发起入口依赖角色，重渲染
+}
+
+function fyInitFilters() {
+  const depts = Array.from(new Set(fyData.map(d => d.dept).filter(Boolean)));
+  const groups = Array.from(new Set(fyData.map(d => d.group).filter(Boolean)));
+  const fill = (id, vals) => {
+    const sel = document.getElementById(id);
+    if (!sel) return;
+    sel.innerHTML = '<option value="">全部</option>' + vals.map(v => '<option value="' + v + '">' + v + '</option>').join('');
+  };
+  fill('fy-dept', depts);
+}
 function fyRender() {
   const tb = document.getElementById('fy-tableBody');
   tb.innerHTML = '';
   if (fyFiltered.length === 0) {
-    tb.innerHTML = '<tr><td colspan="10" class="empty">暂无数据</td></tr>';
+    tb.innerHTML = '<tr><td colspan="14" class="empty">暂无数据</td></tr>';
   } else {
     fyFiltered.forEach((item, index) => {
+      const cancelled = item.status === '已取消';
       const tr = document.createElement('tr');
+      if (cancelled) tr.className = 'row-cancel';
+      const statusCell = cancelled
+        ? '<span class="tag-cancel">已取消</span>'
+        : '<span class="tag-valid">有效</span>';
+      const fcVal = (item.fee_confirmed === '是') ? '是'
+        : ((item.feeFlow === 'meeting' || item.feeFlow === 'sponsor') ? '确认中' : '否');
+      const confirmCell = fcVal === '是'
+        ? '<span class="tag-confirm-yes">是</span>'
+        : (fcVal === '确认中' ? '<span class="tag-confirm-ing">确认中</span>' : '<span class="tag-confirm-no">否</span>');
+      const feeCell = v => cancelled ? '—' : v;
+      // 操作列（点1-3 + 查看全角色全状态；确认中 meeting/sponsor 仅[查看]；取消独立[编辑]按钮，发起即编辑入口）：
+      // 会务 + 已通过有效 + 未发起draft → [发起费用确认]（打开可编辑弹窗）；其余全角色全状态（含确认中 meeting/sponsor、completed、非会务、已取消）→ [查看]（只读）
+      let opCell;
+      const canEdit = FY_ROLE === '会务' && item.approval === '已通过' && item.status === '有效' && item.feeFlow === 'draft';
+      if (cancelled) {
+        opCell = '<button class="btn btn-link" disabled title="已取消会议不可操作">查看</button>';
+      } else if (canEdit) {
+        opCell = '<button class="btn btn-link" onclick="fyInitiate(' + item.id + ')">发起费用确认</button>';
+      } else {
+        opCell = '<button class="btn btn-link" onclick="fyOpenEdit(' + item.id + ')">查看</button>';
+      }
       tr.innerHTML = `
         <td>${index + 1}</td>
         <td>${item.name}</td>
@@ -2331,9 +3084,13 @@ function fyRender() {
         <td>${item.location}</td>
         <td>${item.booker}</td>
         <td>${item.dept}</td>
-        <td>${item.total}</td>
-        <td>${item.roomFee}</td>
-        <td>${item.serviceFee}</td>`;
+        <td>${item.group || '—'}</td>
+        <td>${statusCell}</td>
+        <td>${confirmCell}</td>
+        <td>${feeCell(item.total)}</td>
+        <td>${feeCell(item.roomFee)}</td>
+        <td>${feeCell(item.serviceFee)}</td>
+        <td>${opCell}</td>`;
       tb.appendChild(tr);
     });
   }
@@ -2354,11 +3111,17 @@ function fyRenderPg() {
 function fySearch() {
   const kw = document.getElementById('fy-searchName').value.trim();
   const booker = document.getElementById('fy-searchBooker').value.trim();
+  const dept = document.getElementById('fy-dept').value;
+  const group = document.getElementById('fy-group').value;
+  const status = document.getElementById('fy-status').value;
   const cStart = document.getElementById('fy-createStart').value;
   const cEnd = document.getElementById('fy-createEnd').value;
   fyFiltered = fyData.filter(it => {
     if (!it.name.includes(kw)) return false;
     if (!it.booker.includes(booker)) return false;
+    if (dept && it.dept !== dept) return false;
+    if (group && !it.group.includes(group)) return false;
+    if (status && it.status !== status) return false;
     const cDate = (it.createTime || '').substring(0, 10);
     if (cStart && cDate < cStart) return false;
     if (cEnd && cDate > cEnd) return false;
@@ -2369,19 +3132,29 @@ function fySearch() {
 function fyReset() {
   document.getElementById('fy-searchName').value = '';
   document.getElementById('fy-searchBooker').value = '';
+  document.getElementById('fy-dept').value = '';
+  document.getElementById('fy-group').value = '';
+  document.getElementById('fy-status').value = '';
   document.getElementById('fy-createStart').value = '';
   document.getElementById('fy-createEnd').value = '';
   fyFiltered = [...fyData];
   fyRender();
 }
 function fyExport() {
-  if (fyFiltered.length === 0) {
+  // ④b 未确认禁导出：存在「未取消且费用是否确认=否」的行时禁止导出
+  const blocked = fyFiltered.filter(d => d.status !== '已取消' && d.fee_confirmed !== '是');
+  if (blocked.length) {
+    showToast('存在未确认/确认中费用，禁止导出');
+    return;
+  }
+  const validRows = fyFiltered.filter(d => d.status !== '已取消');
+  if (validRows.length === 0) {
     showToast('暂无可导出的数据');
     return;
   }
-  const headers = ['序号','会议名称','发起时间','会议时间','会议室地点','预约人','所属部门','总费用(元)','会议室费用(元)','会务服务费用(元)'];
-  const rows = fyFiltered.map((item, idx) => [
-    idx + 1, item.name, item.createTime, item.time, item.location, item.booker, item.dept, item.total, item.roomFee, item.serviceFee
+  const headers = ['序号','会议名称','发起时间','会议时间','会议室地点','预约人','所属部门','项目组','状态','总费用(元)','会议室费用(元)','会务服务费用(元)'];
+  const rows = validRows.map((item, idx) => [
+    idx + 1, item.name, item.createTime, item.time, item.location, item.booker, item.dept, item.group || '—', item.status || '有效', item.total, item.roomFee, item.serviceFee
   ]);
   const csv = [headers, ...rows].map(r => r.map(c => {
     const s = String(c);
@@ -2400,45 +3173,239 @@ function fyExport() {
   showToast('导出成功');
 }
 
+/* ============ 会议费用：编辑费用弹窗 ============ */
+/* 打开编辑弹窗：带入该会议的实际时长、单价、服务类型，提供可编辑的费用项 */
+function fyOpenEdit(id) {
+  const item = fyData.find(d => d.id === id);
+  if (!item) return;
+  if (item.status === '已取消') return; // 取消会议不记录费用，不可编辑
+  fyEditId = id;
+  fyEditUnitPrice = parseFloat(item.unitPrice) || 0;
+
+  document.getElementById('fy-editName').textContent = item.name;
+  document.getElementById('fy-editTime').textContent = item.time;
+  document.getElementById('fy-editLocation').textContent = item.location;
+  document.getElementById('fy-editBooker').textContent = item.booker;
+  document.getElementById('fy-editUnitPrice').textContent = '¥' + fyEditUnitPrice.toFixed(2);
+
+  // 实际使用时长（默认带入预存时长）
+  const durEl = document.getElementById('fy-editDuration');
+  durEl.value = item.duration;
+
+  // 会务服务：以"下拉单选 + 数量"的明细行呈现，单价按所选服务自动带出（取自服务字典）
+  const box = document.getElementById('fy-editServiceList');
+  const svcList = item.services || [];
+  let svcHtml = svcList.length
+    ? svcList.map(s => '<div class="yy-svc-row">' + fySvcRowInner(s) + '</div>').join('')
+    : '<div class="yy-svc-row">' + fySvcRowInner(null) + '</div>';
+  box.innerHTML = svcHtml;
+
+  // 初始化费用（按默认时长与服务还原当前费用）
+  fyRecalcRoom();
+  fyRecalcService();
+
+  // ====== 费用确认流：可编辑/只读 + footer 按钮（C6）======
+  const flow = item.feeFlow || 'draft';
+
+  // 可编辑态：仅 会务 + draft（未发起，发起即编辑入口）可改时长与数量；meeting/sponsor/completed 及非会务角色均只读（确认中仅[查看]）
+  const editable = (flow === 'draft' && FY_ROLE === '会务');
+  durEl.disabled = !editable;
+  document.querySelectorAll('#fy-editServiceList .svc-select, #fy-editServiceList .qty').forEach(el => el.disabled = !editable);
+  const addSvcBtn = document.querySelector('.fy-add-svc');
+  if (addSvcBtn) addSvcBtn.style.display = editable ? '' : 'none';
+
+  // 弹窗标题：可编辑（会务+draft，经[发起费用确认]打开）显「编辑会议费用」；只读（经[查看]打开）显「查看」
+  document.getElementById('fy-editTitle').textContent = editable ? '编辑会议费用' : '查看';
+
+  // footer 按钮显隐
+  const btnSubmit = document.getElementById('fy-btnSubmit');
+  // 提交：仅会务在 draft（未发起）态可提交（提交时同步写回业务侧时长/数量/金额，draft→meeting 会务确认通过，进入发起人确认节点）
+  btnSubmit.style.display = (flow === 'draft' && FY_ROLE === '会务') ? '' : 'none';
+  // 发起人确认（sponsor→completed）在审批中心节点动作完成，业务侧不再提供[确认]按钮；确认中 meeting/sponsor 及终态仅[关闭]（只读）
+
+  document.getElementById('fy-editModal').classList.add('show');
+}
+function fyCloseEdit() {
+  document.getElementById('fy-editModal').classList.remove('show');
+  fyEditId = null;
+}
+/* 会务发起费用确认流（C3）：发起即编辑入口，无独立编辑按钮。
+   draft 态点[发起费用确认]直接打开可编辑弹窗（flow 保持 draft，不预流转）；
+   会务在弹窗内改时长/数量后点[提交]方流转至 meeting（会务确认通过，进入发起人确认节点）。确认中 meeting/sponsor 业务侧只读，仅[查看] */
+function fyInitiate(id) {
+  const item = fyData.find(d => d.id === id);
+  if (!item) return;
+  if (FY_ROLE !== '会务') { showToast('仅会务人员可发起费用确认'); return; }
+  if (item.approval !== '已通过' || item.status !== '有效') { showToast('仅已通过且有效的会议可发起'); return; }
+  if (item.feeFlow !== 'draft') { showToast('仅未发起的费用可发起确认'); return; }
+  if (item.fee_confirmed === '是') { showToast('费用已确认，无需重复发起'); return; }
+  fyRender();
+  fyOpenEdit(id); // 发起即打开可编辑弹窗（发起 = 编辑操作，flow 仍为 draft）
+}
+/* 会务提交费用确认（C6）：draft→meeting（会务确认通过，进入发起人确认节点），提交前同步写回业务侧时长/数量/金额；确认中 meeting/sponsor 业务侧只读，仅[查看] */
+function fySubmitToSponsor() {
+  const item = fyData.find(d => d.id === fyEditId);
+  if (!item) return;
+  if (item.feeFlow !== 'draft') { showToast('仅未发起的费用可提交'); return; }
+  if (FY_ROLE !== '会务') { showToast('仅会务人员可提交'); return; }
+  // 写回业务侧数据
+  const roomFee = +(parseFloat(document.getElementById('fy-editRoomFee').value) || 0).toFixed(2);
+  const serviceFee = +(parseFloat(document.getElementById('fy-editServiceFee').value) || 0).toFixed(2);
+  const duration = parseFloat(document.getElementById('fy-editDuration').value) || 0;
+  const services = [];
+  document.querySelectorAll('#fy-editServiceList .yy-svc-row').forEach(row => {
+    const sel = row.querySelector('.svc-select');
+    if (sel && sel.value) {
+      const qty = parseInt(row.querySelector('.qty').value, 10) || 1;
+      const isDict = hyData.some(h => String(h.id) === String(sel.value));
+      if (isDict) {
+        services.push({ id: parseInt(sel.value, 10), qty });
+      } else {
+        services.push({ id: sel.value, qty, name: sel.selectedOptions[0].textContent, cost: parseFloat(sel.selectedOptions[0].getAttribute('data-cost')) || 0, custom: true });
+      }
+    }
+  });
+  item.duration = duration;
+  item.services = services;
+  item.roomFee = roomFee;
+  item.serviceFee = serviceFee;
+  item.total = +(roomFee + serviceFee).toFixed(2);
+  // 流转至发起人确认节点（会务确认通过）
+  item.feeFlow = 'meeting';
+  item.fee_confirmed = '确认中';
+  fyCloseEdit();
+  fyRender();
+  showToast('已提交，费用进入确认中（审批中心流转至发起人确认）');
+}
+/* 会议室费用 = 单价 × 实际时长（时长变动时自动重算） */
+function fyRecalcRoom() {
+  const dur = parseFloat(document.getElementById('fy-editDuration').value) || 0;
+  const fee = +(fyEditUnitPrice * dur).toFixed(2);
+  document.getElementById('fy-editRoomFee').value = fee;
+  fyRecalcTotal();
+}
+/* 会务服务费用 = Σ(所选服务单价 × 数量)；单价取自服务字典，自动带出 */
+function fyRecalcService() {
+  let total = 0;
+  document.querySelectorAll('#fy-editServiceList .yy-svc-row').forEach(row => {
+    const sel = row.querySelector('.svc-select');
+    if (sel && sel.value) {
+      const opt = sel.selectedOptions[0];
+      const price = parseFloat(opt.getAttribute('data-cost')) || 0;
+      const qty = parseInt(row.querySelector('.qty').value, 10) || 0;
+      total += price * qty;
+    }
+  });
+  total = +total.toFixed(2);
+  document.getElementById('fy-editServiceFee').value = total;
+  fyRecalcTotal();
+}
+/* 服务明细行：下拉单选服务名称（单价按字典自动带出）+ 数量 */
+function fySvcRowInner(current) {
+  const curId = current && current.id != null ? String(current.id) : '';
+  const qty = current ? (current.qty || 1) : 1;
+  // 选项：服务字典；若已存服务不在字典内（历史自定义），追加为可选项避免丢失
+  let opts = '<option value="">请选择服务</option>';
+  let initCost = 0;
+  hyData.forEach(s => {
+    const sel = (String(s.id) === curId) ? ' selected' : '';
+    opts += '<option value="' + s.id + '" data-cost="' + s.cost + '"' + sel + '>' + s.name + '</option>';
+  });
+  if (curId) {
+    const h = hyData.find(x => String(x.id) === curId);
+    if (h) initCost = h.cost;
+    else { opts += '<option value="' + curId + '" data-cost="' + (current.cost || 0) + '" selected>' + (current.name || '自定义服务') + '</option>'; initCost = current.cost || 0; }
+  }
+  return '<select class="svc-select" onchange="fySvcChange(this)">' + opts + '</select>' +
+    '<span class="yy-svc-price">¥' + parseFloat(initCost).toFixed(2) + '/项</span>' +
+    '<span class="yy-svc-qty">数量 <input type="number" min="1" value="' + qty + '" class="qty" oninput="fyRecalcService()"></span>' +
+    '<button type="button" class="svc-del" onclick="fyRemoveServiceRow(this)">删除</button>';
+}
+/* 切换服务：单价按服务字典自动带出 */
+function fySvcChange(sel) {
+  const row = sel.closest('.yy-svc-row');
+  const opt = sel.selectedOptions[0];
+  const price = opt ? (parseFloat(opt.getAttribute('data-cost')) || 0) : 0;
+  const ps = row.querySelector('.yy-svc-price');
+  if (ps) ps.textContent = '¥' + price.toFixed(2) + '/项';
+  fyRecalcService();
+}
+/* 新增一条服务明细行 */
+function fyAddServiceRow() {
+  const box = document.getElementById('fy-editServiceList');
+  const row = document.createElement('div');
+  row.className = 'yy-svc-row';
+  row.innerHTML = fySvcRowInner(null);
+  box.appendChild(row);
+  fyRecalcService();
+}
+/* 删除一条服务明细行 */
+function fyRemoveServiceRow(btn) {
+  const row = btn.closest('.yy-svc-row');
+  if (row) row.remove();
+  fyRecalcService();
+}
+/* 费用合计 = 会议室费用 + 会务服务费用（任一费用手动修改时同步） */
+function fyRecalcTotal() {
+  const roomFee = parseFloat(document.getElementById('fy-editRoomFee').value) || 0;
+  const serviceFee = parseFloat(document.getElementById('fy-editServiceFee').value) || 0;
+  const total = +(roomFee + serviceFee).toFixed(2);
+  document.getElementById('fy-editTotal').textContent = '¥' + total.toFixed(2);
+}
 /* 初始渲染 */
 mrRender();
 hyRender();
+fyInitFilters();
 fyRender();
 spRender();
 
 /* ================= 资源矩阵视图 ================= */
-let matrixDate = '2026-08-04';
-const matrixSlots = ['08:00','09:00','10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00','18:00','19:00'];
+let matrixDate = ''; // 页面加载时自动设为今天，见底部初始化
+// 资源矩阵：6:00–24:00、30 分钟槽、允许半小时粒度（v1.28 起资源矩阵与预约表单统一为 6:00 起；规范基础：v1.24 领导意见3 全天30分钟槽）
+const matrixSlots = (function(){ const a=[]; for (let h=6; h<24; h++){ a.push(String(h).padStart(2,'0')+':00'); a.push(String(h).padStart(2,'0')+':30'); } return a; })();
+const bookingSlots = matrixSlots.filter(s => s >= '06:00'); // 资源矩阵与预约表单统一 6:00–24:00（v1.28）
 const ME = '陈琼梦';
+/* 申请人联系电话（原型演示数据，按申请人映射） */
+const applicantPhone = {
+  '张明':'0512-65881234', '李华':'0512-65881235', '王芳':'0512-65881236',
+  '陈琼梦':'0512-65881200', '陈静':'0512-65881237', '刘伟':'0512-65881238',
+  '孙磊':'0512-65881239', '吴勇':'0512-65881240', '郑爽':'0512-65881241'
+};
 let matrixBookings = [
-  { room:'107', date:'2026-08-04', start:'09:00', end:'11:00', title:'党委会', applicant:'张明', dept:'综合办公室', status:'已通过', people:80, attendees:['陈琼梦','李华'] },
-  { room:'107', date:'2026-08-04', start:'14:00', end:'15:30', title:'专题办公会', applicant:'李华', dept:'综合办公室', status:'待审批', people:120, attendees:['王芳'] },
-  { room:'103', date:'2026-08-04', start:'10:00', end:'12:00', title:'部门例会', applicant:'王芳', dept:'科研管理部', status:'已通过', people:40, attendees:['陈琼梦'] },
-  { room:'301', date:'2026-08-04', start:'13:00', end:'15:00', title:'主任办公会', applicant:'陈琼梦', dept:'主任办公室', status:'已通过', people:200, attendees:['赵强','陈琼梦'] },
-  { room:'306', date:'2026-08-04', start:'09:30', end:'10:30', title:'项目评审', applicant:'陈静', dept:'科研管理部', status:'已通过', people:30, attendees:['陈静'] },
-  { room:'308', date:'2026-08-04', start:'15:00', end:'17:00', title:'客户洽谈', applicant:'刘伟', dept:'产业发展部', status:'待审批', people:18, attendees:['陈琼梦','刘伟'] },
-  { room:'310', date:'2026-08-04', start:'11:00', end:'12:00', title:'周例会', applicant:'孙磊', dept:'综合办公室', status:'已通过', people:35, attendees:['孙磊'] },
-  { room:'309', date:'2026-08-05', start:'10:00', end:'11:30', title:'新员工培训', applicant:'陈琼梦', dept:'人力资源部', status:'已通过', people:20, attendees:['周敏','陈琼梦'] },
-  { room:'301', date:'2026-08-05', start:'14:00', end:'16:00', title:'方案评审', applicant:'吴勇', dept:'科研管理部', status:'待审批', people:150, attendees:['吴勇'] },
-  { room:'106', date:'2026-08-05', start:'09:00', end:'10:00', title:'晨会', applicant:'郑爽', dept:'产业发展部', status:'已通过', people:10, attendees:['郑爽'] },
+  { room:'107', date:'2026-08-07', start:'09:00', end:'11:00', title:'党委会', applicant:'张明', dept:'综合办公室', status:'已通过', people:80, attendees:['陈琼梦','李华'], receipts:{'李华':'attend'}, unitPrice:205, services:[{id:5,qty:1},{id:3,qty:1}] },
+  { room:'107', date:'2026-08-07', start:'14:00', end:'15:30', title:'专题办公会', applicant:'李华', dept:'综合办公室', status:'待审批', people:120, attendees:['王芳'], unitPrice:205, services:[{id:5,qty:1},{id:2,qty:1}] },
+  { room:'103', date:'2026-08-07', start:'10:00', end:'12:00', title:'部门例会', applicant:'王芳', dept:'科研管理部', status:'已通过', people:40, attendees:['陈琼梦','王芳'], receipt:'是', receipts:{}, unitPrice:87, services:[{id:2,qty:1}] },
+  { room:'301', date:'2026-08-07', start:'13:00', end:'15:00', title:'主任办公会', applicant:'陈琼梦', dept:'主任办公室', status:'已通过', people:200, attendees:['赵强','陈琼梦'], receipts:{'赵强':'attend','陈琼梦':'attend'}, unitPrice:205, services:[{id:1,qty:1},{id:5,qty:2},{id:3,qty:1}] },
+  { room:'306', date:'2026-08-07', start:'09:30', end:'10:30', title:'项目评审', applicant:'陈静', dept:'科研管理部', status:'已通过', people:30, attendees:['陈静'], unitPrice:72, services:[{id:2,qty:1},{id:4,qty:1}] },
+  { room:'308', date:'2026-08-07', start:'15:00', end:'17:00', title:'客户洽谈', applicant:'刘伟', dept:'产业发展部', status:'待审批', people:18, attendees:['陈琼梦','刘伟'], receipts:{'刘伟':'attend'}, unitPrice:30, services:[{id:5,qty:1},{id:4,qty:1}] },
+  { room:'310', date:'2026-08-07', start:'11:00', end:'12:00', title:'周例会', applicant:'孙磊', dept:'综合办公室', status:'已通过', people:35, attendees:['孙磊'], unitPrice:72, services:[{id:2,qty:1}] },
+  { room:'309', date:'2026-08-08', start:'10:00', end:'11:30', title:'新员工培训', applicant:'陈琼梦', dept:'人力资源部', status:'已通过', people:20, attendees:['周敏','陈琼梦'], receipts:{'周敏':'absent','陈琼梦':'attend'}, unitPrice:72, services:[{id:1,qty:1},{id:2,qty:3},{id:4,qty:3}] },
+  { room:'301', date:'2026-08-08', start:'14:00', end:'16:00', title:'方案评审', applicant:'吴勇', dept:'科研管理部', status:'待审批', people:150, attendees:['吴勇'], unitPrice:205, services:[{id:5,qty:1},{id:3,qty:1}] },
+  { room:'106', date:'2026-08-08', start:'09:00', end:'10:00', title:'晨会', applicant:'郑爽', dept:'产业发展部', status:'已通过', people:10, attendees:['郑爽'], unitPrice:30, services:[{id:2,qty:1}] },
+  /* 与「会议审批」列表 spData#1 对应，便于演示：从审批详情变更后，资源矩阵同步释放 */
+  { room:'301', date:'2026-08-08', start:'08:30', end:'09:00', title:'测试', applicant:'admin', dept:'系统管理员', status:'待审批', people:20, attendees:['陈琼梦'], unitPrice:205, services:[{id:2,qty:1}] },
+  /* 当前周（8/6-8/9）未过期占用，用于原型演示「已通过(蓝)/待审批(橙)」占用格 */
+  { room:'103', date:'2026-08-10', start:'09:00', end:'11:00', title:'部门周会', applicant:'王芳', dept:'科研管理部', status:'已通过', people:40, attendees:['陈琼梦','王芳'], receipt:'是', receipts:{}, unitPrice:87, services:[{id:2,qty:1},{id:5,qty:1}] },
+  { room:'103', date:'2026-08-10', start:'14:00', end:'16:00', title:'项目推进会', applicant:'李华', dept:'综合办公室', status:'待审批', people:36, attendees:['王芳'], unitPrice:87, services:[{id:2,qty:1}] },
+  { room:'107', date:'2026-08-10', start:'10:00', end:'12:00', title:'学术报告', applicant:'张明', dept:'综合办公室', status:'已通过', people:120, attendees:['陈琼梦','李华'], receipts:{'李华':'absent'}, unitPrice:205, services:[{id:1,qty:1},{id:5,qty:1},{id:3,qty:2}] },
+  { room:'107', date:'2026-08-11', start:'13:00', end:'15:00', title:'方案评审', applicant:'陈静', dept:'科研管理部', status:'待审批', people:90, attendees:['陈静'], unitPrice:205, services:[{id:5,qty:1}] },
+  { room:'301', date:'2026-08-10', start:'15:00', end:'17:00', title:'主任办公会', applicant:'陈琼梦', dept:'主任办公室', status:'已通过', people:200, attendees:['赵强','陈琼梦'], receipts:{'赵强':'attend','陈琼梦':'attend'}, unitPrice:205, services:[{id:1,qty:1},{id:5,qty:2},{id:3,qty:1}] },
+  /* 资源视图默认日(8-10)「我发起·待审批」示例：用于演示资源视图详情弹框中的「取消会议」按钮 */
+  { room:'107', date:'2026-08-10', start:'15:30', end:'16:30', title:'季度工作复盘会', applicant:'陈琼梦', dept:'主任办公室', status:'待审批', people:50, attendees:['陈琼梦','李华'], receipts:{}, unitPrice:205, services:[{id:5,qty:1}] },
+  /* 当前用户「待审批」示例：用于演示「我发起的」取消按钮 */
+  { room:'103', date:'2026-08-11', start:'09:00', end:'11:00', title:'预算研讨会', applicant:'陈琼梦', dept:'主任办公室', status:'待审批', people:60, attendees:['陈琼梦','刘伟'], receipts:{'刘伟':'attend','陈琼梦':'attend'}, unitPrice:87, services:[{id:2,qty:1},{id:4,qty:1}] },
+  /* 当前用户「已通过且未来」示例：用于演示「我发起的」取消按钮 */
+  { room:'302', date:'2026-08-14', start:'14:00', end:'16:00', title:'项目评审会', applicant:'陈琼梦', dept:'主任办公室', status:'已通过', people:30, attendees:['陈琼梦','李工'], receipts:{'李工':'absent','陈琼梦':'attend'}, unitPrice:80, services:[{id:1,qty:1},{id:5,qty:2},{id:3,qty:1}] },
+  /* 当前用户「我参加的(未来·已通过·未回执)」示例：用于演示「我参加的」列表参加/不参加回执按钮（决策⑤：会前可回执） */
+  { room:'107', date:'2026-08-12', start:'09:30', end:'11:00', title:'技术研讨会', applicant:'李华', dept:'综合办公室', status:'已通过', people:60, attendees:['陈琼梦','李华'], receipts:{}, unitPrice:205, services:[{id:5,qty:1},{id:2,qty:1}] },
+  { room:'103', date:'2026-08-13', start:'14:00', end:'16:00', title:'部门联席会', applicant:'王芳', dept:'科研管理部', status:'已通过', people:40, attendees:['陈琼梦','王芳'], receipts:{}, unitPrice:87, services:[{id:2,qty:1}] },
+  /* 当前用户「我参加的(未来·已通过·已回执)」示例：用于演示已回执后列表不再显示按钮 */
+  { room:'301', date:'2026-08-12', start:'15:00', end:'17:00', title:'工作总结会', applicant:'张明', dept:'综合办公室', status:'已通过', people:80, attendees:['陈琼梦','张明'], receipts:{'陈琼梦':'attend'}, unitPrice:205, services:[{id:1,qty:1}] },
 ];
-/* ---------- 全量会议：含外出开会（不占房，不在资源矩阵展示） ---------- */
-let offsiteMeetings = [
-  { title:'园区外客户对接会', date:'2026-08-04', start:'16:00', end:'17:30', applicant:'陈琼梦', dept:'产业发展部', status:'已通过', attendees:['张明','李华'], location:'桑田岛·A 栋 12 楼' },
-  { title:'科技局工作汇报',   date:'2026-08-05', start:'09:00', end:'11:00', applicant:'王芳', dept:'科研管理部', status:'待审批', attendees:['陈琼梦','赵强'], location:'市科技局 3 楼会议室' },
-  { title:'供应商现场洽谈',   date:'2026-08-05', start:'15:00', end:'16:30', applicant:'陈琼梦', dept:'产业发展部', status:'已通过', attendees:['刘伟'], location:'园区外·B 大厦' },
-];
+matrixBookings.forEach(b => { if (!b.occupancy) b.occupancy = '已预订'; }); // 预订状态初始化：提交即预占，默认已预订
 function mxAllMeetings(){
-  const room = matrixBookings.map(b => ({ ...b, offsite:false, place:b.room }));
-  const off  = offsiteMeetings.map(b => ({ ...b, offsite:true, room:null, place:b.location }));
-  return room.concat(off);
+  return matrixBookings;
 }
-/* 演示数据：标记部分会议「允许另派他人=是」（陈琼梦均在“我参加的”列表中） */
-if (matrixBookings.find(b=>b.room==='107'&&b.start==='09:00')) matrixBookings.find(b=>b.room==='107'&&b.start==='09:00').allowProxy='是';
-if (matrixBookings.find(b=>b.room==='301'&&b.start==='13:00')) matrixBookings.find(b=>b.room==='301'&&b.start==='13:00').allowProxy='是';
-if (matrixBookings.find(b=>b.room==='309'&&b.start==='10:00')) matrixBookings.find(b=>b.room==='309'&&b.start==='10:00').allowProxy='是';
-if (offsiteMeetings.find(b=>b.title==='园区外客户对接会')) offsiteMeetings.find(b=>b.title==='园区外客户对接会').allowProxy='是';
-if (offsiteMeetings.find(b=>b.title==='供应商现场洽谈')) offsiteMeetings.find(b=>b.title==='供应商现场洽谈').allowProxy='是';
 function mxSetDate(v){ matrixDate = v; mxRender(); }
 
 /* ---------- 位置树（园区-楼栋-楼层，可任选层级） ---------- */
@@ -2479,7 +3446,7 @@ document.addEventListener('click', function(e){
 /* ---------- 过期判断 ---------- */
 function mxIsExpired(slot){
   const d = matrixDate;
-  const t = new Date();
+  const t = new Date(yyNow()); // 使用真实系统时间判定过期
   const td = t.getFullYear() + '-' + String(t.getMonth()+1).padStart(2,'0') + '-' + String(t.getDate()).padStart(2,'0');
   if (d < td) return true;
   if (d > td) return false;
@@ -2522,7 +3489,7 @@ function mxSelUp(){
   document.querySelectorAll('.mx-sel').forEach(c => c.classList.remove('mx-sel'));
   mxSel = null;
   const startSlot = matrixSlots[lo];
-  const endSlot = matrixSlots[hi + 1] || '20:00';
+  const endSlot = matrixSlots[hi + 1] || '24:00';
   mxBook(room, matrixDate, startSlot, endSlot);
 }
 
@@ -2530,51 +3497,73 @@ function mxHasBooking(room, slot, list){
   return list.find(b => b.room === room && b.start <= slot && slot < b.end);
 }
 function mxRender(){
+  const tbl = document.getElementById('mx-table');
+  if (!tbl) return; // 资源矩阵视图已被视频风格预约界面替换，容器不存在时跳过
   const date = matrixDate;
   const node = mxLocNodes.find(n => n.path === mxLocPath) || mxLocNodes[0];
   const floors = node.floors;
   let rooms = mrData.slice();
   if (floors) rooms = rooms.filter(r => floors.includes(r.location));
-  const list = matrixBookings.filter(b => b.date === date);
-  const groups = {};
-  rooms.forEach(r => { (groups[r.location] = groups[r.location] || []).push(r); });
+  rooms = rooms.filter(r => r.enabled !== false);
+  const list = matrixBookings.filter(b => b.date === date && b.occupancy === '已预订');
+
+  // 分组维度：跟随所选位置层级，比其更细一级
+  // 园区级(all / 园区) -> 按楼栋(building)；楼栋级 -> 按楼层(location)；楼层级 -> 不分组
+  let groupBy = 'building';
+  if (mxLocPath !== 'all') {
+    const lvl = mxLocPath.split('|').filter(Boolean).length;
+    if (lvl >= 3) groupBy = null;
+    else if (lvl === 2) groupBy = 'location';
+    else groupBy = 'building';
+  }
+
+  function roomRowHtml(r){
+    let row = '<tr>';
+    row += '<td class="mx-roomcell" onclick="mxShowRoomInfo(\'' + r.name + '\')" title="点击查看会议室详情"><div class="rn">' + r.name + '</div><div class="rmeta">' + r.scale + ' · ' + r.seats + '人</div></td>';
+    matrixSlots.forEach((s, i) => {
+      const b = mxHasBooking(r.name, s, list);
+      const ex = mxIsExpired(s);
+      if (b) {
+        const exCls = ex ? ' mx-expired' : '';
+        const stCls = (b.status === '待审批') ? ' pending' : '';
+        const tip = '<div class="mx-tip"><div><strong>' + b.start + '-' + b.end + '</strong></div><div>' + (b.applicant || '—') + '</div><div>' + (b.dept || '—') + '</div><div>' + (b.title || '—') + '</div></div>';
+        row += '<td class="mx-slot mx-cell mx-busy' + exCls + stCls + '" onclick="mxShowDetail(\'' + r.name + '\',\'' + date + '\',\'' + b.start + '\',\'' + b.end + '\')">' + tip + '</td>';
+      } else if (ex) {
+        row += '<td class="mx-slot mx-cell mx-free mx-expired" data-idx="' + i + '"></td>';
+      } else {
+        row += '<td class="mx-slot mx-cell mx-free mx-bookable" data-idx="' + i + '" data-room="' + r.name + '" onmousedown="mxSelDown(event,\'' + r.name + '\',' + i + ')" onmouseenter="mxSelEnter(\'' + r.name + '\',' + i + ')" title="点击或拖动选择时段"><span class="mx-drag">拖拽选择</span></td>';
+      }
+    });
+    row += '<td class="mx-slot mx-cell mx-free" style="font-size:11px;color:#cfcfcf;" data-idx="' + matrixSlots.length + '">—</td>';
+    row += '</tr>';
+    return row;
+  }
+
   let html = '<thead><tr><th class="mx-roomcell">会议室</th>';
   matrixSlots.forEach(s => {
     const ex = mxIsExpired(s);
     html += '<th' + (ex ? ' class="mx-expired-h"' : '') + '>' + s + (ex ? '<div class="ex-hint">过期</div>' : '') + '</th>';
   });
-  html += '<th>20:00</th></tr></thead><tbody>';
-  ['1F','3F'].forEach(loc => {
-    if (!groups[loc] || (floors && !floors.includes(loc))) return;
-    html += '<tr class="mx-grouprow"><td colspan="' + (matrixSlots.length + 2) + '">' + loc + ' 层 · 共 ' + groups[loc].length + ' 间</td></tr>';
-    groups[loc].forEach(r => {
-      html += '<tr>';
-      html += '<td class="mx-roomcell" onclick="mxShowRoomInfo(\'' + r.name + '\')" title="点击查看会议室详情"><div class="rn">' + r.name + '</div><div class="rmeta">' + r.scale + ' · ' + r.seats + '人</div></td>';
-      matrixSlots.forEach((s, i) => {
-        const b = mxHasBooking(r.name, s, list);
-        const ex = mxIsExpired(s);
-        if (b) {
-          const isStart = b.start === s;
-          const bg = b.status === '待审批' ? '#FAAD14' : '#4165EC';
-          const fg = b.status === '待审批' ? '#614700' : '#fff';
-          const exCls = ex ? ' mx-expired' : '';
-          if (isStart) {
-            html += '<td class="mx-slot mx-cell mx-busy' + exCls + '" style="background:' + bg + ';color:' + fg + ';" onclick="mxShowDetail(\'' + r.name + '\',\'' + date + '\',\'' + b.start + '\',\'' + b.end + '\')"><div class="bt">' + b.title + '</div><div class="bi">申请人：' + b.applicant + '</div><div class="bi">部门：' + b.dept + '</div><div class="bs">' + b.start + '-' + b.end + '</div></td>';
-          } else {
-            html += '<td class="mx-slot mx-cell mx-busy' + exCls + '" style="background:' + bg + ';" onclick="mxShowDetail(\'' + r.name + '\',\'' + date + '\',\'' + b.start + '\',\'' + b.end + '\')"></td>';
-          }
-        } else if (ex) {
-          html += '<td class="mx-slot mx-cell mx-free mx-expired" data-idx="' + i + '">已过期</td>';
-        } else {
-          html += '<td class="mx-slot mx-cell mx-free mx-bookable" data-idx="' + i + '" data-room="' + r.name + '" onmousedown="mxSelDown(event,\'' + r.name + '\',' + i + ')" onmouseenter="mxSelEnter(\'' + r.name + '\',' + i + ')" title="点击或拖动选择时段">空闲</td>';
-        }
-      });
-      html += '<td class="mx-slot mx-cell mx-free" style="font-size:11px;color:#cfcfcf;" data-idx="' + matrixSlots.length + '">—</td>';
-      html += '</tr>';
+  html += '<th>24:00</th></tr></thead><tbody>';
+
+  if (!groupBy) {
+    rooms.forEach(r => { html += roomRowHtml(r); });
+  } else {
+    const groups = {};
+    const order = [];
+    rooms.forEach(r => {
+      const key = r[groupBy];
+      if (!groups[key]) { groups[key] = []; order.push(key); }
+      groups[key].push(r);
     });
-  });
+    order.forEach(key => {
+      const title = (groupBy === 'location') ? (key + ' 层') : key;
+      html += '<tr class="mx-grouprow"><td class="mx-grouptitle">' + title + '</td><td class="mx-groupfill" colspan="' + (matrixSlots.length + 1) + '"></td></tr>';
+      groups[key].forEach(r => { html += roomRowHtml(r); });
+    });
+  }
   html += '</tbody>';
-  document.getElementById('mx-table').innerHTML = html;
+  tbl.innerHTML = html;
 }
 function mxShowDetail(room, date, start, end){
   const b = matrixBookings.find(x => x.room === room && x.date === date && x.start === start && x.end === end);
@@ -2586,18 +3575,39 @@ function mxShowDetail(room, date, start, end){
   document.getElementById('md-time').textContent = b.date + ' ' + b.start + '-' + b.end;
   document.getElementById('md-applicant').textContent = b.applicant || '—';
   document.getElementById('md-dept').textContent = b.dept || '—';
+  document.getElementById('md-phone').textContent = (b.phone || applicantPhone[b.applicant] || '—');
   document.getElementById('md-status').textContent = b.status || '—';
+  document.getElementById('md-occupancy').textContent = b.occupancy || '—';
   document.getElementById('md-people').textContent = (b.people ? b.people + ' 人' : '—');
   document.getElementById('md-attendees').textContent = (b.attendees && b.attendees.length) ? b.attendees.join('、') : '—';
+  document.getElementById('md-attachments').textContent = (b.attachments && b.attachments.length) ? b.attachments.join('、') : '—';
   const isMine = b.applicant === ME;
   const isAttendee = (b.attendees || []).includes(ME);
-  document.getElementById('md-editBtn').style.display = 'none';
-  document.getElementById('md-cancelBtn').style.display = isMine ? '' : 'none';
-  document.getElementById('md-assignBtn').style.display = (b.allowProxy === '是' && isAttendee && !isMine) ? '' : 'none';
-  document.getElementById('md-note').textContent = (b.allowProxy === '是' ? '（允许另派他人）' : '');
-  document.getElementById('md-editBtn').onclick = () => { mdClose(); mxOpenEdit(key); };
-  document.getElementById('md-cancelBtn').onclick = () => { mdClose(); mxCancelMeeting(key); };
-  document.getElementById('md-assignBtn').onclick = () => { mdClose(); mxAssignOpen(key); };
+  // 决策④：会议进行中/已结束不可取消/变更；仅会议开始前可操作
+  const started = yySlotDateTime(b.date, b.start).getTime() <= yyNow();
+  const canCancel = isMine && !started && (b.status === '待审批' || (b.status === '已通过' && b.occupancy === '已预订'));
+  const canChange = isMine && !started && b.status === '已通过' && b.occupancy === '已预订'; // 变更仅对已通过且仍已预订会议；已释放不可变更
+  const cancelBtn = document.getElementById('md-cancelBtn');
+  const changeBtn = document.getElementById('md-changeBtn');
+  cancelBtn.textContent = '取消会议';
+  changeBtn.textContent = '变更';
+  cancelBtn.style.display = '';
+  changeBtn.style.display = '';
+  // 一律渲染：无权限 / 会中·已结束 / 已释放 等不满足前置条件 → 置灰并提示原因，不直接隐藏
+  if (canCancel) {
+    cancelBtn.classList.remove('btn-disabled');
+    cancelBtn.onclick = () => { mdClose(); mxCancelMeeting(key); };
+  } else {
+    cancelBtn.classList.add('btn-disabled');
+    cancelBtn.onclick = () => showToast(started ? '会议进行中不可取消会议' : '您无权限执行该操作');
+  }
+  if (canChange) {
+    changeBtn.classList.remove('btn-disabled');
+    changeBtn.onclick = () => { mdClose(); mxChange(key); };
+  } else {
+    changeBtn.classList.add('btn-disabled');
+    changeBtn.onclick = () => showToast(started ? '会议进行中不可变更' : (isMine ? '当前状态不可变更' : '您无权限执行该操作'));
+  }
   document.getElementById('md-mask').classList.add('show');
   document.getElementById('md-modal').classList.add('show');
 }
@@ -2606,6 +3616,10 @@ function mdClose(){
   document.getElementById('md-modal').classList.remove('show');
 }
 /* ---------- 会议室信息 侧滑抽屉 ---------- */
+function yyOpenRoomDetail(){
+  if (!yyCurrentRoom) return;
+  mxShowRoomInfo(yyCurrentRoom.name);
+}
 function mxShowRoomInfo(name){
   const r = mrData.find(x => x.name === name);
   if (!r) return;
@@ -2623,12 +3637,6 @@ function mxShowRoomInfo(name){
   const thumb = document.getElementById('ri-thumb');
   if (r.images && r.images.length) thumb.innerHTML = '<img src="' + r.images[0] + '">';
   else thumb.textContent = '暂无图片';
-  // 当日预约情况
-  const day = matrixBookings.filter(b => b.room === name && b.date === matrixDate).sort((a, b) => a.start.localeCompare(b.start));
-  const bookHtml = day.length
-    ? day.map(b => '<div>· ' + b.start + '-' + b.end + ' ' + b.title + '（' + b.status + '）</div>').join('')
-    : '<span style="color:#bbb;">当日暂无预约</span>';
-  document.getElementById('ri-bookings').innerHTML = bookHtml;
   document.getElementById('ri-mask').classList.add('show');
   document.getElementById('ri-drawer').classList.add('show');
 }
@@ -2646,18 +3654,18 @@ function mxBook(roomName, date, slot, endSlotOverride){
   const idx = matrixSlots.indexOf(slot);
   const endSlot = endSlotOverride || matrixSlots[idx + 1] || slot;
   document.getElementById('yy-endTime').value = endSlot;
-  showToast('已选定 ' + roomName + ' · ' + date + ' ' + slot + '-' + endSlot + '，请补全会议信息后提交');
 }
 
 // 会议预约页「发起预约」按钮：独立发起入口（默认选首个会议室 + 当前矩阵日期）
 function mxOpenBooking(){
   yyEditTarget = null;
+  mxRebookSource = null; // 全新发起，清掉可能残留的变更来源
   const room = mrData[0];
   if (room) yyCurrentRoom = room;
   yyOpenModal();
-  const d = document.getElementById('mx-date').value || '2026-08-04';
+  const today = new Date();
+  const d = today.getFullYear() + '-' + String(today.getMonth()+1).padStart(2,'0') + '-' + String(today.getDate()).padStart(2,'0');
   document.getElementById('yy-date').value = d;
-  showToast('请选择会议室、时间并补全会议信息后提交');
 }
 
 // 预约弹窗内切换会议室
@@ -2669,6 +3677,7 @@ function yyPickRoom(name){
   document.getElementById('yy-modalRoomSeats').textContent = room.seats + '人';
   document.getElementById('yy-modalRoomLocation').textContent = room.location;
   document.getElementById('yy-modalRoomFacilities').textContent = (room.facilities && room.facilities.length) ? room.facilities.join('、') : '无';
+  yyCalcRoomFee();
 }
 // 会议室名称 模糊搜索下拉
 function yyRoomDisplay(r){
@@ -2705,13 +3714,14 @@ function yyRenderRoomCombo(q){
     return '<div class="combo-item' + (busy ? ' disabled' : '') + '" data-name="' + r.name + '"' +
       (busy ? '' : ' onclick="yySelectRoom(\'' + r.name + '\')"') + '>' +
         '<span class="ci-name">' + r.name + '</span>' +
-        '<span class="ci-meta">' + r.scale + ' · ' + r.location + ' · ' + r.seats + '人' + (busy ? ' · 该时段已占用' : '') + '</span>' +
+        '<span class="ci-meta">' + r.scale + ' · ' + r.location + ' · ' + r.seats + '人' + (busy ? ' · 该时段已预订' : '') + '</span>' +
       '</div>';
   }).join('');
 }
 function yyRefreshRoomComboIfOpen(){
   const panel = document.getElementById('yy-roomPanel');
   if (panel && panel.classList.contains('show')) yyRenderRoomCombo(document.getElementById('yy-roomInput').value);
+  yyCalcRoomFee();
 }
 function yyOpenRoomCombo(){
   document.getElementById('yy-roomPanel').classList.add('show');
@@ -2731,6 +3741,7 @@ function yySelectRoom(name){
   document.getElementById('yy-modalRoomSeats').textContent = room.seats + '人';
   document.getElementById('yy-modalRoomLocation').textContent = room.location;
   document.getElementById('yy-roomPanel').classList.remove('show');
+  yyCalcRoomFee();
 }
 // 点击空白处关闭会议室下拉
 document.addEventListener('click', function(e){
@@ -2739,22 +3750,26 @@ document.addEventListener('click', function(e){
 });
 
 /* ---------- 快速查询：我发起的 / 我参加的 ---------- */
-const qkPageSize = 5;
+const qkPageSize = 8;
 let qkPageMine = 1;
-let qkPageAttend = 1;
+let mxMineFilterType = 'all';
 
-function mxQuickQuery(type){
-  if (type === 'mine') qkPageMine = 1; else qkPageAttend = 1;
-  const page = type === 'mine' ? qkPageMine : qkPageAttend;
-  mxQuickRender(type, page);
-  document.getElementById(type === 'mine' ? 'qk-modal-mine' : 'qk-modal-attend').classList.add('show');
-  document.querySelectorAll('.mx-quick .quick-chip').forEach(c => c.classList.toggle('active', c.dataset.type === type));
+/* 资源视图 / 我的会议 Tab 切换 */
+function mxSwitchTab(tab){
+  document.querySelectorAll('.mx-tab').forEach(t => t.classList.toggle('active', t.dataset.mxtab === tab));
+  document.getElementById('mx-pane-resource').style.display = (tab === 'resource') ? '' : 'none';
+  document.getElementById('mx-pane-mine').style.display = (tab === 'mine') ? '' : 'none';
+  if (tab === 'mine') mxMineFilter(mxMineFilterType);
+  else if (typeof mxRender === 'function') mxRender();
 }
-
-function mxQuickGo(type, page){
-  if (type === 'mine') qkPageMine = page; else qkPageAttend = page;
-  mxQuickRender(type, page);
+/* 我的会议：全部 / 我发起的 / 我参加的 子筛选 */
+function mxMineFilter(type){
+  mxMineFilterType = type;
+  document.querySelectorAll('#mx-pane-mine .quick-chip').forEach(c => c.classList.toggle('active', c.dataset.minefilter === type));
+  qkPageMine = 1;
+  mxMineRender();
 }
+function mxMineGo(page){ qkPageMine = page; mxMineRender(); }
 
 /* 通过 key（room|date|start|end）定位 matrixBookings 中的会议 */
 function mxFindMatrix(key){
@@ -2762,52 +3777,124 @@ function mxFindMatrix(key){
   return matrixBookings.find(x => x.room === p[0] && x.date === p[1] && x.start === p[2] && x.end === p[3]);
 }
 
-/* 编辑会议：打开预约表单并预填（仅占会议室的会议可编辑） */
-function mxOpenEdit(key){
-  const m = mxFindMatrix(key);
-  if (!m) return;
-  yyEditTarget = m;
-  yyOpenModal();
-  const r = mrData.find(x => x.name === m.room);
-  if (r) { yyCurrentRoom = r; document.getElementById('yy-roomInput').value = yyRoomDisplay(r); }
-  document.querySelector('input[name="yy-offsite"][value="否"]').checked = true;
-  yyToggleOffsite();
-  document.getElementById('yy-meetingName').value = m.title || '';
-  // 预填会议类别（必填项，否则提交会被校验拦截）
-  const cat = document.getElementById('yy-category');
-  if (cat) {
-    let setCat = false;
-    if (m.category) { for (let i = 0; i < cat.options.length; i++) { if (cat.options[i].value === m.category) { cat.value = m.category; setCat = true; break; } } }
-    if (!setCat) { for (let i = 0; i < cat.options.length; i++) { if (cat.options[i].value) { cat.value = cat.options[i].value; break; } } }
-  }
-  const deptEl = document.getElementById('yy-dept');
-  if (deptEl && m.dept) deptEl.value = m.dept;
-  document.getElementById('yy-date').value = m.date;
-  document.getElementById('yy-startTime').value = m.start;
-  document.getElementById('yy-endTime').value = m.end;
-  if (document.getElementById('yy-people')) document.getElementById('yy-people').value = m.people || '';
-  if (document.getElementById('yy-content')) document.getElementById('yy-content').value = m.content || '';
-  showToast('正在编辑「' + (m.title || '') + '」，修改后提交');
-}
 
-/* 取消会议：从数据移除并刷新 */
+/* 取消会议：先弹确认框 */
+let mxCancelKey = null;
+let mxRebookSource = null; // 变更来源：新单提交成功时释放原单
 function mxCancelMeeting(key){
   const m = mxFindMatrix(key);
   if (!m) return;
-  if (!window.confirm('确认取消「' + (m.title || '') + '」(' + m.date + ' ' + m.start + '-' + m.end + ') 吗？')) return;
-  const i = matrixBookings.indexOf(m);
-  if (i >= 0) matrixBookings.splice(i, 1);
-  showToast('已取消「' + (m.title || '') + '」');
+  mxCancelKey = key;
+  const isPending = (m.status === '待审批');
+  const verb = isPending ? '取消会议' : '取消会议';
+  const hint = isPending ? '取消会议（撤回）：该预约将转为会议草稿，房间时段立即释放；可稍后在「我发起的」中编辑草稿、重新提交。' : '取消会议（释放会议室）：会议室将释放，该预约不可恢复，审批结论「已通过」保留归档；若需改时间/房间，请改用「变更」按钮。';
+  document.getElementById('mx-cancel-text').textContent = '确认要' + verb + '「' + (m.title || '') + '」(' + m.date + ' ' + m.start + '-' + m.end + ') 吗？' + hint;
+  const cancelBtn = document.getElementById('mx-cancelBtn');
+  if (cancelBtn) cancelBtn.textContent = verb; // 待审批→取消会议；已通过→取消会议
+  document.getElementById('mx-cancel-modal').classList.add('show');
+}
+function mxCancelClose(e){
+  if (e && e.target && e.target.id !== 'mx-cancel-modal') return;
+  mxCancelKey = null;
+  document.getElementById('mx-cancel-modal').classList.remove('show');
+}
+function mxCancelConfirm(){
+  if (!mxCancelKey) return;
+  const m = mxFindMatrix(mxCancelKey);
+  if (m){
+    if (m.status === '待审批') {
+      m.status = '草稿'; // 取消会议：撤回审批，房间释放；审批结论转草稿
+      m.occupancy = '已释放'; // 撤销即释放占用
+      showToast('已取消会议（撤回），已转为会议草稿，可在「我发起的」中编辑后重新提交');
+    } else {
+      // 已通过会议取消：审批结论保留「已通过」(归档)，仅释放房间占用——两维度解耦
+      m.occupancy = '已释放';
+      showToast('已取消会议「' + (m.title || '') + '」，房间已释放（审批结论「已通过」保留）');
+    }
+  }
+  mxCancelKey = null;
+  document.getElementById('mx-cancel-modal').classList.remove('show');
+  mxRefreshAll();
+}
+/* 变更：打开预约表单带出历史信息作为新申请重新发起；
+   原单暂不释放，待新单提交成功（yySubmit）后再释放，避免开了表单又放弃导致原会议丢失 */
+function mxChange(key){
+  const m = mxFindMatrix(key);
+  if (!m) return;
+  document.getElementById('mx-cancel-modal').classList.remove('show');
+  if (m){
+    mxRebookSource = m; // 标记变更来源，提交成功时释放原单
+    // 原单暂不释放，作为全新申请重提，重新触发审批流，不做原子换占
+    yyEditTarget = null;
+    let room = mrData.find(r => r.name === m.room);
+    // 兜底：若会议所属会议室不在 mrData（如演示数据房间缺失），合成最小房间对象，避免 yyOpenModal 读 yyCurrentRoom.scale 抛异常导致变更弹窗打不开
+    if (!room) room = { name: m.room, scale: '—', seats: m.people || 0, location: '—', cost: m.unitPrice || 0, building: '—', facilities: [] };
+    yyCurrentRoom = room;
+    yyOpenModal();
+    document.getElementById('yy-meetingName').value = m.title || '';
+    const cat = document.getElementById('yy-category');
+    if (cat && m.category){ let ok=false; for(let i=0;i<cat.options.length;i++){ if(cat.options[i].value===m.category){cat.value=m.category;ok=true;break;} } if(!ok&&cat.options[1]) cat.value=cat.options[1].value; }
+    const typ = document.getElementById('yy-type');
+    if (typ && m.type){ let ok=false; for(let i=0;i<typ.options.length;i++){ if(typ.options[i].value===m.type){typ.value=m.type;ok=true;break;} } if(!ok&&typ.options[1]) typ.value=typ.options[1].value; }
+    document.getElementById('yy-convener').value = m.convener || '';
+    document.getElementById('yy-contact').value = m.contact || '';
+    document.getElementById('yy-date').value = m.date;
+    document.getElementById('yy-startTime').value = m.start;
+    document.getElementById('yy-endTime').value = m.end;
+    if (document.getElementById('yy-content')) document.getElementById('yy-content').value = m.content || '';
+    if (document.getElementById('yy-dept')) document.getElementById('yy-dept').value = m.dept || '主任办公室';
+    document.getElementById('yy-applicant').value = ME;
+    if (room){
+      document.getElementById('yy-modalRoomScale').textContent = room.scale;
+      document.getElementById('yy-modalRoomSeats').textContent = room.seats + '人';
+      document.getElementById('yy-modalRoomLocation').textContent = room.location;
+      if (document.getElementById('yy-roomInput')) document.getElementById('yy-roomInput').value = yyRoomDisplay(room);
+    }
+    yyCalcRoomFee();
+    showToast('已带出历史信息，请确认后重新提交（原会议将在新预约提交成功后释放）');
+  }
   mxRefreshAll();
 }
 
-/* 统一刷新：资源矩阵 + 两个快速查询列表（若打开） */
+/* 编辑会议草稿：打开预约表单并预填草稿信息，提交时原位更新（状态回待审批） */
+function mxEditDraft(key){
+  const m = mxFindMatrix(key);
+  if (!m) return;
+  yyEditTarget = m; // 标记正在编辑的草稿对象，提交时原位更新
+  const room = mrData.find(r => r.name === m.room);
+  if (room) yyCurrentRoom = room;
+  yyOpenModal();
+  document.getElementById('yy-meetingName').value = m.title || '';
+  const cat = document.getElementById('yy-category');
+  if (cat && m.category){ let ok=false; for(let i=0;i<cat.options.length;i++){ if(cat.options[i].value===m.category){cat.value=m.category;ok=true;break;} } if(!ok&&cat.options[1]) cat.value=cat.options[1].value; }
+  const typ = document.getElementById('yy-type');
+  if (typ && m.type){ let ok=false; for(let i=0;i<typ.options.length;i++){ if(typ.options[i].value===m.type){typ.value=m.type;ok=true;break;} } if(!ok&&typ.options[1]) typ.value=typ.options[1].value; }
+  document.getElementById('yy-convener').value = m.convener || '';
+  document.getElementById('yy-contact').value = m.contact || '';
+  document.getElementById('yy-date').value = m.date;
+  document.getElementById('yy-startTime').value = m.start;
+  document.getElementById('yy-endTime').value = m.end;
+  if (document.getElementById('yy-content')) document.getElementById('yy-content').value = m.content || '';
+  if (document.getElementById('yy-dept')) document.getElementById('yy-dept').value = m.dept || '主任办公室';
+  document.getElementById('yy-applicant').value = ME;
+  if (room){
+    document.getElementById('yy-modalRoomScale').textContent = room.scale;
+    document.getElementById('yy-modalRoomSeats').textContent = room.seats + '人';
+    document.getElementById('yy-modalRoomLocation').textContent = room.location;
+    if (document.getElementById('yy-roomInput')) document.getElementById('yy-roomInput').value = yyRoomDisplay(room);
+  }
+  yyCalcRoomFee();
+  const _nv = m.notify || '是';
+  const _nr = document.querySelector('input[name="yy-notify"][value="' + _nv + '"]'); if (_nr) _nr.checked = true;
+  yyToggleNotify();
+  showToast('已打开会议草稿，编辑后重新提交');
+}
+
+/* 统一刷新：资源矩阵 + 我的会议列表（若处于我的会议 Tab） */
 function mxRefreshAll(){
   if (typeof mxRender === 'function') mxRender();
-  const mOpen = document.getElementById('qk-modal-mine').classList.contains('show');
-  const aOpen = document.getElementById('qk-modal-attend').classList.contains('show');
-  if (mOpen) mxQuickRender('mine', qkPageMine);
-  if (aOpen) mxQuickRender('attend', qkPageAttend);
+  const minePane = document.getElementById('mx-pane-mine');
+  if (minePane && minePane.style.display !== 'none') mxMineRender();
   if (typeof mxCloseRoomInfo === 'function') {
     // 若会议室详情抽屉打开，刷新其当日预约
     const drawer = document.getElementById('ri-drawer');
@@ -2818,108 +3905,171 @@ function mxRefreshAll(){
   }
 }
 
-function mxQuickRender(type, page){
+function mxOpBtn(key, label, opts){
+  opts = opts || {};
+  var danger = (label === '取消会议' || label === '不参加');
+  var cls = 'lnk-btn' + (danger ? ' danger' : '') + (opts.disabled ? ' disabled' : '');
+  var attr;
+  if (opts.disabled) {
+    attr = ' onclick="showToast(' + "'" + (opts.reason || '您无权限执行该操作') + "'" + ')"';
+  } else {
+    var a = (opts.arg != null) ? (',' + "'" + opts.arg + "'") : '';
+    attr = ' onclick="' + opts.fn + '(' + "'" + key + "'" + a + ')"';
+  }
+  return '<button class="' + cls + '"' + attr + '>' + label + '</button>';
+}
+function mxMineRender(){
   const all = mxAllMeetings();
   const list = all.filter(b => {
-    if (type === 'mine') return b.applicant === ME;
-    return (b.attendees || []).includes(ME) || b.applicant === ME;
+    if (mxMineFilterType === 'mine') return b.applicant === ME;
+    // 「我参加的」= 我作为参会人的会议；仅展示「审批通过 且 未取消(occupancy≠已释放)」的会议，其余不展示（point4）；发起人本人若是参会人同样展示（point2）
+    if (mxMineFilterType === 'attend') return (b.attendees || []).includes(ME) && b.status === '已通过' && b.occupancy !== '已释放';
+    return b.applicant === ME || (b.attendees || []).includes(ME);
   }).sort((a, b) => (a.date + a.start).localeCompare(b.date + b.start));
   const total = list.length;
   const totalPages = Math.max(1, Math.ceil(total / qkPageSize));
-  if (page > totalPages) page = totalPages;
-  const startIdx = (page - 1) * qkPageSize;
+  if (qkPageMine > totalPages) qkPageMine = totalPages;
+  const startIdx = (qkPageMine - 1) * qkPageSize;
   const items = list.slice(startIdx, startIdx + qkPageSize);
-  const listId = type === 'mine' ? 'qk-list-mine' : 'qk-list-attend';
-  const pageId = type === 'mine' ? 'qk-page-mine' : 'qk-page-attend';
-  const isAttend = type === 'attend';
-  const colCount = 9;
   const rows = items.map((b, i) => {
-    const roomMeta = !b.offsite ? (mrData.find(r => r.name === b.room) || {}) : {};
-    const placeCell = b.offsite
-      ? '<span class="qk-off">外出</span>' + (b.place || '外部地点')
-      : (b.room || '—') + ' · ' + (roomMeta.scale || '—');
-    const peopleCell = b.offsite ? '—' : (b.people || '—');
-    const key = b.offsite ? ('off|' + b.title + '|' + b.date + '|' + b.start) : (b.room + '|' + b.date + '|' + b.start + '|' + b.end);
+    const roomMeta = mrData.find(r => r.name === b.room) || {};
+    const key = b.room + '|' + b.date + '|' + b.start + '|' + b.end;
+    const isMine = (b.applicant === ME);
+    const rel = isMine ? '我发起' : '我参加';
+    const relCls = isMine ? 'mx-rel-mine' : 'mx-rel-att';
     let opCell;
-    if (isAttend) {
-      opCell = '<td class="op">' + (b.allowProxy === '是' ? '<button class="lnk-btn" onclick="mxAssignOpen(\'' + key + '\')">指派</button>' : '—') + '</td>';
+    var started = (b.status === '已通过') && yySlotDateTime(b.date, b.start).getTime() <= yyNow();
+    // 渲染模式：我参加的 tab 一律按参会人身份渲染（参加/不参加/详情，无取消会议/变更，point1）；我发起的 tab 走发起人分支；全部 tab 沿用身份判定（point2：发起人本人参会时在我参加的里同样显回执）
+    const mode = (mxMineFilterType === 'attend') ? 'attend' : (mxMineFilterType === 'mine' ? 'mine' : (isMine ? 'mine' : 'attend'));
+    if (mode === 'mine') {
+      // 「我发起的」操作按钮：取消会议 / 变更 / (编辑仅草稿) / 详情
+      // 原则：无操作权限的按钮不隐藏，置灰显示（point1）；无「已释放(取消后)」独立状态（point2：取消释放后仍为 已通过+已释放，归入已通过分支）
+      var canCancel = false, cancelReason = '当前状态不可取消会议';
+      var canChange = false, changeReason = '当前状态不可变更';
+      var canEdit = false, editReason = '当前状态不可编辑';
+      if (b.status === '待审批') {
+        if (!started) { canCancel = true; changeReason = '会议待审批，暂不可变更，请先撤回'; }
+        else { cancelReason = '会议进行中不可取消会议'; changeReason = '会议进行中不可变更'; }
+      } else if (b.status === '已通过') {
+        if (b.occupancy !== '已预订') {
+          cancelReason = '该会议已释放，不可操作'; changeReason = '该会议已释放，不可变更'; editReason = '该会议已释放，不可编辑';
+        } else if (!started) {
+          canCancel = true; canChange = true; editReason = '会议已通过，不可编辑';
+        } else {
+          cancelReason = '会议进行中不可取消会议'; changeReason = '会议进行中不可变更'; editReason = '会议进行中不可编辑';
+        }
+      } else if (b.status === '草稿') {
+        canEdit = true; cancelReason = '草稿未提交，不可取消会议'; changeReason = '草稿未提交，不可变更';
+      } else {
+        // 已拒绝 / 已撤销 / 已过期 / 已取消 等终态：均无操作权限，置灰展示
+        cancelReason = '该会议已失效，不可操作'; changeReason = '该会议已失效，不可变更'; editReason = '该会议已失效，不可编辑';
+      }
+      opCell = mxOpBtn(key, '取消会议', canCancel ? {fn:'mxCancelMeeting'} : {disabled:true, reason:cancelReason})
+            + mxOpBtn(key, '变更', canChange ? {fn:'mxChange'} : {disabled:true, reason:changeReason})
+            + (canEdit ? mxOpBtn(key, '编辑', {fn:'mxEditDraft'}) : '')
+            + '<button class="lnk-btn" onclick="mxOpenDetail(' + "'" + key + "'" + ')">详情</button>';
     } else {
-      opCell = '<td class="op"><button class="lnk-btn" onclick="mxCancelMeeting(\'' + key + '\')">取消</button></td>';
+      // 「我参加的」参会人身份：仅 参加/不参加/详情（point1：无 取消会议/变更 按钮）；锁定前可改（已回执后可切换另一项）
+      const myReply = b.receipts && b.receipts[ME];
+      let inner = '';
+      if (b.status === '已通过' && b.occupancy === '已预订') {
+        if (myReply === 'attend') {
+          inner = mxOpBtn(key, '参加', {disabled:true, reason:'您已回执：参加'})
+               + mxOpBtn(key, '不参加', {fn:'mxReceiptInline', arg:'absent'});
+        } else if (myReply === 'absent') {
+          inner = mxOpBtn(key, '参加', {fn:'mxReceiptInline', arg:'attend'})
+               + mxOpBtn(key, '不参加', {disabled:true, reason:'您已回执：不参加'});
+        } else if (!started) {
+          inner = mxOpBtn(key, '参加', {fn:'mxReceiptInline', arg:'attend'})
+               + mxOpBtn(key, '不参加', {fn:'mxReceiptInline', arg:'absent'});
+        } else {
+          inner = mxOpBtn(key, '参加', {disabled:true, reason:'会议已开始，回执已锁定'})
+               + mxOpBtn(key, '不参加', {disabled:true, reason:'会议已开始，回执已锁定'});
+        }
+      }
+      opCell = inner
+            + '<button class="lnk-btn" onclick="mxOpenDetail(' + "'" + key + "'" + ')">详情</button>';
     }
+    const stCls = statusMap[b.status] ? statusMap[b.status].cls : (b.status === '待审批' ? 'wait' : 'pass');
+    const occCls = (b.occupancy === '已预订') ? 'busy' : 'released';
     return `<tr>
       <td class="idx">${startIdx + i + 1}</td>
+      <td><span class="mx-rel ${relCls}">${rel}</span></td>
       <td>${b.applicant}</td>
       <td>${b.dept || '—'}</td>
       <td>${b.title}</td>
-      <td>${peopleCell}</td>
-      <td><span class="qk-st ${b.status==='待审批'?'wait':'pass'}">${b.status}</span></td>
-      <td>${placeCell}</td>
+      <td>${b.people || '—'}</td>
+      <td><span class="qk-st ${stCls}">${b.status}</span></td>
+      <td><span class="qk-st ${occCls}">${b.occupancy}</span></td>
+      <td>${b.room || '—'}</td>
+      <td>${roomMeta.scale || '—'}</td>
       <td>${b.date} ${b.start}-${b.end}</td>
-      ${opCell}
+      <td class="op">${opCell}</td>
     </tr>`;
   }).join('');
+  const colCount = 12;
   const emptyRow = items.length ? '' : '<tr><td colspan="' + colCount + '" class="qk-empty">暂无相关会议</td></tr>';
-  const header = isAttend
-    ? '<th>序号</th><th>申请人</th><th>申请人部门</th><th>会议名称</th><th>参会人数</th><th>审批状态</th><th>会议室规模</th><th>会议时间</th><th>操作</th>'
-    : '<th>序号</th><th>申请人</th><th>申请人部门</th><th>会议名称</th><th>参会人数</th><th>审批状态</th><th>会议室规模</th><th>会议时间</th><th>操作</th>';
-  document.getElementById(listId).innerHTML =
+  const header = '<th>序号</th><th>参与身份</th><th>申请人</th><th>申请人部门</th><th>会议名称</th><th>参会人数</th><th>审批状态</th><th>预订状态</th><th>会议室</th><th>会议室规模</th><th>会议时间</th><th class="op">操作</th>';
+  document.getElementById('qk-list-mine').innerHTML =
     '<table class="qk-table"><thead><tr>' + header +
     '</tr></thead><tbody>' + rows + emptyRow + '</tbody></table>';
+  // 计数
+  const cntEl = document.getElementById('mx-mine-count');
+  if (cntEl) cntEl.textContent = '共 ' + total + ' 条';
   // 分页条
-  let pager = '<span class="pg-info">第 ' + page + ' / ' + totalPages + ' 页</span>';
-  pager += '<button ' + (page <= 1 ? 'disabled' : '') + ' onclick="mxQuickGo(\'' + type + '\',' + (page - 1) + ')">上一页</button>';
+  let pager = '<span class="pg-info">第 ' + qkPageMine + ' / ' + totalPages + ' 页</span>';
+  pager += '<button ' + (qkPageMine <= 1 ? 'disabled' : '') + ' onclick="mxMineGo(' + (qkPageMine - 1) + ')">上一页</button>';
   for (let p = 1; p <= totalPages; p++) {
-    pager += '<button class="' + (p === page ? 'active' : '') + '" onclick="mxQuickGo(\'' + type + '\',' + p + ')">' + p + '</button>';
+    pager += '<button class="' + (p === qkPageMine ? 'active' : '') + '" onclick="mxMineGo(' + p + ')">' + p + '</button>';
   }
-  pager += '<button ' + (page >= totalPages ? 'disabled' : '') + ' onclick="mxQuickGo(\'' + type + '\',' + (page + 1) + ')">下一页</button>';
-  document.getElementById(pageId).innerHTML = pager;
+  pager += '<button ' + (qkPageMine >= totalPages ? 'disabled' : '') + ' onclick="mxMineGo(' + (qkPageMine + 1) + ')">下一页</button>';
+  document.getElementById('qk-page-mine').innerHTML = pager;
+}
+/* 「我参加的」列表内联回执（F-NT-04）：直接参加/不参加，回写并刷新列表 */
+function mxReceiptInline(key, val) {
+  const map = {'attend':'参加', 'absent':'不参加'};
+  if (!confirm('确认将您的回执标记为「' + map[val] + '」？')) return;
+  const all = mxAllMeetings();
+  const it = all.find(b => (b.room + '|' + b.date + '|' + b.start + '|' + b.end) === key);
+  if (!it) return;
+  it.receipts = it.receipts || {}; it.receipts[ME] = val;
+  showToast(val === 'attend' ? '已回执：参加会议' : '已回执：不参加');
+  mxMineRender();
+}
+/* 「我发起的 / 我参加的」列表行「详情」按钮：用 key 打开会议详情抽屉（复用 spRenderDetail，零回归） */
+function mxOpenDetail(key) {
+  const it = mxAllMeetings().find(b => (b.room + '|' + b.date + '|' + b.start + '|' + b.end) === key);
+  if (!it) return;
+  spRenderDetail(it);
+}
+/* 详情抽屉内回执（F-NT-04）：在「我参加的」会议详情里直接参加/不参加，回写并刷新详情与列表 */
+function spReceiptInline(key, val) {
+  const map = {'attend':'参加', 'absent':'不参加'};
+  if (!confirm('确认将您的回执标记为「' + map[val] + '」？')) return;
+  const it = mxAllMeetings().find(b => (b.room + '|' + b.date + '|' + b.start + '|' + b.end) === key);
+  if (!it) return;
+  it.receipts = it.receipts || {};
+  it.receipts[ME] = val;
+  showToast(val === 'attend' ? '已回执：参加会议' : '已回执：不参加');
+  spRenderDetail(it);
+  mxMineRender();
 }
 
-/* ---------- 指派参会人（仅“我参加的”中 允许另派他人=是 的会议） ---------- */
-const mxPeoplePool = ['张三','李四','王五','赵六','钱七','孙八','周九','吴十','郑十一','王芳','李华','刘伟','赵强','周敏','陈静'];
-let mxAssignTarget = null; // 当前指派的会议 key
-function mxFindMeeting(key){
-  const p = key.split('|');
-  if (p[0] === 'off') return offsiteMeetings.find(x => x.title === p[1] && x.date === p[2] && x.start === p[3]);
-  return matrixBookings.find(x => x.room === p[0] && x.date === p[1] && x.start === p[2] && x.end === p[3]);
-}
-function mxAssignOpen(key){
-  mxAssignTarget = key;
-  const m = mxFindMeeting(key);
-  if (!m) return;
-  document.getElementById('as-meetingInfo').innerHTML = '会议：<b>' + m.title + '</b> · ' + m.date + ' ' + m.start + '-' + m.end;
-  document.getElementById('as-input').value = '';
-  document.getElementById('as-current').innerHTML = '<span class="as-label">当前参会人：</span>' + ((m.attendees || []).join('、') || '—');
-  mxAssignRenderPanel('');
-  document.getElementById('as-panel').classList.remove('show');
-  document.getElementById('as-modal').classList.add('show');
-}
-function mxAssignOpenPanel(){ document.getElementById('as-panel').classList.add('show'); }
-function mxAssignFilter(q){ mxAssignRenderPanel(q); document.getElementById('as-panel').classList.add('show'); }
-function mxAssignRenderPanel(q){
-  const kw = (q || '').trim().toLowerCase();
-  const list = mxPeoplePool.filter(p => !kw || p.toLowerCase().includes(kw));
-  const panel = document.getElementById('as-panel');
-  if (!list.length){ panel.innerHTML = '<div class="combo-empty">无匹配人员</div>'; return; }
-  panel.innerHTML = list.map(p => '<div class="combo-item" onclick="mxAssignPick(\'' + p + '\')"><span class="ci-name">' + p + '</span></div>').join('');
-}
-function mxAssignPick(p){
-  document.getElementById('as-input').value = p;
-  document.getElementById('as-panel').classList.remove('show');
-}
-function mxAssignConfirm(){
-  const p = (document.getElementById('as-input').value || '').trim();
-  if (!p){ showToast('请选择指派人员'); return; }
-  const m = mxFindMeeting(mxAssignTarget);
-  if (!m){ document.getElementById('as-modal').classList.remove('show'); return; }
-  if (!(m.attendees || []).includes(p)) m.attendees.push(p);
-  document.getElementById('as-modal').classList.remove('show');
-  showToast('已指派 ' + p + ' 参加《' + m.title + '》');
-}
-document.addEventListener('click', function(e){
-  const wrap = document.getElementById('as-input') ? document.getElementById('as-input').parentElement : null;
-  if (wrap && !wrap.contains(e.target)) document.getElementById('as-panel').classList.remove('show');
-});
+/* 资源视图：日期默认今天，过期日期置灰不可选；预约表单时段下拉与矩阵一致（0:00–24:00 / 30 分钟） */
+(function(){
+  var _n = new Date();
+  var _today = _n.getFullYear() + '-' + String(_n.getMonth()+1).padStart(2,'0') + '-' + String(_n.getDate()).padStart(2,'0');
+  matrixDate = _today;
+  var _di = document.getElementById('mx-date');
+  if (_di) { _di.value = _today; _di.min = _today; }
+  // 预约表单起止时间下拉：可预约范围 6:00–24:00（v1.28），资源矩阵现统一为 6:00–24:00
+  var _s = document.getElementById('yy-startTime');
+  var _e = document.getElementById('yy-endTime');
+  if (_s) _s.innerHTML = bookingSlots.map(function(t){ return '<option>' + t + '</option>'; }).join('');
+  if (_e) _e.innerHTML = bookingSlots.slice(1).concat(['24:00']).map(function(t){ return '<option>' + t + '</option>'; }).join('');
+  if (_s) _s.value = '15:00';
+  if (_e) _e.value = '15:30';
+})();
 mxRender();
 </script>
 </body>
