@@ -292,6 +292,9 @@ tr:hover td { background: #F7F7FA; }
 }
 .form-row label .required { color: #ff4d4f; margin-right: 4px; }
 .form-row .input-wrap { flex: 1; }
+.hy-cost-wrap { display: flex; gap: 8px; align-items: center; }
+.form-row .hy-cost-wrap input { flex-grow: 1; flex-shrink: 1; flex-basis: 0; min-width: 0; width: auto; }
+.form-row .hy-unit-select { width: 80px; flex: 0 0 80px; box-sizing: border-box; background: #F7F7FA; }
 .form-row input, .form-row select, .form-row textarea {
   width: 100%; padding: 8px 12px;
   border: 1px solid #D8D8D8; border-radius: 4px;
@@ -436,6 +439,20 @@ tr:hover td { background: #F7F7FA; }
 .sp-detail-item.full { grid-column: 1 / -1; }
 .sp-detail-label { color: #8F9098; font-size: 13px; }
 .sp-detail-value { color: #36373B; }
+/* 会务服务：需要会务服务的样式效果 */
+.sp-detail-section.svc-needed {
+  background: #F0F4FF; border: 1px solid #4165EC; border-radius: 8px; padding: 16px;
+}
+.sp-detail-section.svc-needed .sp-detail-section-title { color: #4165EC; }
+.sp-detail-section.svc-none { opacity: 0.7; }
+.svc-badge {
+  display: inline-flex; align-items: center; gap: 4px; margin-left: 2px;
+  font-size: 12px; font-weight: 600; line-height: 1; padding: 4px 9px; border-radius: 10px;
+}
+.svc-badge.on { background: #4165EC; color: #fff; }
+.svc-badge.off { background: #E8E8E8; color: #8F9098; }
+.svc-badge.on::before { content: '✓'; font-weight: 700; }
+.svc-badge.off { background: #F0F0F2; color: #8F9098; }
 .sp-detail-subtitle { color: #8F9098; font-size: 13px; margin: 16px 0 8px; }
 .fee-lines { border: 1px solid #F0F0F2; border-radius: 6px; overflow: hidden; }
 .fee-line { display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; font-size: 13px; border-bottom: 1px solid #F6F6F8; }
@@ -780,8 +797,8 @@ tr:hover td { background: #F7F7FA; }
   .qk-st.pass { background:#E6F7E6; color:#389E0D; }
   .qk-st.wait { background:#FFF7E6; color:#D46B08; }
   .qk-st.reject { background:#FFF1F0; color:#CF1322; }
-  .qk-st.busy { background:#E8F0FE; color:#4165EC; }   /* 预订状态·已预订：统一主色蓝 */
-  .qk-st.released { background:#F2F2F2; color:#8F9098; } /* 预订状态·已释放：灰 */
+  .qk-st.busy { background:#E8F0FE; color:#4165EC; }   /* 预定状态·已预定：统一主色蓝 */
+  .qk-st.released { background:#F2F2F2; color:#8F9098; } /* 预定状态·已释放：灰 */
   .qk-off { display:inline-block; font-size:11px; padding:1px 6px; border-radius:4px; background:#FFF7E6; color:#D46B08; margin-right:4px; }
   .qk-empty { padding:30px; text-align:center; color:#bbb; }
   .qk-table td.op { text-align:center; white-space:nowrap; }
@@ -974,7 +991,7 @@ tr:hover td { background: #F7F7FA; }
               <tr>
                 <th style="width:80px;">序号</th>
                 <th>服务名称</th>
-                <th style="width:160px;">成本（元/人）</th>
+                <th style="width:160px;">成本</th>
                 <th style="width:120px;">操作</th>
               </tr>
             </thead>
@@ -984,7 +1001,7 @@ tr:hover td { background: #F7F7FA; }
         </div>
       </div>
 
-      <!-- 会议预约页已用资源矩阵(按空闲找房)预订视图替代 -->
+      <!-- 会议预约页已用资源矩阵(按空闲找房)预定视图替代 -->
 
       <!-- 预约审批 -->
       <div class="view" id="view-sp">
@@ -1049,14 +1066,6 @@ tr:hover td { background: #F7F7FA; }
             <input type="text" id="fy-group" placeholder="请输入" style="width: 180px;">
           </div>
           <div class="form-item">
-            <label>状态</label>
-            <select id="fy-status" style="width: 120px;">
-              <option value="">全部</option>
-              <option value="有效">有效</option>
-              <option value="已取消">已取消</option>
-            </select>
-          </div>
-          <div class="form-item">
             <label>发起时间</label>
             <input type="date" id="fy-createStart" style="width: 150px;"> <span>~</span>
             <input type="date" id="fy-createEnd" style="width: 150px;">
@@ -1077,7 +1086,6 @@ tr:hover td { background: #F7F7FA; }
                 <th style="width:100px;">预约人</th>
                 <th style="width:120px;">所属部门</th>
                 <th style="width:120px;">项目组</th>
-                <th style="width:90px;">状态</th>
                 <th style="width:110px;">费用是否确认</th>
                 <th style="width:100px;">总费用</th>
                 <th style="width:120px;">会议室费用</th>
@@ -1120,7 +1128,7 @@ tr:hover td { background: #F7F7FA; }
             </div>
             <button class="btn btn-default" style="margin-left:auto;" onclick="mxOpenBooking()" title="或在下方矩阵中按住鼠标拖动空白时段发起预约"><span>&#x2795;</span> 发起预约</button>
             <div class="mx-legend">
-              <span><span class="k" style="background:#4165EC;"></span>已预订</span>
+              <span><span class="k" style="background:#4165EC;"></span>已预定</span>
               <span><span class="k" style="background:#F5F5F5;border:1px dashed #e0e0e0;"></span>已过期</span>
             </div>
           </div>
@@ -1300,8 +1308,14 @@ tr:hover td { background: #F7F7FA; }
         <div class="input-wrap"><input type="text" id="hy-serviceName" placeholder="请输入"></div>
       </div>
       <div class="form-row">
-        <label><span class="required">*</span>成本（元/人）</label>
-        <div class="input-wrap"><input type="number" id="hy-serviceCost" placeholder="请输入"></div>
+        <label><span class="required">*</span>成本</label>
+        <div class="input-wrap hy-cost-wrap">
+          <input type="number" id="hy-serviceCost" placeholder="请输入">
+          <select id="hy-serviceUnit" class="hy-unit-select">
+            <option value="元/份">元/份</option>
+            <option value="元/小时">元/小时</option>
+          </select>
+        </div>
       </div>
     </div>
     <div class="modal-footer">
@@ -1559,7 +1573,7 @@ tr:hover td { background: #F7F7FA; }
         <div class="sp-detail-item"><div class="sp-detail-label">申请人</div><div class="sp-detail-value" id="sp-detailApplicant">admin</div></div>
         <div class="sp-detail-item"><div class="sp-detail-label">联系电话</div><div class="sp-detail-value" id="sp-detailContact">176221189702</div></div>
         <div class="sp-detail-item"><div class="sp-detail-label">审批状态</div><div class="sp-detail-value" id="sp-detailStatus">待审批</div></div>
-        <div class="sp-detail-item"><div class="sp-detail-label">预订状态</div><div class="sp-detail-value" id="sp-detailOccupancy">—</div></div>
+        <div class="sp-detail-item"><div class="sp-detail-label">预定状态</div><div class="sp-detail-value" id="sp-detailOccupancy">—</div></div>
         <div class="sp-detail-item full"><div class="sp-detail-label">会议时间</div><div class="sp-detail-value" id="sp-detailMeetingTime">2026-08-05 08:30-09:00</div></div>
         <div class="sp-detail-item full"><div class="sp-detail-label">会议内容</div><div class="sp-detail-value" id="sp-detailContent">—</div></div>
         <div class="sp-detail-item full"><div class="sp-detail-label">附件</div><div class="sp-detail-value" id="sp-detailAttachments">—</div></div>
@@ -1575,12 +1589,12 @@ tr:hover td { background: #F7F7FA; }
         <div class="sp-detail-item"><div class="sp-detail-label">配套设施</div><div class="sp-detail-value" id="sp-detailFacilities">—</div></div>
       </div>
     </div>
-    <div class="sp-detail-section">
-      <div class="sp-detail-section-title">会务服务</div>
-      <div class="sp-detail-grid">
-        <div class="sp-detail-item"><div class="sp-detail-label">是否需要</div><div class="sp-detail-value" id="sp-detailNeedService">是</div></div>
-        <div class="sp-detail-item"><div class="sp-detail-label">服务类型</div><div class="sp-detail-value" id="sp-detailServiceType">茶水、席卡、纸笔套装</div></div>
-        <div class="sp-detail-item full"><div class="sp-detail-label">会务说明</div><div class="sp-detail-value" id="sp-detailNote">请按时准备</div></div>
+    <div class="sp-detail-section" id="sp-detailSvcSection">
+      <div class="sp-detail-section-title">会务服务<span class="svc-badge" id="sp-svcBadge"></span></div>
+      <div class="sp-detail-grid" id="sp-detailSvcGrid">
+        <div class="sp-detail-item"><div class="sp-detail-label">是否需要</div><div class="sp-detail-value" id="sp-detailNeedService">—</div></div>
+        <div class="sp-detail-item full" id="sp-detailSvcListWrap"><div class="sp-detail-label">服务明细</div><div class="sp-detail-value" id="sp-detailSvcList">—</div></div>
+        <div class="sp-detail-item full"><div class="sp-detail-label">会务说明</div><div class="sp-detail-value" id="sp-detailNote">—</div></div>
       </div>
     </div>
     <div class="sp-detail-section" id="sp-detailCostShareSection">
@@ -1712,7 +1726,7 @@ tr:hover td { background: #F7F7FA; }
         <div class="sp-detail-item"><div class="sp-detail-label">申请人部门</div><div class="sp-detail-value" id="md-dept"></div></div>
         <div class="sp-detail-item"><div class="sp-detail-label">联系电话</div><div class="sp-detail-value" id="md-phone"></div></div>
         <div class="sp-detail-item"><div class="sp-detail-label">审批状态</div><div class="sp-detail-value" id="md-status"></div></div>
-        <div class="sp-detail-item"><div class="sp-detail-label">预订状态</div><div class="sp-detail-value" id="md-occupancy"></div></div>
+        <div class="sp-detail-item"><div class="sp-detail-label">预定状态</div><div class="sp-detail-value" id="md-occupancy"></div></div>
         <div class="sp-detail-item"><div class="sp-detail-label">参会人数</div><div class="sp-detail-value" id="md-people"></div></div>
       </div>
       <div class="sp-detail-section">
@@ -2238,7 +2252,7 @@ function hyRender() {
       tr.innerHTML = `
         <td>${index + 1}</td>
         <td>${item.name}</td>
-        <td>${item.cost}</td>
+        <td>${item.cost} ${item.unit || '元/份'}</td>
         <td>
           <div class="actions">
             <button class="btn btn-link" onclick="hyOpenEdit(${item.id})">编辑</button>
@@ -2283,6 +2297,7 @@ function hyOpenAdd() {
   document.getElementById('hy-formTitle').innerText = '新增';
   document.getElementById('hy-serviceName').value = '';
   document.getElementById('hy-serviceCost').value = '';
+  document.getElementById('hy-serviceUnit').value = '元/份';
   hyClearErr();
   document.getElementById('hy-formModal').classList.add('show');
 }
@@ -2292,6 +2307,7 @@ function hyOpenEdit(id) {
   document.getElementById('hy-formTitle').innerText = '编辑';
   document.getElementById('hy-serviceName').value = it.name;
   document.getElementById('hy-serviceCost').value = it.cost;
+  document.getElementById('hy-serviceUnit').value = it.unit || '元/份';
   hyClearErr();
   document.getElementById('hy-formModal').classList.add('show');
 }
@@ -2302,10 +2318,23 @@ function hyClearErr() {
 function hySave() {
   const nameEl = document.getElementById('hy-serviceName');
   const costEl = document.getElementById('hy-serviceCost');
+  const unitEl = document.getElementById('hy-serviceUnit');
   let ok = true; hyClearErr();
   if (!nameEl.value.trim()) { nameEl.classList.add('error'); ok = false; }
   if (!costEl.value.trim()) { costEl.classList.add('error'); ok = false; }
   if (!ok) return;
+  const name = nameEl.value.trim();
+  const cost = parseFloat(costEl.value);
+  const unit = unitEl.value;
+  if (hyEditingId) {
+    const it = hyData.find(d => d.id === hyEditingId);
+    if (it) { it.name = name; it.cost = cost; it.unit = unit; }
+  } else {
+    const nextId = hyData.reduce((m, d) => Math.max(m, d.id), 0) + 1;
+    hyData.push({ id: nextId, name, cost, unit });
+  }
+  hyFiltered = [...hyData];
+  hyRender();
   hyCloseModal();
   showToast(hyEditingId ? '演示：编辑保存（视频未演示成功）' : '演示：新增保存（视频未演示成功）');
 }
@@ -2702,7 +2731,7 @@ function yySubmit() {
   const editExclude = yyEditTarget;
   const conflict = matrixBookings.find(b =>
     b !== editExclude && b !== mxRebookSource &&
-    b.occupancy === '已预订' &&
+    b.occupancy === '已预定' &&
     b.room === room.name && b.date === date &&
     start < b.end && end > b.start
   );
@@ -2729,19 +2758,18 @@ function yySubmit() {
     yyEditTarget.start = start;
     yyEditTarget.end = end;
     yyEditTarget.title = title;
-    yyEditTarget.roomFee = +roomFee.toFixed(2); yyEditTarget.serviceFee = +serviceFee.toFixed(2);
-    yyEditTarget.applicant = ME;
-    yyEditTarget.dept = yyEditTarget.dept || '主任办公室';
-    yyEditTarget.attachments = yyGetAttachments();
-    yyEditTarget.status = '待审批'; // 草稿/编辑后重新提交 → 回到审批中
-    yyEditTarget.notify = (document.querySelector('input[name="yy-notify"]:checked')||{}).value || '否';
+      yyEditTarget.roomFee = +roomFee.toFixed(2); yyEditTarget.serviceFee = +serviceFee.toFixed(2);
+      yyEditTarget.applicant = ME;
+      yyEditTarget.dept = yyEditTarget.dept || '主任办公室';
+      yyEditTarget.attachments = yyGetAttachments();
+      yyEditTarget.status = '待审批'; // 草稿/编辑后重新提交 → 回到审批中
+      yyEditTarget.notify = (document.querySelector('input[name="yy-notify"]:checked')||{}).value || '否';
     showToast('已更新会议「' + title + '」');
   } else {
     matrixBookings.push({
       room: yyCurrentRoom.name, date, start, end, title, category: catEl.value,
-      applicant: ME, dept: '主任办公室', status: '待审批', occupancy: '已预订',
+      applicant: ME, dept: '主任办公室', status: '待审批', occupancy: '已预定',
       roomFee: +roomFee.toFixed(2), serviceFee: +serviceFee.toFixed(2),
-      people: parseInt(document.getElementById('yy-people') ? document.getElementById('yy-people').value : '0', 10) || 0,
       attendees: [ME],
       notify: (document.querySelector('input[name="yy-notify"]:checked')||{}).value || '否',
       facilities: yyCurrentRoom.facilities || [],
@@ -2773,16 +2801,16 @@ document.getElementById('sp-searchStatus').addEventListener('change', () => spSe
 
 /* ================= 预约审批 ================= */
 let spData = [
-  { id: 1, title: '测试', category: '管理类', type: '其他', convener: '张三', confidential: '否', dept: '系统管理员', applicant: 'admin', contact: '176221189702', date: '2026-08-05', start: '08:30', end: '09:00', content: '年度工作会议', room: '301', scale: '大报告厅', location: '3F', seats: '263', offsite: '否', outLocation: '', needService: '是', serviceType: '茶水、席卡、纸笔套装', note: '请按时准备', costShare: '否', shareGroup: '', notice: '是', noticeObj: '部门联络人', leaders: '', deptAttend: '', attendees: 'bmct', receipt: '否', attachment: '加载失败', status: '待审批' },
-  { id: 2, title: 'T 会议预定052802', category: '管理类', type: '主任办公会', convener: '李四', confidential: '否', dept: '系统管理员', applicant: 'admin', contact: '176221189702', date: '2026-05-29', start: '08:00', end: '08:30', content: '主任办公例会', room: '103', scale: '中会议室', location: '1F', seats: '64', offsite: '否', outLocation: '', needService: '是', serviceType: '纸笔套装', note: '无', costShare: '否', shareGroup: '', notice: '是', noticeObj: '部门联络人', leaders: '', deptAttend: '', attendees: 'admin', receipt: '否', attachment: '加载失败', status: '已撤销' },
-  { id: 3, title: 'T 会议预定052801', category: '科研类', type: '专题办公会', convener: '王五', confidential: '否', dept: '系统管理员', applicant: 'admin', contact: '176221189702', date: '2026-05-28', start: '19:02', end: '20:02', content: '科研专题研讨', room: '103', scale: '中会议室', location: '1F', seats: '64', offsite: '否', outLocation: '', needService: '是', serviceType: '纸笔套装', note: '无', costShare: '否', shareGroup: '', notice: '是', noticeObj: '部门联络人', leaders: '', deptAttend: '', attendees: 'admin', receipt: '是', attachment: '加载失败', status: '已通过' },
-  { id: 4, title: '526预约2', category: '管理类', type: '部门例会', convener: '赵六', confidential: '否', dept: '系统管理员', applicant: 'admin', contact: '176221189702', date: '2026-05-26', start: '11:30', end: '12:00', content: '部门周例会', room: '301', scale: '大报告厅', location: '3F', seats: '263', offsite: '否', outLocation: '', needService: '是', serviceType: '茶水、席卡、纸笔套装', note: '请按时准备', costShare: '否', shareGroup: '', notice: '是', noticeObj: '部门联络人', leaders: '', deptAttend: '', attendees: 'admin,bmct', receipt: '否', attachment: '加载失败', status: '已通过' },
-  { id: 5, title: '526预约2', category: '科研类', type: '部门例会', convener: '赵六', confidential: '否', dept: '系统管理员', applicant: 'admin', contact: '176221189702', date: '2026-05-26', start: '11:00', end: '11:30', content: '部门周例会', room: '301', scale: '大报告厅', location: '3F', seats: '263', offsite: '否', outLocation: '', needService: '是', serviceType: '茶水、席卡、纸笔套装', note: '请按时准备', costShare: '否', shareGroup: '', notice: '是', noticeObj: '部门联络人', leaders: '', deptAttend: '', attendees: 'admin,bmct', receipt: '否', attachment: '加载失败', status: '已通过' },
-  { id: 6, title: '526预约1', category: '管理类', type: '部门例会', convener: '赵六', confidential: '否', dept: '系统管理员', applicant: 'admin', contact: '176221189702', date: '2026-05-26', start: '10:30', end: '11:00', content: '部门周例会', room: '301', scale: '大报告厅', location: '3F', seats: '263', offsite: '否', outLocation: '', needService: '是', serviceType: '茶水、席卡、纸笔套装', note: '请按时准备', costShare: '否', shareGroup: '', notice: '是', noticeObj: '部门联络人', leaders: '', deptAttend: '', attendees: 'admin,bmct', receipt: '否', attachment: '加载失败', status: '已通过' },
-  { id: 7, title: '部门周会', category: '管理类', type: '部门例会', convener: '孙七', confidential: '否', dept: '系统管理员', applicant: 'admin', contact: '176221189702', date: '2026-05-23', start: '15:51', end: '16:51', content: '部门周会', room: '301', scale: '大报告厅', location: '3F', seats: '263', offsite: '否', outLocation: '', needService: '是', serviceType: '矿泉水', note: '无', costShare: '否', shareGroup: '', notice: '是', noticeObj: '部门联络人', leaders: '', deptAttend: '', attendees: 'admin', receipt: '否', attachment: '加载失败', status: '已过期' },
-  { id: 8, title: '测试会议522', category: '科研类', type: '其他', convener: '周八', confidential: '否', dept: '系统管理员', applicant: 'admin', contact: '176221189702', date: '2026-05-22', start: '16:00', end: '16:30', content: '测试会议', room: '301', scale: '大报告厅', location: '3F', seats: '263', offsite: '否', outLocation: '', needService: '是', serviceType: '矿泉水', note: '无', costShare: '否', shareGroup: '', notice: '是', noticeObj: '部门联络人', leaders: '', deptAttend: '', attendees: 'admin', receipt: '否', attachment: '加载失败', status: '已过期' },
-  { id: 9, title: '521521', category: '管理类', type: '其他', convener: '吴九', confidential: '否', dept: '系统管理员', applicant: 'admin', contact: '176221189702', date: '2026-05-21', start: '17:00', end: '18:00', content: '专题讨论', room: '301', scale: '大报告厅', location: '3F', seats: '263', offsite: '否', outLocation: '', needService: '是', serviceType: '矿泉水', note: '无', costShare: '否', shareGroup: '', notice: '是', noticeObj: '部门联络人', leaders: '', deptAttend: '', attendees: 'admin', receipt: '否', attachment: '加载失败', status: '已通过' },
-  { id: 10, title: '外出调研会', category: '科研类', type: '其他', convener: '郑十', confidential: '否', dept: '系统管理员', applicant: 'admin', contact: '176221189702', date: '2026-05-22', start: '17:54', end: '18:54', content: '外出调研交流', room: '—', scale: '—', location: '—', seats: '—', offsite: '是', outLocation: '苏州工业园区展示中心', needService: '否', serviceType: '', note: '', costShare: '否', shareGroup: '', notice: '是', noticeObj: '指定参会人', leaders: '', deptAttend: '', attendees: 'admin', receipt: '否', attachment: '加载失败', status: '已通过' }
+  { id: 1, title: '测试', category: '管理类', type: '其他', convener: '张三', dept: '系统管理员', applicant: 'admin', contact: '176221189702', date: '2026-08-05', start: '08:30', end: '09:00', content: '年度工作会议', room: '301', scale: '大报告厅', location: '3F', seats: '263', needService: '是', serviceType: '茶水、席卡、纸笔套装', note: '请按时准备', costShare: '否', shareGroup: '', notice: '是', noticeObj: '部门联络人', deptAttend: '', attendees: 'bmct', receipt: '否', attachment: '加载失败', status: '待审批' },
+  { id: 2, title: 'T 会议预定052802', category: '管理类', type: '主任办公会', convener: '李四', dept: '系统管理员', applicant: 'admin', contact: '176221189702', date: '2026-05-29', start: '08:00', end: '08:30', content: '主任办公例会', room: '103', scale: '中会议室', location: '1F', seats: '64', needService: '是', serviceType: '纸笔套装', note: '无', costShare: '否', shareGroup: '', notice: '是', noticeObj: '部门联络人', deptAttend: '', attendees: 'admin', receipt: '否', attachment: '加载失败', status: '已撤销' },
+  { id: 3, title: 'T 会议预定052801', category: '科研类', type: '专题办公会', convener: '王五', dept: '系统管理员', applicant: 'admin', contact: '176221189702', date: '2026-05-28', start: '19:02', end: '20:02', content: '科研专题研讨', room: '103', scale: '中会议室', location: '1F', seats: '64', needService: '是', serviceType: '纸笔套装', note: '无', costShare: '否', shareGroup: '', notice: '是', noticeObj: '部门联络人', deptAttend: '', attendees: 'admin', receipt: '是', attachment: '加载失败', status: '已通过' },
+  { id: 4, title: '526预约2', category: '管理类', type: '部门例会', convener: '赵六', dept: '系统管理员', applicant: 'admin', contact: '176221189702', date: '2026-05-26', start: '11:30', end: '12:00', content: '部门周例会', room: '301', scale: '大报告厅', location: '3F', seats: '263', needService: '是', serviceType: '茶水、席卡、纸笔套装', note: '请按时准备', costShare: '否', shareGroup: '', notice: '是', noticeObj: '部门联络人', deptAttend: '', attendees: 'admin,bmct', receipt: '否', attachment: '加载失败', status: '已通过' },
+  { id: 5, title: '526预约2', category: '科研类', type: '部门例会', convener: '赵六', dept: '系统管理员', applicant: 'admin', contact: '176221189702', date: '2026-05-26', start: '11:00', end: '11:30', content: '部门周例会', room: '301', scale: '大报告厅', location: '3F', seats: '263', needService: '是', serviceType: '茶水、席卡、纸笔套装', note: '请按时准备', costShare: '否', shareGroup: '', notice: '是', noticeObj: '部门联络人', deptAttend: '', attendees: 'admin,bmct', receipt: '否', attachment: '加载失败', status: '已通过' },
+  { id: 6, title: '526预约1', category: '管理类', type: '部门例会', convener: '赵六', dept: '系统管理员', applicant: 'admin', contact: '176221189702', date: '2026-05-26', start: '10:30', end: '11:00', content: '部门周例会', room: '301', scale: '大报告厅', location: '3F', seats: '263', needService: '是', serviceType: '茶水、席卡、纸笔套装', note: '请按时准备', costShare: '否', shareGroup: '', notice: '是', noticeObj: '部门联络人', deptAttend: '', attendees: 'admin,bmct', receipt: '否', attachment: '加载失败', status: '已通过' },
+  { id: 7, title: '部门周会', category: '管理类', type: '部门例会', convener: '孙七', dept: '系统管理员', applicant: 'admin', contact: '176221189702', date: '2026-05-23', start: '15:51', end: '16:51', content: '部门周会', room: '301', scale: '大报告厅', location: '3F', seats: '263', needService: '是', serviceType: '矿泉水', note: '无', costShare: '否', shareGroup: '', notice: '是', noticeObj: '部门联络人', deptAttend: '', attendees: 'admin', receipt: '否', attachment: '加载失败', status: '已过期' },
+  { id: 8, title: '测试会议522', category: '科研类', type: '其他', convener: '周八', dept: '系统管理员', applicant: 'admin', contact: '176221189702', date: '2026-05-22', start: '16:00', end: '16:30', content: '测试会议', room: '301', scale: '大报告厅', location: '3F', seats: '263', needService: '是', serviceType: '矿泉水', note: '无', costShare: '否', shareGroup: '', notice: '是', noticeObj: '部门联络人', deptAttend: '', attendees: 'admin', receipt: '否', attachment: '加载失败', status: '已过期' },
+  { id: 9, title: '521521', category: '管理类', type: '其他', convener: '吴九', dept: '系统管理员', applicant: 'admin', contact: '176221189702', date: '2026-05-21', start: '17:00', end: '18:00', content: '专题讨论', room: '301', scale: '大报告厅', location: '3F', seats: '263', needService: '是', serviceType: '矿泉水', note: '无', costShare: '否', shareGroup: '', notice: '是', noticeObj: '部门联络人', deptAttend: '', attendees: 'admin', receipt: '否', attachment: '加载失败', status: '已通过' },
+  { id: 10, title: '专题调研会', category: '科研类', type: '其他', convener: '郑十', dept: '系统管理员', applicant: 'admin', contact: '176221189702', date: '2026-05-22', start: '17:54', end: '18:54', content: '专题调研交流', room: '301', scale: '大报告厅', location: '3F', seats: '263', needService: '否', serviceType: '', note: '', costShare: '否', shareGroup: '', notice: '是', noticeObj: '指定参会人', deptAttend: '', attendees: 'admin', receipt: '否', attachment: '加载失败', status: '已通过' }
 ];
 let spFiltered = [...spData];
 let spCurrentItem = null;
@@ -2793,7 +2821,7 @@ const statusMap = {
   '已拒绝': { cls: 'reject', label: '已拒绝' },
   '已撤销': { cls: 'revoke', label: '已撤销' },
   '已取消': { cls: 'cancel', label: '已取消' },
-  '草稿': { cls: 'draft', label: '草稿' },
+  '草稿': { cls: 'draft', label: '已撤销' },
   '已过期': { cls: 'expired', label: '已过期' }
 };
 const RELEASED = ['已过期', '已取消', '已拒绝', '已撤销', '草稿']; // 已释放/已过期，资源矩阵不再占用
@@ -2845,7 +2873,7 @@ function spRenderPg() {
 function spSearch() {
   const kw = document.getElementById('sp-searchName').value.trim();
   const status = document.getElementById('sp-searchStatus').value;
-  spFiltered = spData.filter(it => it.booker.includes(kw) && (!status || it.status === status));
+  spFiltered = spData.filter(it => (it.applicant || '').includes(kw) && (!status || it.status === status));
   spRender();
 }
 function spReset() {
@@ -2896,15 +2924,35 @@ function spRenderDetail(it) {
   set('sp-detailAttachments', (it.attachments && it.attachments.length) ? it.attachments.join('、') : '—');
   set('sp-detailStatus', it.status);
   set('sp-detailOccupancy', it.occupancy || '—');
-  set('sp-detailRoom', it.offsite === '是' ? '—' : it.room);
+  set('sp-detailRoom', it.room);
   set('sp-detailScale', it.scale);
   set('sp-detailLocation', it.location);
   set('sp-detailSeats', it.seats);
   const _fac = (it.facilities && it.facilities.length) ? it.facilities : ((mrData.find(r => r.name === it.room) || {}).facilities || []);
   set('sp-detailFacilities', _fac.length ? _fac.join('、') : '—');
-  set('sp-detailNeedService', it.needService);
-  set('sp-detailServiceType', it.serviceType || '—');
+  // 会务服务：仅当 是否需要会务=是 时展示服务类型与数量（来源 it.services：{id, qty}，用 hyData 映射名称）；=否 时不展示服务明细
+  const svcList = it.services || [];
+  const needSvc = (it.needService === '是');
+  set('sp-detailNeedService', needSvc ? '是' : '否');
   set('sp-detailNote', it.note || '—');
+  const svcSec = document.getElementById('sp-detailSvcSection');
+  const svcBadge = document.getElementById('sp-svcBadge');
+  const svcListEl = document.getElementById('sp-detailSvcList');
+  const svcListWrap = document.getElementById('sp-detailSvcListWrap');
+  if (svcSec) svcSec.className = 'sp-detail-section ' + (needSvc ? 'svc-needed' : 'svc-none');
+  if (svcBadge) { svcBadge.textContent = needSvc ? '需会务服务' : '无需会务服务'; svcBadge.className = 'svc-badge ' + (needSvc ? 'on' : 'off'); }
+  if (svcListEl) {
+    if (needSvc && svcList.length) {
+      svcListEl.innerHTML = svcList.map(s => {
+        const d = hyData.find(h => h.id === s.id) || {};
+        return (d.name || ('服务' + s.id)) + ' ×' + (s.qty || 1);
+      }).join('、');
+      if (svcListWrap) svcListWrap.style.display = '';
+    } else {
+      svcListEl.textContent = needSvc ? '—' : '无需会务服务';
+      if (svcListWrap) svcListWrap.style.display = 'none';
+    }
+  }
   set('sp-detailCostShare', it.costShare);
   set('sp-detailShareGroup', it.shareGroup || '—');
   // 费用分摊：仅「我发起的」会议展示；「我参加的」不展示
@@ -2917,7 +2965,7 @@ function spRenderDetail(it) {
   document.getElementById('sp-detailAttendees').innerHTML = spRenderAttendees(it);
   // 回执确认（F-NT-04）：「我参加的」会议（我作为参会人）底部固定栏展示参加/不参加；发起人本人若是参会人同样展示（point2）；会前可回执、会后锁定、锁定前可改（已回执可切换）
   const rcBar = document.getElementById('sp-detailReceiptBar');
-  const isMyAttend = Array.isArray(it.attendees) && it.attendees.includes(ME) && it.status === '已通过' && it.occupancy === '已预订';
+  const isMyAttend = Array.isArray(it.attendees) && it.attendees.includes(ME) && it.status === '已通过' && it.occupancy === '已预定';
   if (rcBar) {
     if (isMyAttend) {
       const myReply = it.receipts && it.receipts[ME];
@@ -3050,27 +3098,23 @@ function fyRender() {
   const tb = document.getElementById('fy-tableBody');
   tb.innerHTML = '';
   if (fyFiltered.length === 0) {
-    tb.innerHTML = '<tr><td colspan="14" class="empty">暂无数据</td></tr>';
+    tb.innerHTML = '<tr><td colspan="13" class="empty">暂无数据</td></tr>';
   } else {
     fyFiltered.forEach((item, index) => {
       const cancelled = item.status === '已取消';
       const tr = document.createElement('tr');
-      if (cancelled) tr.className = 'row-cancel';
-      const statusCell = cancelled
-        ? '<span class="tag-cancel">已取消</span>'
-        : '<span class="tag-valid">有效</span>';
       const fcVal = (item.fee_confirmed === '是') ? '是'
         : ((item.feeFlow === 'meeting' || item.feeFlow === 'sponsor') ? '确认中' : '否');
       const confirmCell = fcVal === '是'
         ? '<span class="tag-confirm-yes">是</span>'
         : (fcVal === '确认中' ? '<span class="tag-confirm-ing">确认中</span>' : '<span class="tag-confirm-no">否</span>');
-      const feeCell = v => cancelled ? '—' : v;
+      const feeCell = v => v;
       // 操作列（点1-3 + 查看全角色全状态；确认中 meeting/sponsor 仅[查看]；取消独立[编辑]按钮，发起即编辑入口）：
       // 会务 + 已通过有效 + 未发起draft → [发起费用确认]（打开可编辑弹窗）；其余全角色全状态（含确认中 meeting/sponsor、completed、非会务、已取消）→ [查看]（只读）
       let opCell;
       const canEdit = FY_ROLE === '会务' && item.approval === '已通过' && item.status === '有效' && item.feeFlow === 'draft';
       if (cancelled) {
-        opCell = '<button class="btn btn-link" disabled title="已取消会议不可操作">查看</button>';
+        opCell = '<button class="btn btn-link" onclick="fyOpenEdit(' + item.id + ')">查看</button>';
       } else if (canEdit) {
         opCell = '<button class="btn btn-link" onclick="fyInitiate(' + item.id + ')">发起费用确认</button>';
       } else {
@@ -3085,7 +3129,6 @@ function fyRender() {
         <td>${item.booker}</td>
         <td>${item.dept}</td>
         <td>${item.group || '—'}</td>
-        <td>${statusCell}</td>
         <td>${confirmCell}</td>
         <td>${feeCell(item.total)}</td>
         <td>${feeCell(item.roomFee)}</td>
@@ -3113,7 +3156,6 @@ function fySearch() {
   const booker = document.getElementById('fy-searchBooker').value.trim();
   const dept = document.getElementById('fy-dept').value;
   const group = document.getElementById('fy-group').value;
-  const status = document.getElementById('fy-status').value;
   const cStart = document.getElementById('fy-createStart').value;
   const cEnd = document.getElementById('fy-createEnd').value;
   fyFiltered = fyData.filter(it => {
@@ -3121,7 +3163,6 @@ function fySearch() {
     if (!it.booker.includes(booker)) return false;
     if (dept && it.dept !== dept) return false;
     if (group && !it.group.includes(group)) return false;
-    if (status && it.status !== status) return false;
     const cDate = (it.createTime || '').substring(0, 10);
     if (cStart && cDate < cStart) return false;
     if (cEnd && cDate > cEnd) return false;
@@ -3134,7 +3175,6 @@ function fyReset() {
   document.getElementById('fy-searchBooker').value = '';
   document.getElementById('fy-dept').value = '';
   document.getElementById('fy-group').value = '';
-  document.getElementById('fy-status').value = '';
   document.getElementById('fy-createStart').value = '';
   document.getElementById('fy-createEnd').value = '';
   fyFiltered = [...fyData];
@@ -3152,9 +3192,9 @@ function fyExport() {
     showToast('暂无可导出的数据');
     return;
   }
-  const headers = ['序号','会议名称','发起时间','会议时间','会议室地点','预约人','所属部门','项目组','状态','总费用(元)','会议室费用(元)','会务服务费用(元)'];
+  const headers = ['序号','会议名称','发起时间','会议时间','会议室地点','预约人','所属部门','项目组','总费用(元)','会议室费用(元)','会务服务费用(元)'];
   const rows = validRows.map((item, idx) => [
-    idx + 1, item.name, item.createTime, item.time, item.location, item.booker, item.dept, item.group || '—', item.status || '有效', item.total, item.roomFee, item.serviceFee
+    idx + 1, item.name, item.createTime, item.time, item.location, item.booker, item.dept, item.group || '—', item.total, item.roomFee, item.serviceFee
   ]);
   const csv = [headers, ...rows].map(r => r.map(c => {
     const s = String(c);
@@ -3178,7 +3218,6 @@ function fyExport() {
 function fyOpenEdit(id) {
   const item = fyData.find(d => d.id === id);
   if (!item) return;
-  if (item.status === '已取消') return; // 取消会议不记录费用，不可编辑
   fyEditId = id;
   fyEditUnitPrice = parseFloat(item.unitPrice) || 0;
 
@@ -3208,11 +3247,13 @@ function fyOpenEdit(id) {
   const flow = item.feeFlow || 'draft';
 
   // 可编辑态：仅 会务 + draft（未发起，发起即编辑入口）可改时长与数量；meeting/sponsor/completed 及非会务角色均只读（确认中仅[查看]）
-  const editable = (flow === 'draft' && FY_ROLE === '会务');
+  const editable = (flow === 'draft' && FY_ROLE === '会务' && item.status !== '已取消');
   durEl.disabled = !editable;
   document.querySelectorAll('#fy-editServiceList .svc-select, #fy-editServiceList .qty').forEach(el => el.disabled = !editable);
   const addSvcBtn = document.querySelector('.fy-add-svc');
   if (addSvcBtn) addSvcBtn.style.display = editable ? '' : 'none';
+  // 查看态（只读）：移除每条服务明细行的「删除」按钮，仅可编辑态(draft+会务)保留
+  document.querySelectorAll('#fy-editServiceList .svc-del').forEach(el => el.style.display = editable ? '' : 'none');
 
   // 弹窗标题：可编辑（会务+draft，经[发起费用确认]打开）显「编辑会议费用」；只读（经[查看]打开）显「查看」
   document.getElementById('fy-editTitle').textContent = editable ? '编辑会议费用' : '查看';
@@ -3220,7 +3261,7 @@ function fyOpenEdit(id) {
   // footer 按钮显隐
   const btnSubmit = document.getElementById('fy-btnSubmit');
   // 提交：仅会务在 draft（未发起）态可提交（提交时同步写回业务侧时长/数量/金额，draft→meeting 会务确认通过，进入发起人确认节点）
-  btnSubmit.style.display = (flow === 'draft' && FY_ROLE === '会务') ? '' : 'none';
+  btnSubmit.style.display = (flow === 'draft' && FY_ROLE === '会务' && item.status !== '已取消') ? '' : 'none';
   // 发起人确认（sponsor→completed）在审批中心节点动作完成，业务侧不再提供[确认]按钮；确认中 meeting/sponsor 及终态仅[关闭]（只读）
 
   document.getElementById('fy-editModal').classList.add('show');
@@ -3375,7 +3416,7 @@ let matrixBookings = [
   { room:'107', date:'2026-08-07', start:'09:00', end:'11:00', title:'党委会', applicant:'张明', dept:'综合办公室', status:'已通过', people:80, attendees:['陈琼梦','李华'], receipts:{'李华':'attend'}, unitPrice:205, services:[{id:5,qty:1},{id:3,qty:1}] },
   { room:'107', date:'2026-08-07', start:'14:00', end:'15:30', title:'专题办公会', applicant:'李华', dept:'综合办公室', status:'待审批', people:120, attendees:['王芳'], unitPrice:205, services:[{id:5,qty:1},{id:2,qty:1}] },
   { room:'103', date:'2026-08-07', start:'10:00', end:'12:00', title:'部门例会', applicant:'王芳', dept:'科研管理部', status:'已通过', people:40, attendees:['陈琼梦','王芳'], receipt:'是', receipts:{}, unitPrice:87, services:[{id:2,qty:1}] },
-  { room:'301', date:'2026-08-07', start:'13:00', end:'15:00', title:'主任办公会', applicant:'陈琼梦', dept:'主任办公室', status:'已通过', people:200, attendees:['赵强','陈琼梦'], receipts:{'赵强':'attend','陈琼梦':'attend'}, unitPrice:205, services:[{id:1,qty:1},{id:5,qty:2},{id:3,qty:1}] },
+  { room:'301', date:'2026-08-07', start:'13:00', end:'15:00', title:'主任办公会', applicant:'陈琼梦', dept:'主任办公室', status:'已通过', people:200, attendees:['赵强','陈琼梦'], receipts:{'赵强':'attend','陈琼梦':'attend'}, unitPrice:205, needService:'是', services:[{id:1,qty:1},{id:5,qty:2},{id:3,qty:1}] },
   { room:'306', date:'2026-08-07', start:'09:30', end:'10:30', title:'项目评审', applicant:'陈静', dept:'科研管理部', status:'已通过', people:30, attendees:['陈静'], unitPrice:72, services:[{id:2,qty:1},{id:4,qty:1}] },
   { room:'308', date:'2026-08-07', start:'15:00', end:'17:00', title:'客户洽谈', applicant:'刘伟', dept:'产业发展部', status:'待审批', people:18, attendees:['陈琼梦','刘伟'], receipts:{'刘伟':'attend'}, unitPrice:30, services:[{id:5,qty:1},{id:4,qty:1}] },
   { room:'310', date:'2026-08-07', start:'11:00', end:'12:00', title:'周例会', applicant:'孙磊', dept:'综合办公室', status:'已通过', people:35, attendees:['孙磊'], unitPrice:72, services:[{id:2,qty:1}] },
@@ -3395,14 +3436,15 @@ let matrixBookings = [
   /* 当前用户「待审批」示例：用于演示「我发起的」取消按钮 */
   { room:'103', date:'2026-08-11', start:'09:00', end:'11:00', title:'预算研讨会', applicant:'陈琼梦', dept:'主任办公室', status:'待审批', people:60, attendees:['陈琼梦','刘伟'], receipts:{'刘伟':'attend','陈琼梦':'attend'}, unitPrice:87, services:[{id:2,qty:1},{id:4,qty:1}] },
   /* 当前用户「已通过且未来」示例：用于演示「我发起的」取消按钮 */
-  { room:'302', date:'2026-08-14', start:'14:00', end:'16:00', title:'项目评审会', applicant:'陈琼梦', dept:'主任办公室', status:'已通过', people:30, attendees:['陈琼梦','李工'], receipts:{'李工':'absent','陈琼梦':'attend'}, unitPrice:80, services:[{id:1,qty:1},{id:5,qty:2},{id:3,qty:1}] },
+  { room:'302', date:'2026-08-14', start:'14:00', end:'16:00', title:'项目评审会', applicant:'陈琼梦', dept:'主任办公室', status:'已通过', people:30, attendees:['陈琼梦','李工'], receipts:{'李工':'absent','陈琼梦':'attend'}, unitPrice:80, needService:'是', services:[{id:1,qty:1},{id:5,qty:2},{id:3,qty:1}] },
   /* 当前用户「我参加的(未来·已通过·未回执)」示例：用于演示「我参加的」列表参加/不参加回执按钮（决策⑤：会前可回执） */
   { room:'107', date:'2026-08-12', start:'09:30', end:'11:00', title:'技术研讨会', applicant:'李华', dept:'综合办公室', status:'已通过', people:60, attendees:['陈琼梦','李华'], receipts:{}, unitPrice:205, services:[{id:5,qty:1},{id:2,qty:1}] },
   { room:'103', date:'2026-08-13', start:'14:00', end:'16:00', title:'部门联席会', applicant:'王芳', dept:'科研管理部', status:'已通过', people:40, attendees:['陈琼梦','王芳'], receipts:{}, unitPrice:87, services:[{id:2,qty:1}] },
   /* 当前用户「我参加的(未来·已通过·已回执)」示例：用于演示已回执后列表不再显示按钮 */
   { room:'301', date:'2026-08-12', start:'15:00', end:'17:00', title:'工作总结会', applicant:'张明', dept:'综合办公室', status:'已通过', people:80, attendees:['陈琼梦','张明'], receipts:{'陈琼梦':'attend'}, unitPrice:205, services:[{id:1,qty:1}] },
 ];
-matrixBookings.forEach(b => { if (!b.occupancy) b.occupancy = '已预订'; }); // 预订状态初始化：提交即预占，默认已预订
+matrixBookings.forEach(b => { if (!b.occupancy) b.occupancy = '已预定'; }); // 预定状态初始化：提交即预占，默认已预定
+matrixBookings.forEach(b => { if (b.needService === undefined) b.needService = '否'; }); // 会务服务字段默认值：未声明视为无需
 function mxAllMeetings(){
   return matrixBookings;
 }
@@ -3505,7 +3547,7 @@ function mxRender(){
   let rooms = mrData.slice();
   if (floors) rooms = rooms.filter(r => floors.includes(r.location));
   rooms = rooms.filter(r => r.enabled !== false);
-  const list = matrixBookings.filter(b => b.date === date && b.occupancy === '已预订');
+  const list = matrixBookings.filter(b => b.date === date && b.occupancy === '已预定');
 
   // 分组维度：跟随所选位置层级，比其更细一级
   // 园区级(all / 园区) -> 按楼栋(building)；楼栋级 -> 按楼层(location)；楼层级 -> 不分组
@@ -3585,8 +3627,8 @@ function mxShowDetail(room, date, start, end){
   const isAttendee = (b.attendees || []).includes(ME);
   // 决策④：会议进行中/已结束不可取消/变更；仅会议开始前可操作
   const started = yySlotDateTime(b.date, b.start).getTime() <= yyNow();
-  const canCancel = isMine && !started && (b.status === '待审批' || (b.status === '已通过' && b.occupancy === '已预订'));
-  const canChange = isMine && !started && b.status === '已通过' && b.occupancy === '已预订'; // 变更仅对已通过且仍已预订会议；已释放不可变更
+  const canCancel = isMine && !started && (b.status === '待审批' || (b.status === '已通过' && b.occupancy === '已预定'));
+  const canChange = isMine && !started && b.status === '已通过' && b.occupancy === '已预定'; // 变更仅对已通过且仍已预定会议；已释放不可变更
   const cancelBtn = document.getElementById('md-cancelBtn');
   const changeBtn = document.getElementById('md-changeBtn');
   cancelBtn.textContent = '取消会议';
@@ -3714,7 +3756,7 @@ function yyRenderRoomCombo(q){
     return '<div class="combo-item' + (busy ? ' disabled' : '') + '" data-name="' + r.name + '"' +
       (busy ? '' : ' onclick="yySelectRoom(\'' + r.name + '\')"') + '>' +
         '<span class="ci-name">' + r.name + '</span>' +
-        '<span class="ci-meta">' + r.scale + ' · ' + r.location + ' · ' + r.seats + '人' + (busy ? ' · 该时段已预订' : '') + '</span>' +
+        '<span class="ci-meta">' + r.scale + ' · ' + r.location + ' · ' + r.seats + '人' + (busy ? ' · 该时段已预定' : '') + '</span>' +
       '</div>';
   }).join('');
 }
@@ -3951,7 +3993,7 @@ function mxMineRender(){
         if (!started) { canCancel = true; changeReason = '会议待审批，暂不可变更，请先撤回'; }
         else { cancelReason = '会议进行中不可取消会议'; changeReason = '会议进行中不可变更'; }
       } else if (b.status === '已通过') {
-        if (b.occupancy !== '已预订') {
+        if (b.occupancy !== '已预定') {
           cancelReason = '该会议已释放，不可操作'; changeReason = '该会议已释放，不可变更'; editReason = '该会议已释放，不可编辑';
         } else if (!started) {
           canCancel = true; canChange = true; editReason = '会议已通过，不可编辑';
@@ -3972,7 +4014,7 @@ function mxMineRender(){
       // 「我参加的」参会人身份：仅 参加/不参加/详情（point1：无 取消会议/变更 按钮）；锁定前可改（已回执后可切换另一项）
       const myReply = b.receipts && b.receipts[ME];
       let inner = '';
-      if (b.status === '已通过' && b.occupancy === '已预订') {
+      if (b.status === '已通过' && b.occupancy === '已预定') {
         if (myReply === 'attend') {
           inner = mxOpBtn(key, '参加', {disabled:true, reason:'您已回执：参加'})
                + mxOpBtn(key, '不参加', {fn:'mxReceiptInline', arg:'absent'});
@@ -3991,7 +4033,7 @@ function mxMineRender(){
             + '<button class="lnk-btn" onclick="mxOpenDetail(' + "'" + key + "'" + ')">详情</button>';
     }
     const stCls = statusMap[b.status] ? statusMap[b.status].cls : (b.status === '待审批' ? 'wait' : 'pass');
-    const occCls = (b.occupancy === '已预订') ? 'busy' : 'released';
+    const occCls = (b.occupancy === '已预定') ? 'busy' : 'released';
     return `<tr>
       <td class="idx">${startIdx + i + 1}</td>
       <td><span class="mx-rel ${relCls}">${rel}</span></td>
@@ -3999,7 +4041,7 @@ function mxMineRender(){
       <td>${b.dept || '—'}</td>
       <td>${b.title}</td>
       <td>${b.people || '—'}</td>
-      <td><span class="qk-st ${stCls}">${b.status}</span></td>
+      <td><span class="qk-st ${stCls}">${statusMap[b.status] ? statusMap[b.status].label : b.status}</span></td>
       <td><span class="qk-st ${occCls}">${b.occupancy}</span></td>
       <td>${b.room || '—'}</td>
       <td>${roomMeta.scale || '—'}</td>
@@ -4009,7 +4051,7 @@ function mxMineRender(){
   }).join('');
   const colCount = 12;
   const emptyRow = items.length ? '' : '<tr><td colspan="' + colCount + '" class="qk-empty">暂无相关会议</td></tr>';
-  const header = '<th>序号</th><th>参与身份</th><th>申请人</th><th>申请人部门</th><th>会议名称</th><th>参会人数</th><th>审批状态</th><th>预订状态</th><th>会议室</th><th>会议室规模</th><th>会议时间</th><th class="op">操作</th>';
+  const header = '<th>序号</th><th>参与身份</th><th>申请人</th><th>申请人部门</th><th>会议名称</th><th>参会人数</th><th>审批状态</th><th>预定状态</th><th>会议室</th><th>会议室规模</th><th>会议时间</th><th class="op">操作</th>';
   document.getElementById('qk-list-mine').innerHTML =
     '<table class="qk-table"><thead><tr>' + header +
     '</tr></thead><tbody>' + rows + emptyRow + '</tbody></table>';
