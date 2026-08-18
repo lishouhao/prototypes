@@ -481,6 +481,7 @@ tr:hover td { background: #F7F7FA; }
   display: flex; justify-content: space-between; align-items: center; gap: 8px;
 }
 .sp-detail-receipt-bar { display: flex; align-items: center; gap: 8px; }
+.sp-detail-ops { display: flex; align-items: center; gap: 8px; }
 .sp-detail-mask {
   position: fixed; inset: 0;
   background: rgba(0,0,0,0.45);
@@ -615,6 +616,7 @@ tr:hover td { background: #F7F7FA; }
 .modal-section-title::before {
   content: ''; width: 3px; height: 14px; background: #4165EC; border-radius: 2px;
 }
+.yy-svc-tip { font-size: 12px; color: #8F9098; line-height: 1.6; margin: 0 0 12px; padding: 8px 10px; background: #F7F7FA; border-radius: 6px; }
 .info-row { display: flex; margin-bottom: 8px; color: #36373B; }
 .info-row .info-label { width: 110px; color: #8F9098; }
 /* 会务服务多选计费 */
@@ -1429,6 +1431,7 @@ tr:hover td { background: #F7F7FA; }
       </div>
       <div class="modal-section" id="yy-serviceSection">
         <div class="modal-section-title">会务服务</div>
+        <div class="yy-svc-tip">如有会议场地布置及会议室功能咨询等会务服务事项，可联系物业工作人员：吕慧娟 18506247652。</div>
         <div class="form-row">
           <label>是否需要</label>
           <div class="input-wrap">
@@ -1447,7 +1450,7 @@ tr:hover td { background: #F7F7FA; }
           </div>
         </div>
       </div>
-      <div class="modal-section" id="yy-costShareSection" style="display:none;">
+      <div class="modal-section" id="yy-costShareSection">
         <div class="modal-section-title">费用分摊</div>
         <div class="form-row">
           <label>是否分摊</label>
@@ -1617,6 +1620,7 @@ tr:hover td { background: #F7F7FA; }
   </div>
   <div class="sp-detail-footer" id="sp-detailFooter">
     <div class="sp-detail-receipt-bar" id="sp-detailReceiptBar" style="display:none;"></div>
+    <div class="sp-detail-ops" id="sp-detailOps" style="display:none;"></div>
     <button class="btn btn-primary" onclick="spCloseDetail()">关闭</button>
   </div>
 </div>
@@ -2232,11 +2236,11 @@ document.addEventListener('click', function (e) {
 
 /* ================= 会务需求 ================= */
 let hyData = [
-  { id: 1, name: '会务服务', cost: 21 },
-  { id: 2, name: '纸笔套装', cost: 4.5 },
-  { id: 3, name: '席卡', cost: 1.5 },
-  { id: 4, name: '矿泉水', cost: 2.5 },
-  { id: 5, name: '茶水', cost: 6 }
+  { id: 1, name: '会务服务', cost: 21, unit: '元/份' },
+  { id: 2, name: '纸笔套装', cost: 4.5, unit: '元/份' },
+  { id: 3, name: '席卡', cost: 1.5, unit: '元/份' },
+  { id: 4, name: '矿泉水', cost: 2.5, unit: '元/份' },
+  { id: 5, name: '茶水', cost: 6, unit: '元/份' }
 ];
 let hyFiltered = [...hyData];
 let hyEditingId = null;
@@ -2666,7 +2670,7 @@ function yyRenderServiceList(){
   box.innerHTML = hyData.map(s => {
     return '<div class="yy-svc-row">' +
       '<label class="yy-svc-chk"><input type="checkbox" value="' + s.id + '" onchange="yyCalcService()"> ' + s.name + '</label>' +
-      '<span class="yy-svc-price">¥' + parseFloat(s.cost).toFixed(2) + '/项</span>' +
+      '<span class="yy-svc-price">' + parseFloat(s.cost).toFixed(2) + ' ' + (s.unit || '元/份') + '</span>' +
       '<span class="yy-svc-qty">数量 <input type="number" min="1" value="1" style="width:54px;" oninput="yyCalcService()"></span>' +
     '</div>';
   }).join('');
@@ -2764,6 +2768,8 @@ function yySubmit() {
       yyEditTarget.attachments = yyGetAttachments();
       yyEditTarget.status = '待审批'; // 草稿/编辑后重新提交 → 回到审批中
       yyEditTarget.notify = (document.querySelector('input[name="yy-notify"]:checked')||{}).value || '否';
+      yyEditTarget.costShare = (document.querySelector('input[name="yy-costShare"]:checked')||{}).value || '否';
+      yyEditTarget.shareGroup = (document.getElementById('yy-shareGroup')||{}).value || '';
     showToast('已更新会议「' + title + '」');
   } else {
     matrixBookings.push({
@@ -2772,6 +2778,8 @@ function yySubmit() {
       roomFee: +roomFee.toFixed(2), serviceFee: +serviceFee.toFixed(2),
       attendees: [ME],
       notify: (document.querySelector('input[name="yy-notify"]:checked')||{}).value || '否',
+      costShare: (document.querySelector('input[name="yy-costShare"]:checked')||{}).value || '否',
+      shareGroup: (document.getElementById('yy-shareGroup')||{}).value || '',
       facilities: yyCurrentRoom.facilities || [],
       attachments: yyGetAttachments()
     });
@@ -2953,8 +2961,8 @@ function spRenderDetail(it) {
       if (svcListWrap) svcListWrap.style.display = 'none';
     }
   }
-  set('sp-detailCostShare', it.costShare);
-  set('sp-detailShareGroup', it.shareGroup || '—');
+  set('sp-detailCostShare', it.costShare || '-');
+  set('sp-detailShareGroup', it.shareGroup || '-');
   // 费用分摊：仅「我发起的」会议展示；「我参加的」不展示
   const csSec = document.getElementById('sp-detailCostShareSection');
   if (csSec) csSec.style.display = (it.applicant === ME) ? '' : 'none';
@@ -2983,6 +2991,20 @@ function spRenderDetail(it) {
       rcBar.style.display = '';
     } else {
       rcBar.style.display = 'none';
+    }
+  }
+  // 发起人操作入口：仅「我发起的」会议展示「变更」按钮（最近6天内可点击，其余置灰）
+  const opsEl = document.getElementById('sp-detailOps');
+  if (opsEl) {
+    if (it.applicant === ME && it.status === '已通过') {
+      const started = yySlotDateTime(it.date, it.start).getTime() <= yyNow();
+      const recent = mxRecentWindow(it, 6);
+      const canChg = it.occupancy === '已预定' && (!started || recent);
+      opsEl.innerHTML = mxOpBtn(it.room + '|' + it.date + '|' + it.start + '|' + it.end, '变更',
+        canChg ? {fn:'mxChange'} : {disabled:true, reason: started ? '会议已超期，变更仅限会议开始前或最近6天内' : '当前状态不可变更'});
+      opsEl.style.display = '';
+    } else {
+      opsEl.style.display = 'none';
     }
   }
   document.getElementById('sp-detailMask').classList.add('show');
@@ -3348,17 +3370,18 @@ function fySvcRowInner(current) {
   // 选项：服务字典；若已存服务不在字典内（历史自定义），追加为可选项避免丢失
   let opts = '<option value="">请选择服务</option>';
   let initCost = 0;
+  let initUnit = '元/份';
   hyData.forEach(s => {
     const sel = (String(s.id) === curId) ? ' selected' : '';
-    opts += '<option value="' + s.id + '" data-cost="' + s.cost + '"' + sel + '>' + s.name + '</option>';
+    opts += '<option value="' + s.id + '" data-cost="' + s.cost + '" data-unit="' + (s.unit || '元/份') + '"' + sel + '>' + s.name + '</option>';
   });
   if (curId) {
     const h = hyData.find(x => String(x.id) === curId);
-    if (h) initCost = h.cost;
-    else { opts += '<option value="' + curId + '" data-cost="' + (current.cost || 0) + '" selected>' + (current.name || '自定义服务') + '</option>'; initCost = current.cost || 0; }
+    if (h) { initCost = h.cost; initUnit = h.unit || '元/份'; }
+    else { opts += '<option value="' + curId + '" data-cost="' + (current.cost || 0) + '" data-unit="' + (current.unit || '元/份') + '" selected>' + (current.name || '自定义服务') + '</option>'; initCost = current.cost || 0; initUnit = current.unit || '元/份'; }
   }
   return '<select class="svc-select" onchange="fySvcChange(this)">' + opts + '</select>' +
-    '<span class="yy-svc-price">¥' + parseFloat(initCost).toFixed(2) + '/项</span>' +
+    '<span class="yy-svc-price">' + parseFloat(initCost).toFixed(2) + ' ' + initUnit + '</span>' +
     '<span class="yy-svc-qty">数量 <input type="number" min="1" value="' + qty + '" class="qty" oninput="fyRecalcService()"></span>' +
     '<button type="button" class="svc-del" onclick="fyRemoveServiceRow(this)">删除</button>';
 }
@@ -3368,7 +3391,8 @@ function fySvcChange(sel) {
   const opt = sel.selectedOptions[0];
   const price = opt ? (parseFloat(opt.getAttribute('data-cost')) || 0) : 0;
   const ps = row.querySelector('.yy-svc-price');
-  if (ps) ps.textContent = '¥' + price.toFixed(2) + '/项';
+  const pu = opt ? (opt.getAttribute('data-unit') || '元/份') : '元/份';
+  if (ps) ps.textContent = parseFloat(price).toFixed(2) + ' ' + pu;
   fyRecalcService();
 }
 /* 新增一条服务明细行 */
@@ -3607,6 +3631,10 @@ function mxRender(){
   html += '</tbody>';
   tbl.innerHTML = html;
 }
+function mxRecentWindow(b, days){
+  // 会议开始时间是否落在「最近 days 天」窗口内（含当天及未来）
+  return yySlotDateTime(b.date, b.start).getTime() >= (yyNow() - days*86400000);
+}
 function mxShowDetail(room, date, start, end){
   const b = matrixBookings.find(x => x.room === room && x.date === date && x.start === start && x.end === end);
   if (!b) return;
@@ -3625,10 +3653,11 @@ function mxShowDetail(room, date, start, end){
   document.getElementById('md-attachments').textContent = (b.attachments && b.attachments.length) ? b.attachments.join('、') : '—';
   const isMine = b.applicant === ME;
   const isAttendee = (b.attendees || []).includes(ME);
-  // 决策④：会议进行中/已结束不可取消/变更；仅会议开始前可操作
+  // 决策④：会议进行中/已结束不可取消/变更；仅会议开始前可操作；但最近6天内的会议仍允许变更
   const started = yySlotDateTime(b.date, b.start).getTime() <= yyNow();
+  const recent = mxRecentWindow(b, 6); // 最近6天窗口：会议开始后6天内仍可变更
   const canCancel = isMine && !started && (b.status === '待审批' || (b.status === '已通过' && b.occupancy === '已预定'));
-  const canChange = isMine && !started && b.status === '已通过' && b.occupancy === '已预定'; // 变更仅对已通过且仍已预定会议；已释放不可变更
+  const canChange = isMine && b.status === '已通过' && b.occupancy === '已预定' && (!started || recent); // 变更：已通过且仍已预定，会议开始前或最近6天内
   const cancelBtn = document.getElementById('md-cancelBtn');
   const changeBtn = document.getElementById('md-changeBtn');
   cancelBtn.textContent = '取消会议';
@@ -3648,7 +3677,7 @@ function mxShowDetail(room, date, start, end){
     changeBtn.onclick = () => { mdClose(); mxChange(key); };
   } else {
     changeBtn.classList.add('btn-disabled');
-    changeBtn.onclick = () => showToast(started ? '会议进行中不可变更' : (isMine ? '当前状态不可变更' : '您无权限执行该操作'));
+    changeBtn.onclick = () => showToast(started ? '会议已超期，变更仅限会议开始前或最近6天内' : (isMine ? '当前状态不可变更' : '您无权限执行该操作'));
   }
   document.getElementById('md-mask').classList.add('show');
   document.getElementById('md-modal').classList.add('show');
@@ -3829,7 +3858,7 @@ function mxCancelMeeting(key){
   mxCancelKey = key;
   const isPending = (m.status === '待审批');
   const verb = isPending ? '取消会议' : '取消会议';
-  const hint = isPending ? '取消会议（撤回）：该预约将转为会议草稿，房间时段立即释放；可稍后在「我发起的」中编辑草稿、重新提交。' : '取消会议（释放会议室）：会议室将释放，该预约不可恢复，若需改时间/房间，请改用「变更」按钮。';
+  const hint = isPending ? '取消会议后会议室预约时段立即释放。' : '取消的会议室将释放。';
   document.getElementById('mx-cancel-text').textContent = '确认要' + verb + '「' + (m.title || '') + '」(' + m.date + ' ' + m.start + '-' + m.end + ') 吗？' + hint;
   const cancelBtn = document.getElementById('mx-cancelBtn');
   if (cancelBtn) cancelBtn.textContent = verb; // 待审批→取消会议；已通过→取消会议
@@ -3892,6 +3921,9 @@ function mxChange(key){
       document.getElementById('yy-modalRoomLocation').textContent = room.location;
       if (document.getElementById('yy-roomInput')) document.getElementById('yy-roomInput').value = yyRoomDisplay(room);
     }
+    const _cs = document.querySelector('input[name="yy-costShare"][value="' + (m.costShare || '否') + '"]'); if (_cs) _cs.checked = true;
+    if (document.getElementById('yy-shareGroup')) document.getElementById('yy-shareGroup').value = m.shareGroup || '';
+    yyToggleCostShare();
     yyCalcRoomFee();
     showToast('已带出历史信息，请确认后重新提交（原会议将在新预约提交成功后释放）');
   }
@@ -3925,6 +3957,9 @@ function mxEditDraft(key){
     document.getElementById('yy-modalRoomLocation').textContent = room.location;
     if (document.getElementById('yy-roomInput')) document.getElementById('yy-roomInput').value = yyRoomDisplay(room);
   }
+  const _cs = document.querySelector('input[name="yy-costShare"][value="' + (m.costShare || '否') + '"]'); if (_cs) _cs.checked = true;
+  if (document.getElementById('yy-shareGroup')) document.getElementById('yy-shareGroup').value = m.shareGroup || '';
+  yyToggleCostShare();
   yyCalcRoomFee();
   const _nv = m.notify || '是';
   const _nr = document.querySelector('input[name="yy-notify"][value="' + _nv + '"]'); if (_nr) _nr.checked = true;
@@ -3981,6 +4016,7 @@ function mxMineRender(){
     const relCls = isMine ? 'mx-rel-mine' : 'mx-rel-att';
     let opCell;
     var started = (b.status === '已通过') && yySlotDateTime(b.date, b.start).getTime() <= yyNow();
+    var recent = mxRecentWindow(b, 6); // 最近6天窗口：会议开始后6天内仍可变更
     // 渲染模式：我参加的 tab 一律按参会人身份渲染（参加/不参加/详情，无取消会议/变更，point1）；我发起的 tab 走发起人分支；全部 tab 沿用身份判定（point2：发起人本人参会时在我参加的里同样显回执）
     const mode = (mxMineFilterType === 'attend') ? 'attend' : (mxMineFilterType === 'mine' ? 'mine' : (isMine ? 'mine' : 'attend'));
     if (mode === 'mine') {
@@ -3997,8 +4033,10 @@ function mxMineRender(){
           cancelReason = '该会议已释放，不可操作'; changeReason = '该会议已释放，不可变更'; editReason = '该会议已释放，不可编辑';
         } else if (!started) {
           canCancel = true; canChange = true; editReason = '会议已通过，不可编辑';
+        } else if (recent) {
+          canChange = true; changeReason = '会议进行中，变更仅限最近6天内';
         } else {
-          cancelReason = '会议进行中不可取消会议'; changeReason = '会议进行中不可变更'; editReason = '会议进行中不可编辑';
+          cancelReason = '会议进行中不可取消会议'; changeReason = '会议已超期，变更仅限会议开始前或最近6天内';
         }
       } else if (b.status === '草稿') {
         canEdit = true; cancelReason = '草稿未提交，不可取消会议'; changeReason = '草稿未提交，不可变更';
