@@ -1,0 +1,663 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>外来人员移动端原型</title>
+    <style>
+
+:root{
+  /* ===== 设计 Token：颜色 ===== */
+  --brand:#4c7fed; --brand-d:#5b84d3; --brand-line:#b9cdf6; --border-dash:#cdd6e6;
+  --brand-200:#aabcf2; --brand-100:#e9eefc; --brand-50:#f7f8fd;
+  --success:#2ba471; --success-bg:#e7f7ef;
+  --danger:#e5484d; --danger-bg:#fdecec; --danger-border:#f6c9c9;
+  --warn-bg:#fff8e6; --warn-border:#f2d688; --warn-text:#8a6d1f;
+  --surface:#ffffff; --surface-soft:#f6f7fa; --bg:#eef2f7;
+  --border:#eceff4; --border-2:#dfe4ec; --border-soft:#f0f2f6;
+  --text:#1f2229; --text-2:#333844; --muted:#5e6470; --muted-2:#8a909c;
+  --ink-900:#142238; --ink-800:#24344e; --brand-disabled:#c4cee0;
+  /* ===== 间距 / 圆角 / 阴影 ===== */
+  --sp-1:4px; --sp-2:8px; --sp-3:12px; --sp-4:16px; --sp-5:20px;
+  --r-sm:8px; --r-md:12px; --r-lg:16px; --r-pill:999px;
+  --sh-sm:0 1px 4px rgba(20,34,56,.08); --sh-md:0 12px 40px rgba(20,34,56,.16);
+font-family:-apple-system,BlinkMacSystemFont,Segoe UI,PingFang SC,Microsoft YaHei,sans-serif;color:var(--text);background:var(--bg)}*{box-sizing:border-box}html,body,#root{margin:0;min-width:320px;min-height:100vh}body{-webkit-font-smoothing:antialiased;background:var(--bg)}button,input,textarea{font:inherit}button{cursor:pointer}.mobile-prototype{width:min(100vw,390px);height:min(100vh,844px);margin-inline:auto;overflow:hidden;position:relative;background:var(--bg);box-shadow:0 0 0 1px #14223814}.nav{height:60px;padding:14px 14px 0;display:flex;align-items:center;justify-content:center;background:var(--surface);border-bottom:1px solid var(--border);position:relative;z-index:5}.nav h1{margin:0;font-size:18px;font-weight:800;letter-spacing:0}.icon-button{border:0;background:transparent;color:var(--text);display:grid;place-items:center;padding:7px}.back{position:absolute;left:12px;bottom:10px}.success-nav .back{color:var(--brand)}.capsule{position:absolute;right:14px;bottom:9px;height:32px;min-width:74px;padding:0 11px;border:1px solid var(--border);border-radius:var(--r-pill);display:flex;align-items:center;gap:10px;color:var(--text);box-shadow:0 1px 4px #1e283c0f}.capsule span{font-size:17px;font-weight:800;transform:translateY(-3px)}.capsule i{width:1px;height:18px;background:var(--border)}.choose-page{height:calc(100% - 60px);padding:36px 16px 96px;background:var(--surface)}.choose-page h2{margin:0 0 16px;font-size:25px;line-height:1.2;font-weight:800}.choose-page p{margin:0 0 36px;color:var(--muted);font-size:15px;line-height:1.7}.type-list{display:grid;gap:16px}.type-card{height:98px;border:1px solid transparent;border-radius:var(--r-md);padding:0 22px;display:flex;align-items:center;gap:17px;position:relative;overflow:hidden;background:var(--surface-soft);color:var(--text);text-align:left}.type-card.active{border:2px solid var(--brand);background:var(--brand-50);color:var(--brand)}.type-card.active:after{content:"";position:absolute;right:-28px;top:-55px;width:116px;height:116px;border-radius:var(--r-pill);background:var(--brand-100)}.type-icon{width:55px;height:55px;border-radius:50%;display:grid;place-items:center;flex:0 0 auto;background:var(--border-soft);color:var(--text-2)}.active .type-icon{background:var(--brand-100);color:var(--brand)}.type-copy{display:grid;gap:8px}.type-copy strong{font-size:20px;font-weight:800}.type-copy small{font-size:16px;color:var(--brand-d)}.type-card:not(.active) .type-copy small{color:var(--text-2)}.selected-bubble{width:24px;height:24px;position:absolute;right:23px;top:35px;z-index:1;border-radius:50%;background:var(--brand);color:var(--surface);display:grid;place-items:center}.bottom-bar{position:absolute;left:0;right:0;bottom:0;min-height:72px;padding:11px 16px max(12px,env(safe-area-inset-bottom));background:#fffffff5;box-shadow:0 -4px 18px #24344e0f;z-index:6}.home-bottom{min-height:74px}.primary{width:100%;height:48px;border:0;border-radius:var(--r-sm);color:var(--surface);background:var(--brand);font-size:18px;font-weight:800;display:inline-flex;align-items:center;justify-content:center;gap:9px}.primary:disabled{background:var(--brand-200)}.next{height:56px;font-size:20px;border-radius:var(--r-sm) 8px 0 0}.form-page{height:calc(100% - 60px);overflow-y:auto;padding:14px 16px 86px;scrollbar-width:none}.form-page::-webkit-scrollbar{width:0}.tabs{height:44px;padding:4px;margin-bottom:16px;border-radius:var(--r-sm);background:var(--surface);display:grid;grid-template-columns:repeat(3,1fr);gap:2px;box-shadow:0 1px 5px #24344e0f}.tabs button{border:0;border-radius:var(--r-sm);background:transparent;color:var(--text-2);font-size:15px;font-weight:500}.tabs button.active{background:var(--brand);color:var(--surface);font-weight:700}.tabs button:disabled{opacity:1;cursor:default}.panel{background:var(--surface);border-radius:var(--r-md);padding:18px;margin-bottom:16px;box-shadow:0 1px 4px #1e2c4614}.panel h2,.panel-title{margin:0 0 11px;padding-bottom:13px;border-bottom:1px solid var(--border-soft);font-size:17px;font-weight:800}.field{min-height:60px;border-bottom:1px solid var(--border-soft);display:grid;grid-template-columns:minmax(92px,132px) 1fr;align-items:center;color:var(--text);font-size:15px}.field b,.textarea-label b,.radio-row b{color:var(--danger);font-weight:700;margin-left:2px}.field-box{height:40px;display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;background:var(--surface)}.val{flex:1;text-align:right;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.val.placeholder{color:var(--muted-2)}.field input{width:100%;border:0;outline:0;text-align:right;color:var(--text);background:transparent;font-size:15px}.field input::placeholder,textarea::placeholder{color:var(--text-2);opacity:.9}.field svg{flex:0 0 auto;color:var(--text-2)}.textarea-label{margin:18px 0 11px;font-size:15px;color:var(--text)}textarea{width:100%;height:88px;border:0;border-radius:var(--r-sm);outline:0;resize:none;padding:14px;background:var(--surface-soft);color:var(--text);font-size:15px}.radio-row{margin-top:18px;padding-top:15px;border-top:1px solid var(--border-soft);display:flex;align-items:center;gap:18px;font-size:14px}.radio-row span{margin-right:auto}.radio-row label{display:flex;align-items:center;gap:4px}input[type=radio],input[type=checkbox]{accent-color:var(--brand)}.file-area{margin-top:18px;padding-top:1px;border-top:1px solid var(--border-soft)}.conditional-area{margin-top:2px}.conditional-area textarea{height:82px}.attachment-area{padding-bottom:2px}.person-panel{padding-top:16px}.row-title{display:flex;align-items:center;justify-content:space-between}.delete{border:0;background:transparent;color:var(--danger);display:inline-flex;align-items:center;gap:5px;padding:0;font-size:14px}.photo-title{margin:17px 0 10px;font-size:15px}.photo-title small{color:var(--text-2);font-size:12px}.upload{width:70px;height:70px;border:1px dashed var(--border-2);border-radius:var(--r-sm);background:var(--surface);color:var(--muted-2);display:grid;place-items:center;align-content:center;gap:4px;font-size:11px}.upload.uploaded{color:var(--brand);border-color:var(--brand-200);background:var(--brand-50)}.add-person{width:100%;height:44px;border:1px solid var(--brand);border-radius:var(--r-sm);background:var(--surface);color:var(--brand);font-size:16px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:8px;margin:1px 0 13px}.agreement{display:flex;align-items:center;gap:5px;color:var(--text-2);font-size:13px;margin:0 0 18px 2px}.agreement button{border:0;background:transparent;color:var(--brand);padding:0}.success-page{height:calc(100% - 60px);padding:82px 24px 0;background:var(--surface);text-align:center}.success-mark{width:80px;height:80px;margin:0 auto 28px;border-radius:50%;display:grid;place-items:center;background:var(--success-bg);color:var(--success)}.success-mark svg{width:48px;height:48px;padding:8px;border-radius:50%;background:var(--success);color:var(--surface)}.success-page h2{margin:0 0 12px;font-size:20px;font-weight:800}.success-page p{margin:0 auto 52px;color:var(--text-2);line-height:1.55;font-size:16px}.summary-card{border:1px solid var(--border);border-radius:var(--r-md);padding:6px 16px;text-align:left;box-shadow:0 1px 8px #1e2c460f}.summary-card dl{margin:0}.summary-card div{min-height:52px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border-soft)}.summary-card div:last-child{border-bottom:0}.summary-card dt{color:var(--muted)}.summary-card dd{margin:0;font-weight:500}.done{margin-top:40px;height:48px}.overlay{position:absolute;top:0;right:0;bottom:0;left:0;z-index:20;background:#0c121f57;display:flex;align-items:flex-end}.time-sheet{width:100%;padding:18px 18px 24px;border-radius:var(--r-pill) 18px 0 0;background:var(--surface)}.time-sheet h3{margin:0 0 12px;font-size:17px}.time-sheet button{width:100%;height:48px;border:0;border-bottom:1px solid var(--border-soft);background:var(--surface);display:flex;align-items:center;gap:10px;color:var(--text)}.notice-overlay{align-items:center;padding:0 24px}.notice-modal{width:100%;max-height:72%;overflow:auto;position:relative;padding:24px 20px 20px;border-radius:var(--r-md);background:var(--surface);color:var(--text)}.notice-close{position:absolute;top:12px;right:12px;width:34px;height:34px;border:0;border-radius:50%;background:var(--surface-soft);color:var(--muted);display:grid;place-items:center}.notice-modal h3{margin:2px 38px 10px 0;font-size:18px;font-weight:800}.notice-modal p{margin:0 0 14px;color:var(--muted);font-size:14px;line-height:1.6}.notice-modal ol{margin:0 0 20px;padding-left:20px;color:var(--text-2);font-size:14px;line-height:1.75}.notice-modal li+li{margin-top:8px}.notice-primary{height:42px;font-size:16px}.toast{position:absolute;left:50%;bottom:92px;transform:translate(-50%);padding:9px 14px;border-radius:var(--r-pill);background:#121824d1;color:var(--surface);font-size:13px;z-index:30;white-space:nowrap}
+
+    
+.overlay{position:absolute;inset:0;background:rgba(20,34,56,.45);display:flex;align-items:flex-end;justify-content:center;z-index:20}
+.imp-overlay{align-items:center;padding:18px}
+.imp-modal{position:relative;width:100%;max-height:92%;overflow:auto;background:var(--surface);border-radius:var(--r-lg);padding:22px 18px 18px;box-shadow:0 12px 40px #1e283c33}
+.imp-title{margin:0 0 12px;font-size:18px;font-weight:800}
+.imp-divider{height:1px;background:var(--border-soft);margin:14px 0}
+.imp-tip{margin:0 0 12px;color:var(--muted);font-size:13px;line-height:1.6}
+.req{color:var(--danger);font-weight:700}
+.imp-file{display:flex;align-items:center;gap:10px;padding:14px;border:1.5px dashed var(--border-dash);border-radius:var(--r-md);color:var(--brand);font-size:14px;margin-bottom:14px;cursor:pointer}
+.imp-file input{display:none}
+.imp-summary{display:flex;gap:10px;margin-bottom:12px}
+.imp-summary span{flex:1;text-align:center;padding:9px;border-radius:var(--r-sm);font-weight:700;font-size:14px}
+.s-ok{background:var(--success-bg);color:var(--success)}
+.s-fail{background:var(--danger-bg);color:var(--danger)}
+.imp-rows{display:grid;gap:8px;margin-bottom:12px;max-height:42vh;overflow:auto}
+.imp-row{border-radius:var(--r-md);padding:10px 12px;background:var(--surface-soft)}
+.imp-row.ok{display:flex;align-items:center;gap:8px;background:var(--success-bg)}
+.imp-row.ok small{color:var(--muted-2);margin-left:auto;font-size:12px}
+.imp-row.fail{border:1px solid var(--danger-border);background:var(--danger-bg)}
+.ok-tag{display:inline-flex;align-items:center;gap:3px;color:var(--success);font-weight:700;font-size:13px}
+.err-tag{display:inline-flex;align-items:center;gap:3px;color:var(--danger);font-weight:600;font-size:12px;margin-left:auto}
+.imp-row-head{display:flex;align-items:center;gap:6px;margin-bottom:6px}
+.imp-actions{display:grid;gap:9px;margin-bottom:8px}
+.imp-actions .primary{width:100%}
+.import-btn{color:var(--brand);border:1px dashed var(--brand-line);margin-top:10px}
+.import-btn svg{stroke:var(--brand)}
+.ghost{width:100%;padding:11px;border:1px solid var(--border-2);background:var(--surface);color:var(--muted);border-radius:var(--r-md);font-size:14px;font-weight:600}
+button.primary{width:100%;padding:13px;border:0;border-radius:var(--r-md);background:var(--brand);color:var(--surface);font-size:16px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:6px}
+button.primary:disabled{background:var(--brand-disabled);color:var(--surface);cursor:not-allowed}
+.mode-switch{display:flex;gap:8px;margin:14px 0 4px}
+.mode-opt{flex:1;padding:11px;border:1px solid var(--border-2);border-radius:var(--r-md);background:var(--surface);color:var(--muted);font-size:14px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:6px}
+.mode-opt.active{border-color:var(--brand);background:var(--brand-50);color:var(--brand)}
+.batch-hint{color:var(--muted);font-size:13px;line-height:1.6;margin:6px 0 10px}
+.imp-row .del{margin-left:auto;color:var(--danger);font-size:12px;background:none;border:0;cursor:pointer;padding:0}
+.bottom-bar{display:grid;gap:8px}
+.draft-bar{display:flex;align-items:center;gap:8px;background:var(--warn-bg);border:1px solid var(--warn-border);border-radius:var(--r-md);padding:10px 12px;margin:0 0 16px;font-size:13px;color:var(--warn-text)}
+.draft-bar b{font-size:13px}
+.draft-actions{display:flex;gap:6px;margin-left:auto}
+.draft-actions button{border:0;border-radius:var(--r-sm);padding:6px 11px;font-size:12px;font-weight:600;cursor:pointer}
+.draft-actions .resume{background:var(--brand);color:var(--surface)}
+.draft-actions .discard{background:var(--surface);color:var(--muted);border:1px solid var(--border-2)}
+
+</style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script>
+"use strict";
+
+/* ============ 图标（内联 SVG，离线可用） ============ */
+const ICON = {
+  visitor: '<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>',
+  office: '<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>',
+  construction: '<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 18h20"/><path d="M4 18a8 8 0 0 1 16 0"/><path d="M12 6v4"/><path d="M9 10V8a3 3 0 0 1 6 0v2"/></svg>',
+  back: '<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>',
+  x: '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>',
+  check: '<svg viewBox="0 0 24 24" width="38" height="38" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>',
+  plus: '<svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>',
+  arrow: '<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>',
+  chevron: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>',
+  camera: '<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>',
+  file: '<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>',
+  trash: '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg>',
+  clock: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
+  download: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 11l5 5 5-5M5 21h14"/></svg>',
+  sheet: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h18v18H3zM3 9h18M3 15h18M9 3v18M15 3v18"/></svg>',
+  alert: '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg>'
+};
+
+/* ============ 配置 ============ */
+const TYPES = {
+  visitor: {key:'visitor', name:'来访人员', desc:'短期外来人员，如入园参观、会议交流等', hostCode:'受访人工号', hostName:'受访人姓名', startTime:'拜访开始时间', endTime:'拜访结束时间', unit:'访客单位', reason:'访客事由', reasonPlaceholder:'请输入具体事由', personTitle:'访客信息', personName:'访客姓名', addText:'新增访客', agreement:'', hasContract:false, fileLabel:''},
+  office: {key:'office', name:'驻场办公人员', desc:'中长期外来人员，如物业、运维等', hostCode:'实验室对接人', hostName:'责任人部门', startTime:'驻场开始时间', endTime:'驻场结束时间', unit:'驻场单位', reason:'驻场事由', reasonPlaceholder:'请输入具体事由', personTitle:'驻场人员信息', personName:'驻场人员姓名', addText:'新增驻场人员', agreement:'安全须知', hasContract:false, fileLabel:'相关合作协议', fileTip:'如合同、备忘录等相关协议'},
+  construction: {key:'construction', name:'施工作业人员', desc:'工程施工、维修改造、设备安装等', hostCode:'项目负责人', hostName:'项目负责人部门', startTime:'施工开始时间', endTime:'施工结束时间', unit:'施工单位', reason:'施工事由', reasonPlaceholder:'请输入具体事由', personTitle:'施工人员信息', personName:'施工人员姓名', addText:'新增施工人员', agreement:'安全须知', hasContract:false, fileLabel:'施工作业申请单'}
+};
+const NOTICES = {
+  office: ['驻场办公人员须遵守园区出入管理要求，按申请时间和区域通行。','驻场期间如人员、车辆、单位信息发生变化，应及时重新提交或补充申请。','相关合作协议（合同、备忘录等）须真实有效，审批通过后方可办理通行权限。'],
+  construction: ['施工作业人员须遵守现场安全管理要求，按审批时间进出。','施工前应上传施工作业申请单或相关安全承诺材料。','涉及动火、高空、强弱电等特殊作业时，应按园区要求另行办理审批。']
+};
+
+/* ============ 工号反查演示数据（无后端，原型演示用） ============ */
+const PERSON_LOOKUP = {
+  office: {'1001': {name:'张明', dept:'苏州实验室-综合管理部'}},
+  construction: {'2001': {name:'李强', dept:'苏州实验室-基建保障部'}}
+};
+function lookupPerson(type, code){
+  const m = PERSON_LOOKUP[type];
+  return (m && m[code]) ? {name:m[code].name, dept:m[code].dept} : {name:'', dept:''};
+}
+
+/* 模板导入：4 字段（* 必填） */
+const TEMPLATE_FIELDS = [
+  {k:'name', label:'姓名', req:true},
+  {k:'phone', label:'手机号', req:true},
+  {k:'idcard', label:'身份证号', req:true}
+];
+
+/* 演示解析结果：成功 7 / 失败 2 */
+const DEMO_ROWS = [
+  {name:'王磊', phone:'13800001111', idcard:'320583199001011234', err:''},
+  {name:'陈晓', phone:'13900002222', idcard:'310104199203034567', err:''},
+  {name:'刘伟', phone:'13700003333', idcard:'11010119950505321X', err:''},
+  {name:'赵敏', phone:'13600004444', idcard:'32058519920808789X', err:''},
+  {name:'孙强', phone:'13500005555', idcard:'32058119931111666X', err:''},
+  {name:'周婷', phone:'13400006666', idcard:'32058219940404999X', err:''},
+  {name:'吴昊', phone:'13300007777', idcard:'32058319950707222X', err:''},
+  {name:'郑凯', phone:'137', idcard:'110101199005051234', err:'手机号位数不足（应为11位）'},
+  {name:'冯磊', phone:'13600008888', idcard:'1201031988', err:'证件号校验位错误（位数或格式不符）'}
+];
+
+/* ============ 状态 ============ */
+let _id = 0;
+const uid = () => ++_id;
+function newPerson() { return {id: uid(), name:'', phone:'', idcard:'', photo:false}; }
+
+const state = {
+  view: 'choose',
+  type: 'visitor',
+  singlePersons: [newPerson()],
+  batchPersons: [],
+  personMode: 'single',
+  hasContract: '是',
+  noContractReason: '',
+  hostCode: '',
+  hostName: '',
+  hostDept: '',
+  unit: '',
+  reason: '',
+  startTime: '',
+  endTime: '',
+  attachment: false,
+  protocolFile: false,
+  agreementOk: false,
+  overlay: null,        // 'time' | 'notice' | null（批量导入内嵌于表单页，不走弹框/独立页）
+  importOpen: false,    // 批量导入流程是否展开（true=显示步骤1/2；false=显示已导入名单）
+  timeWhich: null,
+  toast: ''
+};
+let importState = { rows: null, fileName: '', parsing: false };
+
+/* ============ 草稿自动保存（移动端防丢） ============ */
+const DRAFT_KEY = 'waiwai-apply-draft-v1';
+function saveDraft(){
+  try{
+    const d = {
+      _id: _id,
+      type: state.type,
+      singlePersons: state.singlePersons,
+      batchPersons: state.batchPersons,
+      personMode: state.personMode,
+      hasContract: state.hasContract,
+      noContractReason: state.noContractReason,
+      hostCode: state.hostCode,
+      hostName: state.hostName,
+      hostDept: state.hostDept,
+      unit: state.unit,
+      reason: state.reason,
+      startTime: state.startTime,
+      endTime: state.endTime,
+      attachment: state.attachment,
+      protocolFile: state.protocolFile,
+      agreementOk: state.agreementOk,
+      savedAt: Date.now()
+    };
+    localStorage.setItem(DRAFT_KEY, JSON.stringify(d));
+  }catch(e){}
+}
+function clearDraft(){
+  try{ localStorage.removeItem(DRAFT_KEY); }catch(e){}
+}
+function hasDraft(){
+  try{ return !!localStorage.getItem(DRAFT_KEY); }catch(e){ return false; }
+}
+function loadDraft(){
+  try{
+    const raw = localStorage.getItem(DRAFT_KEY);
+    return raw ? JSON.parse(raw) : null;
+  }catch(e){ return null; }
+}
+function resumeDraft(){
+  const d = loadDraft();
+  if(!d){ render(); return; }
+  state.type = d.type || 'visitor';
+  state.singlePersons = (d.singlePersons && d.singlePersons.length) ? d.singlePersons : [newPerson()];
+  state.batchPersons = d.batchPersons || [];
+  state.personMode = d.personMode || 'single';
+  state.hasContract = d.hasContract || '是';
+  state.noContractReason = d.noContractReason || '';
+  state.hostCode = d.hostCode || '';
+  state.hostName = d.hostName || '';
+  state.hostDept = d.hostDept || '';
+  state.unit = d.unit || '';
+  state.reason = d.reason || '';
+  state.startTime = d.startTime || '';
+  state.endTime = d.endTime || '';
+  state.attachment = !!d.attachment;
+  state.protocolFile = !!d.protocolFile;
+  state.agreementOk = !!d.agreementOk;
+  if(d._id) _id = d._id;
+  state.view = 'form';
+  render();
+}
+function discardDraft(){ clearDraft(); resetForm(); render(); }
+function draftBar(){
+  if(!hasDraft()) return '';
+  const d = loadDraft();
+  const tName = (d && TYPES[d.type]) ? TYPES[d.type].name : '';
+  return '<div class="draft-bar"><b>有未完成的'+(tName||'')+'申请草稿</b>'
+    + '<span class="draft-actions">'
+    + '<button class="resume" onclick="resumeDraft()">继续填写</button>'
+    + '<button class="discard" onclick="discardDraft()">重新开始</button>'
+    + '</span></div>';
+}
+
+/* ============ 工具 ============ */
+function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+function showToast(msg){ state.toast = msg; render(); clearTimeout(showToast._t); showToast._t = setTimeout(()=>{ state.toast=''; render(); }, 1800); }
+
+/* ============ 字段校验 ============ */
+function validatePerson(p){
+  if(!/^1\d{10}$/.test(p.phone||'')) return '手机号位数不足（应为11位）';
+  return '';
+}
+function validateRow(r){
+  if(!/^1\d{10}$/.test(r.phone||'')) return '手机号位数不足（应为11位）';
+  return '';
+}
+
+/* ============ 顶部导航 ============ */
+function Nav(title, mode){
+  const backIcon = mode==='success' ? ICON.x : ICON.back;
+  const capsule = mode==='home'
+    ? '<div class="capsule"><span>···</span><i></i>'+ICON.x.replace(/width="[^"]*"/,'width="18"').replace(/height="[^"]*"/,'height="18"')+'</div>'
+    : '';
+  return '<header class="nav '+(mode==='success'?'success-nav':'')+'">'
+    + '<button class="icon-button back" onclick="onBack()" aria-label="返回">'+backIcon+'</button>'
+    + '<h1>'+esc(title)+'</h1>'+capsule+'</header>';
+}
+
+/* ============ 选择申请类别 ============ */
+function renderChoose(){
+  const cards = Object.values(TYPES).map(t=>{
+    const active = state.type===t.key;
+    return '<button class="type-card '+(active?'active':'')+'" onclick="selectType(\''+t.key+'\')">'
+      + '<span class="type-icon">'+ICON[t.key]+'</span>'
+      + '<span class="type-copy"><strong>'+esc(t.name)+'</strong><small>'+esc(t.desc)+'</small></span>'
+      + (active?'<span class="selected-bubble">'+ICON.check.replace(/width="[^"]*"/,'width="18"').replace(/height="[^"]*"/,'height="18"')+'</span>':'')
+      + '</button>';
+  }).join('');
+  return '<div class="mobile-prototype">'
+    + Nav('统一外来人员申请','home')
+    + '<main class="choose-page">'
+    + '<h2>请选择申请类别</h2>'
+    + '<p>请根据您的入园事项选择相应的申请类别。</p>'
+    + draftBar()
+    + '<div class="type-list">'+cards+'</div>'
+    + '</main>'
+    + '</div>';
+}
+
+/* ============ 申请表单 ============ */
+function Field(label, required, value, placeholder, readonly, arrow, onClick, onChange){
+  const valHtml = value
+    ? '<span class="val">'+esc(value)+'</span>'
+    : '<span class="val placeholder">'+esc(placeholder||'')+'</span>';
+  const box = arrow || onClick
+    ? '<div class="field-box">'+valHtml+ICON.chevron+'</div>'
+    : '<div class="field-box"><input value="'+esc(value)+'" placeholder="'+esc(placeholder||'')+'" '+(readonly?'readonly ':'')+'oninput="'+esc(onChange||'')+'(this.value)"/></div>';
+  return '<label class="field '+(arrow||onClick?'clickable':'')+'" '+(onClick?'onclick="'+esc(onClick)+'"':'')+'>'
+    + '<span>'+esc(label)+(required?'<b>*</b>':'')+'</span>'+box+'</label>';
+}
+function TimeField(label, value, onChange){
+  const lv = value ? (''+value).replace(' ','T') : '';
+  return '<label class="field"><span>'+esc(label)+'<b>*</b></span>'
+    + '<div class="field-box"><input type="datetime-local" value="'+esc(lv)+'" onchange="'+esc(onChange)+'(this.value)"/></div></label>';
+}
+function PersonPanel(p, idx){
+  const t = TYPES[state.type];
+  const canDel = state.singlePersons.length>1;
+  return '<section class="panel person-panel">'
+    + '<div class="panel-title row-title"><strong>'+esc(t.personTitle)+' ('+(idx+1)+')</strong>'
+    + (canDel?'<button class="delete" onclick="removePerson('+p.id+')">'+ICON.trash+'删除</button>':'')+'</div>'
+    + Field(t.personName, true, p.name, '请输入姓名', false, false, '', 'setPerson('+p.id+',\'name\',')
+    + Field('手机号', true, p.phone, '请输入手机号', false, false, '', 'setPerson('+p.id+',\'phone\',')
+    + Field('身份证号', true, p.idcard, '请输入身份证号', false, false, '', 'setPerson('+p.id+',\'idcard\',')
+    + '<div class="photo-title">人脸照片 <small>（用于门禁通行）</small></div>'
+    + '<button class="upload '+(p.photo?'uploaded':'')+'" onclick="togglePhoto('+p.id+')">'+(p.photo?ICON.check:ICON.camera)+'<span>'+(p.photo?'已上传':'上传照片')+'</span></button>'
+    + '</section>';
+}
+function renderForm(){
+  const t = TYPES[state.type];
+  const tabs = Object.values(TYPES).map(x=>'<button class="'+(state.type===x.key?'active':'')+'" disabled>'+esc(x.name)+'</button>').join('');
+  // 信息面板
+  let info = '<section class="panel"><h2>申请信息</h2>'
+    + Field(t.hostCode, true, state.hostCode, (state.type==='visitor'?'请输入工号':'请输入工号'), false, false, '', 'setHostCode(')
+    + (state.type==='visitor'
+        ? Field(t.hostName, false, state.hostName, '自动带出', true)
+        : Field('姓名', false, state.hostName, '自动带出', true)
+          + Field(t.hostName, false, state.hostDept, '自动带出', true))
+    + Field(t.unit, true, state.unit, '请输入单位名称', false, false, '', 'setUnit(')
+    + '<div class="textarea-label">'+esc(t.reason)+(t.reason?'<b>*</b>':'')+'</div>'
+    + '<textarea placeholder="'+esc(t.reasonPlaceholder)+'" oninput="setReason(this.value)">'+esc(state.reason)+'</textarea>'
+    + TimeField(t.startTime, state.startTime, 'setTime(\'start\',')
+    + TimeField(t.endTime, state.endTime, 'setTime(\'end\',');
+  if(t.hasContract){
+    info += '<div class="radio-row"><span>是否有合同<b>*</b></span>'
+      + '<label><input type="radio" name="hc" '+(state.hasContract==='是'?'checked':'')+' onclick="setContract(\'是\')"/>是</label>'
+      + '<label><input type="radio" name="hc" '+(state.hasContract==='否'?'checked':'')+' onclick="setContract(\'否\')"/>否</label></div>';
+    if(state.hasContract==='否'){
+      info += '<div class="conditional-area"><div class="textarea-label">无合同说明<b>*</b></div>'
+        + '<textarea placeholder="请说明无合同驻场原因" oninput="setNoContract(this.value)">'+esc(state.noContractReason)+'</textarea></div>';
+    }
+  }
+  if(t.fileLabel){
+    info += '<div class="file-area"><div class="textarea-label">'+esc(t.fileLabel)+'<b>*</b></div>'
+      + (t.fileTip?'<p class="imp-tip">'+esc(t.fileTip)+'</p>':'')
+      + '<button class="upload '+(state.protocolFile?'uploaded':'')+'" onclick="toggleProtocolFile()">'+(state.protocolFile?ICON.check:ICON.file)+'<span>'+(state.protocolFile?'已上传':'上传文件')+'</span></button></div>';
+  }
+  info += '<div class="file-area attachment-area"><div class="textarea-label">上传附件</div>'
+    + '<button class="upload '+(state.attachment?'uploaded':'')+'" onclick="toggleAttachment()">'+(state.attachment?ICON.check:ICON.file)+'<span>'+(state.attachment?'已上传':'上传附件')+'</span></button></div>';
+  info += '</section>';
+
+  const persons = renderPersons();
+
+  let agree = '';
+  if(t.agreement){
+    agree = '<label class="agreement"><input type="checkbox" '+(state.agreementOk?'checked':'')+' onclick="toggleAgreement()"/><span>我已阅读并同意</span>'
+      + '<button type="button" onclick="openNotice()">《'+esc(t.agreement)+'》</button></label>';
+  }
+
+  const blocked = (state.type!=='visitor') && (!state.agreementOk || (t.hasContract && state.hasContract==='否' && !state.noContractReason.trim()) || (t.fileLabel && !state.protocolFile));
+  const submit = '<div class="bottom-bar"><button class="primary" '+(blocked?'disabled':'')+' onclick="submitForm()">提交申请</button></div>';
+
+  return '<div class="mobile-prototype">'
+    + Nav('外来人员申请','')
+    + '<div class="form-page">'
+    + '<div class="tabs">'+tabs+'</div>'
+    + info
+    + persons
+    + agree
+    + '</div>'
+    + submit
+    + overlayHTML()
+    + '</div>';
+}
+
+/* ============ 成功页 ============ */
+function renderSuccess(){
+  const t = TYPES[state.type];
+  return '<div class="mobile-prototype">'
+    + Nav('外来人员申请','success')
+    + '<main class="success-page">'
+    + '<div class="success-mark">'+ICON.check+'</div>'
+    + '<h2>申请提交成功</h2>'
+    + '<p>申请已提交，请等待审批<br/>审批结果将通过短信通知</p>'
+    + '<section class="summary-card"><dl>'
+    + '<div><dt>申请编号</dt><dd>REQ-20260819-001</dd></div>'
+    + '<div><dt>申请类型</dt><dd>'+esc(t.name)+'</dd></div>'
+    + '<div><dt>提交时间</dt><dd>2026-08-19 13:30</dd></div>'
+    + '<div><dt>人员数量</dt><dd>'+activePersons().length+' 人</dd></div>'
+    + '</dl></section>'
+    + '<button class="primary done" onclick="toChoose()">完成</button>'
+    + '</main></div>';
+}
+
+/* ============ 模板导入：内嵌于申请页人员步骤 ============ */
+function overlayHTML(){
+  if(state.overlay==='notice') return renderNotice();
+  return '';
+}
+function renderImportSection(){
+  const rows = importState.rows;
+  const passed = rows ? rows.filter(r=>!r.err).length : 0;
+  const failed = rows ? rows.length - passed : 0;
+
+
+  let h = ''
+    + '<h3>批量导入（Excel模板）</h3>'
+    + '<p class="imp-tip">模板含 3 个字段（姓名、手机号、身份证号），<span class="req">*</span> 为必填列。先下载模板填写，再选择文件导入。</p>'
+    + '<div class="imp-actions"><button class="primary" onclick="downloadTemplate()">'+ICON.download+'下载 Excel 模板</button></div>'
+    + '<div class="imp-divider"></div>'
+    + '<label class="imp-file"><input type="file" accept=".xlsx,.xls,.csv" onchange="onImportFile(event)"/>'+ICON.file+'<span>'+(importState.fileName||'点击选择文件（.xlsx / .xls / .csv）')+'</span></label>';
+
+  if(!rows){
+    h += '<div class="imp-actions"><button class="primary" '+(importState.fileName?'':'disabled')+' onclick="parseFile()">'+(importState.parsing?'解析中…':'开始解析')+'</button></div>';
+  } else {
+    h += '<div class="imp-summary"><span class="s-ok">成功 '+passed+'</span><span class="s-fail">失败 '+failed+'</span></div>'
+      + '<div class="imp-actions">'
+      + (failed>0
+        ? '<button class="primary" onclick="exportErrors()">'+ICON.download+'生成错误文件（'+failed+' 条）</button>'
+          + '<button class="ghost" onclick="reupload()">重新上传</button>'
+        : '<button class="primary" onclick="submitPassed()">确认导入 '+passed+' 人</button>')
+      + '</div>';
+  }
+  return h;
+}
+function renderNotice(){
+  const t = TYPES[state.type];
+  const items = (NOTICES[t.key]||[]).map(n=>'<li>'+esc(n)+'</li>').join('');
+  return '<div class="overlay notice-overlay" onclick="closeOverlay()"><section class="notice-modal" onclick="event.stopPropagation()">'
+    + '<button class="notice-close" onclick="closeOverlay()">'+ICON.x+'</button>'
+    + '<h3>'+esc(t.agreement)+'</h3>'
+    + '<p>请阅读以下要求，确认后再提交申请。</p>'
+    + '<ol>'+items+'</ol>'
+    + '<button class="primary notice-primary" onclick="agreeNotice()">我已阅读并同意</button>'
+    + '</section></div>';
+}
+
+/* ============ 渲染入口 ============ */
+function render(){
+  // 渲染前记录表单视图当前滚动位置（DOM 重建后浏览器会丢失）
+  const fpOld = document.querySelector('.form-page');
+  const savedTop = fpOld ? fpOld.scrollTop : 0;
+  const root = document.getElementById('root');
+  let html = '';
+  if(state.view==='choose') html = renderChoose();
+  else if(state.view==='form') html = renderForm();
+  else if(state.view==='success') html = renderSuccess();
+  root.innerHTML = html + (state.toast?'<div class="toast">'+esc(state.toast)+'</div>':'');
+  // 同视图内 render 保持滚动位置；跨视图进入表单则从顶部开始
+  const fp = document.querySelector('.form-page');
+  if(fp) fp.scrollTop = (lastView==='form') ? savedTop : 0;
+  lastView = state.view;
+}
+
+/* ============ 事件 ============ */
+function selectType(k){
+  state.type=k;
+  if(state.view!=='form'){
+    // 从选择页点击卡片 = 开启新申请（清除旧草稿，待用户开始填写后再存新草稿）
+    clearDraft(); resetForm();
+    state.view='form';
+    render(); return;
+  }
+  // 表单内 Tab 切换类型：类型变更入草稿
+  saveDraft(); render();
+}
+function toForm(){ state.view='form'; render(); }
+function toChoose(){ state.view='choose'; resetForm(); render(); }
+function onBack(){ state.view='choose'; render(); }
+function resetForm(){
+  state.singlePersons=[newPerson()]; state.batchPersons=[]; state.personMode='single'; state.hasContract='是'; state.noContractReason='';
+  state.hostCode=''; state.hostName=''; state.hostDept=''; state.unit=''; state.reason=''; state.startTime=''; state.endTime='';
+  state.attachment=false; state.protocolFile=false; state.agreementOk=false; state.overlay=null; state.importOpen=false; importState={rows:null,fileName:'',parsing:false};
+}
+function setHostCode(v){
+  state.hostCode=v;
+  if(state.type==='office' || state.type==='construction'){
+    const r = lookupPerson(state.type, v.trim());
+    state.hostName = r.name; state.hostDept = r.dept;
+  }
+  saveDraft(); render();
+}
+function setUnit(v){ state.unit=v; saveDraft(); }
+function setReason(v){ state.reason=v; saveDraft(); }
+function setContract(v){ state.hasContract=v; saveDraft(); render(); }
+function setNoContract(v){ state.noContractReason=v; saveDraft(); }
+function setPerson(id,key,v){ const p=state.singlePersons.find(x=>x.id===id); if(p){ p[key]=v; saveDraft(); } }
+function addPerson(){ state.singlePersons.push(newPerson()); saveDraft(); render(); }
+function removePerson(id){ state.singlePersons=state.singlePersons.filter(p=>p.id!==id); saveDraft(); render(); }
+function togglePhoto(id){ const p=state.singlePersons.find(x=>x.id===id); if(p){ p.photo=!p.photo; saveDraft(); } render(); }
+function toggleAttachment(){ state.attachment=!state.attachment; saveDraft(); render(); }
+function toggleProtocolFile(){ state.protocolFile=!state.protocolFile; saveDraft(); render(); }
+function toggleAgreement(){ state.agreementOk=!state.agreementOk; saveDraft(); render(); }
+function setTime(which, val){
+  val = (val||'').replace('T',' ');
+  if(which==='start') state.startTime = val; else state.endTime = val;
+  saveDraft(); render();
+}
+function openNotice(){ state.overlay='notice'; render(); }
+function agreeNotice(){ state.agreementOk=true; state.overlay=null; saveDraft(); render(); }
+function closeOverlay(){ state.overlay=null; render(); }
+function submitForm(){
+  const t=TYPES[state.type];
+  if(state.type==='visitor'){ clearDraft(); state.view='success'; render(); return; }
+  if(!state.agreementOk){ showToast('请阅读并同意《'+t.agreement+'》'); return; }
+  if(t.hasContract && state.hasContract==='否' && !state.noContractReason.trim()){ showToast('请填写无合同说明'); return; }
+  if(t.fileLabel && !state.protocolFile){ showToast('请上传'+t.fileLabel); return; }
+  clearDraft();
+  state.view='success'; render();
+}
+
+/* 模板导入 */
+let lastView = '';
+function scrollFormToTop(){
+  const el = document.querySelector('.form-page');
+  if(el) el.scrollTop = 0;
+}
+function openImport(){ state.importOpen=true; importState={rows:null,fileName:'',parsing:false}; render(); }
+function downloadTemplate(){
+  const header = TEMPLATE_FIELDS.map(f=>f.label).join(',');
+  const sample = ['张伟,13800001111,320583199001011234,苏E·8X9K2',
+                  '李娜,13900002222,310104199203034567,'];
+  const csv = '﻿'+[header,...sample].join('\n');
+  const blob = new Blob([csv], {type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='驻场人员导入模板.csv'; a.click();
+  showToast('模板已下载（Excel 打开）');
+}
+function onImportFile(e){
+  const f = e.target.files && e.target.files[0];
+  importState.fileName = f ? f.name : '示例名单.xlsx';
+  render();
+}
+function pickCell(r, label, k){
+  if(r==null) return '';
+  if(r[label]!=null && (''+r[label]).trim()!=='') return (''+r[label]).trim();
+  if(r[k]!=null && (''+r[k]).trim()!=='') return (''+r[k]).trim();
+  for(const key in r){ if(key && key.indexOf(label)>=0) return (''+r[key]).trim(); }
+  return '';
+}
+function parseCsv(text){
+  const lines = text.split(/\r?\n/).filter(l=>l.trim()!=='');
+  if(!lines.length) return [];
+  const header = lines[0].replace(/^﻿/,'').split(',').map(s=>s.trim());
+  return lines.slice(1).map(line=>{
+    const cells = line.split(',');
+    const o={}; header.forEach((h,i)=> o[h] = cells[i]!==undefined ? (cells[i]||'').trim() : '');
+    return o;
+  });
+}
+function parseFile(){
+  const input = document.querySelector('.imp-file input');
+  const f = input && input.files && input.files[0];
+  if(!f){ showToast('请先选择文件'); return; }
+  if(f.size > 10*1024*1024){ showToast('文件超过 10MB 上限'); return; }
+  importState.parsing=true; render();
+  const ext = (f.name.split('.').pop()||'').toLowerCase();
+  const reader = new FileReader();
+  reader.onerror = ()=>{ importState.parsing=false; render(); showToast('文件读取失败'); };
+  reader.onload = (e)=>{
+    try{
+      let raw=[];
+      if(ext==='csv'){
+        raw = parseCsv(e.target.result);
+      } else if(window.XLSX){
+        const wb = XLSX.read(e.target.result, {type:'array'});
+        raw = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {defval:''});
+      } else {
+        throw new Error('解析组件未加载，请联网后重试');
+      }
+      if(raw.length>1000){ importState.parsing=false; render(); showToast('超过 1000 行上限'); return; }
+      importState.rows = raw.map(r=>{
+        const o={
+          name: pickCell(r,'姓名','name'), phone: pickCell(r,'手机号','phone'),
+          idcard: pickCell(r,'身份证号','idcard')
+        };
+        return {name:o.name, phone:o.phone, idcard:o.idcard,
+          err: validateRow({phone:o.phone, idcard:o.idcard})};
+      });
+      importState.parsing=false; render();
+      if(!importState.rows.length) showToast('未解析到数据行');
+    }catch(err){
+      importState.parsing=false; render();
+      showToast('解析失败：'+(err&&err.message?err.message:'文件格式错误'));
+    }
+  };
+  if(ext==='csv') reader.readAsText(f,'utf-8'); else reader.readAsArrayBuffer(f);
+}
+function activePersons(){
+  if(state.type==='visitor') return state.singlePersons;
+  if(state.personMode==='batch') return state.batchPersons;
+  return state.singlePersons;
+}
+function modeSwitch(){
+  const m = state.personMode||'single';
+  return '<div class="mode-switch">'
+    + '<button class="mode-opt '+(m==='single'?'active':'')+'" onclick="setPersonMode(\'single\')">'+ICON.plus+'单个添加</button>'
+    + '<button class="mode-opt '+(m==='batch'?'active':'')+'" onclick="setPersonMode(\'batch\')">'+ICON.download+'批量导入</button>'
+    + '</div>';
+}
+function setPersonMode(m){
+  if(state.personMode===m) return;
+  state.personMode=m;
+  if(m==='single'){
+    state.importOpen=false;
+    if(!state.singlePersons.length) state.singlePersons=[newPerson()];
+  } else {
+    // 切到批量导入：无已导入名单时直接展开步骤1
+    if(!state.batchPersons.length) state.importOpen=true;
+  }
+  saveDraft(); render(); scrollFormToTop();
+}
+function renderPersons(){
+  const t = TYPES[state.type];
+  // 来访人员：仅单个添加，无批量导入
+  if(state.type==='visitor'){
+    const persons = state.singlePersons.map((p,i)=>PersonPanel(p,i)).join('');
+    return persons + '<button class="add-person" onclick="addPerson()">'+ICON.plus+esc(t.addText)+'</button>';
+  }
+  // 驻场办公人员 / 施工作业人员：单个添加 与 批量导入 二选一
+  const m = state.personMode||'single';
+  const sw = modeSwitch();
+  if(m==='single'){
+    const persons = state.singlePersons.map((p,i)=>PersonPanel(p,i)).join('');
+    return sw + persons + '<button class="add-person" onclick="addPerson()">'+ICON.plus+esc(t.addText)+'</button>';
+  }
+  let body;
+  if(state.batchPersons.length && !state.importOpen){
+    // 已导入名单 + 重新导入入口
+    const list = state.batchPersons.map((p,i)=>'<div class="imp-row ok">'
+      + '<span class="ok-tag">'+ICON.check.replace(/width="[^"]*"/,'width="14"').replace(/height="[^"]*"/,'height="14"')+'已导入</span>'
+      + '<b>'+esc(p.name)+'</b><small>'+esc(p.phone)+'</small>'
+      + '<button class="del" onclick="removeImported('+i+')">移除</button></div>').join('');
+    body = '<div class="imp-rows">'+list+'</div>'
+      + '<button class="add-person import-btn" onclick="openImport()">'+ICON.download+'重新导入（Excel模板）</button>';
+  } else {
+    // 批量导入步骤1/步骤2 直接内嵌展示
+    body = renderImportSection();
+  }
+  return sw + body;
+}
+function removeImported(i){ state.batchPersons.splice(i,1); saveDraft(); render(); }
+function reupload(){ importState={rows:null,fileName:'',parsing:false}; render(); }
+function exportErrors(){
+  const fails = (importState.rows||[]).filter(r=>r.err);
+  if(!fails.length){ showToast('无错误行'); return; }
+  const header = TEMPLATE_FIELDS.map(f=>f.label).join(',');
+  const lines = fails.map(r=>[r.name,r.phone,r.idcard].join(','));
+  const csv = '﻿'+[header,...lines].join('\n');
+  const blob = new Blob([csv], {type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='导入错误行.csv'; a.click();
+  showToast('已导出 '+fails.length+' 条错误行');
+}
+function submitPassed(){
+  const passed = (importState.rows||[]).filter(r=>!r.err);
+  passed.forEach(r=> state.batchPersons.push({id:uid(), name:r.name||'', phone:r.phone||'', idcard:r.idcard||'', photo:false}));
+  state.importOpen=false;                       // 回名单视图
+  importState={rows:null,fileName:'',parsing:false};
+  saveDraft();
+  showToast('已导入 '+passed.length+' 人');
+}
+
+/* 启动 */
+render();
+</script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  </body>
+</html>
