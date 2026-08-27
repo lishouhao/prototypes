@@ -267,7 +267,8 @@ tr:hover td { background: #F7F7FA; }
   animation: modalIn .2s ease;
   display: flex; flex-direction: column;
 }
-#yy-formModal .modal { width: 920px; max-width: 94%; }
+#yy-formModal .modal { width: 920px; max-width: 94%; height: 82vh; }
+#yy-formModal .modal-body { flex: 1 1 auto; min-height: 0; }
 @keyframes modalIn {
   from { opacity: 0; transform: translateY(-20px); }
   to { opacity: 1; transform: translateY(0); }
@@ -714,6 +715,12 @@ tr:hover td { background: #F7F7FA; }
 .mx-tab:hover { color:#4165EC; }
 .mx-tab.active { color:#4165EC; font-weight:600; }
 .mx-tab.active::after { content:""; position:absolute; left:0; right:0; bottom:-1px; height:3px; background:#4165EC; border-radius:2px; }
+/* 会议预约弹窗：分步页签 */
+.yy-tabs { display:flex; gap:24px; border-bottom:1px solid #EBEEF5; margin-bottom:16px; }
+.yy-tab { padding:10px 4px; font-size:14px; font-weight:500; color:#8F9098; cursor:pointer; position:relative; transition:color .2s; }
+.yy-tab:hover { color:#4165EC; }
+.yy-tab.active { color:#4165EC; font-weight:600; }
+.yy-tab.active::after { content:""; position:absolute; left:0; right:0; bottom:-1px; height:3px; background:#4165EC; border-radius:2px; }
 .mx-bar-mine { padding:14px 24px; }
 .mx-mine-count { margin-left:auto; font-size:13px; color:#8F9098; }
 .mx-rel { display:inline-block; font-size:12px; padding:2px 8px; border-radius:10px; }
@@ -1334,7 +1341,12 @@ tr:hover td { background: #F7F7FA; }
       <button class="modal-close" onclick="yyCloseModal()">&times;</button>
     </div>
     <div class="modal-body">
-      <div class="modal-section">
+      <div class="yy-tabs">
+        <div class="yy-tab active" data-yytab="info" onclick="yySwitchTab('info')">会议信息</div>
+        <div class="yy-tab" data-yytab="service" onclick="yySwitchTab('service')">会务与费用</div>
+        <div class="yy-tab" data-yytab="notice" onclick="yySwitchTab('notice')">参会通知</div>
+      </div>
+      <div class="modal-section yy-pane" data-yytab="info">
         <div class="modal-section-title">基础信息</div>
         <div class="yy-grid">
         <div class="form-row">
@@ -1413,7 +1425,7 @@ tr:hover td { background: #F7F7FA; }
         </div>
         </div>
       </div>
-      <div class="modal-section" id="yy-roomInfoSection">
+      <div class="modal-section yy-pane" id="yy-roomInfoSection" data-yytab="info">
         <div class="modal-section-title">会议室信息</div>
         <div class="info-row"><div class="info-label">会议室名称：</div>
           <div class="combo" id="yy-roomCombo">
@@ -1429,7 +1441,7 @@ tr:hover td { background: #F7F7FA; }
         <div class="info-row"><div class="info-label">单价（元/小时）：</div><div id="yy-modalRoomPrice">—</div></div>
         <div class="info-row"><div class="info-label">会议室费用：</div><div id="yy-roomFee">—</div></div>
       </div>
-      <div class="modal-section" id="yy-serviceSection">
+      <div class="modal-section yy-pane" id="yy-serviceSection" data-yytab="service" style="display:none;">
         <div class="modal-section-title">会务服务</div>
         <div class="yy-svc-tip">如有会议场地布置及会议室功能咨询等会务服务事项，可联系物业工作人员：吕慧娟 18506247652。</div>
         <div class="form-row">
@@ -1450,7 +1462,7 @@ tr:hover td { background: #F7F7FA; }
           </div>
         </div>
       </div>
-      <div class="modal-section" id="yy-costShareSection">
+      <div class="modal-section yy-pane" id="yy-costShareSection" data-yytab="service" style="display:none;">
         <div class="modal-section-title">费用分摊</div>
         <div class="form-row">
           <label>是否分摊</label>
@@ -1466,7 +1478,7 @@ tr:hover td { background: #F7F7FA; }
           </div>
         </div>
       </div>
-      <div class="modal-section" id="yy-noticeSection">
+      <div class="modal-section yy-pane" id="yy-noticeSection" data-yytab="notice" style="display:none;">
         <div class="modal-section-title">参会通知</div>
         <div class="form-row">
           <label>是否通知</label>
@@ -1667,26 +1679,6 @@ tr:hover td { background: #F7F7FA; }
   <div class="confirm-btns">
     <button class="btn btn-default" style="height:28px;padding:0 12px;" onclick="closeDeleteConfirm()">取消</button>
     <button class="btn btn-primary" style="height:28px;padding:0 12px;" onclick="confirmDelete()">确定</button>
-  </div>
-</div>
-
-<!-- ========== 预约审批：通过/拒绝确认弹窗 ========== -->
-<div class="modal-overlay" id="sp-confirm-modal" onclick="spCloseConfirmModal(event)">
-  <div class="modal" style="width:420px;max-width:90%;" onclick="event.stopPropagation()">
-    <div class="modal-header">
-      <span>提示</span>
-      <button class="modal-close" onclick="spCloseConfirmModal()">&times;</button>
-    </div>
-    <div class="modal-body" style="padding:24px;">
-      <div style="display:flex;align-items:center;gap:12px;font-size:14px;color:#36373B;">
-        <span style="color:#faad14;font-size:22px;">&#x26A0;</span>
-        <span id="sp-confirm-text">确认要通过该条预约么？</span>
-      </div>
-    </div>
-    <div style="padding:12px 24px 24px;display:flex;justify-content:flex-end;gap:8px;">
-      <button class="btn btn-default" style="height:32px;padding:0 16px;" onclick="spCloseConfirmModal()">取消</button>
-      <button class="btn btn-primary" style="height:32px;padding:0 16px;" onclick="spConfirmAction()">确定</button>
-    </div>
   </div>
 </div>
 
@@ -2617,6 +2609,7 @@ function yyOpenModal() {
   document.querySelector('input[name="yy-costShare"][value="否"]').checked = true;
   yyToggleCostShare();
   yyClearErr();
+  yySwitchTab('info');
   document.getElementById('yy-formModal').classList.add('show');
 }
 function yyCloseModal() {
@@ -2856,8 +2849,6 @@ function spRender() {
         <td><span class="status-tag ${st.cls}">${st.label}</span></td>
         <td>
           <div class="actions">
-            <button class="btn btn-link" onclick="spOpenApproveModal(${item.id})">通过</button>
-            <button class="btn btn-danger" onclick="spOpenRejectModal(${item.id})">拒绝</button>
             <button class="btn btn-link" onclick="spOpenDetail(${item.id})">详情</button>
           </div>
         </td>`;
@@ -3048,41 +3039,6 @@ function spCloseDetail() {
   document.getElementById('sp-detailDrawer').classList.remove('show');
 }
 /* 审批详情为管理员审批视角，不提供用户侧变更/取消入口；用户变更、取消仅在「会议预约」界面（资源矩阵 / 我发起的）进行 */
-let spConfirmItem = null;
-let spConfirmType = null;
-function spOpenApproveModal(id) {
-  spConfirmItem = spData.find(d => d.id === id) || null;
-  spConfirmType = 'approve';
-  document.getElementById('sp-confirm-text').textContent = '确认要通过该条预约么？';
-  document.getElementById('sp-confirm-modal').classList.add('show');
-}
-function spOpenRejectModal(id) {
-  spConfirmItem = spData.find(d => d.id === id) || null;
-  spConfirmType = 'reject';
-  document.getElementById('sp-confirm-text').textContent = '确认要拒绝该条预约么？';
-  document.getElementById('sp-confirm-modal').classList.add('show');
-}
-function spCloseConfirmModal(event) {
-  if (event && event.target !== event.currentTarget) return;
-  document.getElementById('sp-confirm-modal').classList.remove('show');
-  spConfirmItem = null;
-  spConfirmType = null;
-}
-function spConfirmAction() {
-  if (!spConfirmItem || !spConfirmType) return;
-  if (spConfirmType === 'approve') {
-    spConfirmItem.status = '已通过';
-    showToast('已通过该预约');
-  } else {
-    spConfirmItem.status = '已拒绝';
-    showToast('已拒绝该预约');
-  }
-  spRender();
-  if (spCurrentItem && spCurrentItem.id === spConfirmItem.id) {
-    document.getElementById('sp-detailStatus').textContent = spConfirmItem.status;
-  }
-  spCloseConfirmModal();
-}
 
 /* ================= 会议费用 ================= */
 let fyData = [
@@ -3838,6 +3794,10 @@ let qkPageMine = 1;
 let mxMineFilterType = 'all';
 
 /* 资源视图 / 我的会议 Tab 切换 */
+function yySwitchTab(tab){
+  document.querySelectorAll('.yy-tab').forEach(t => t.classList.toggle('active', t.dataset.yytab === tab));
+  document.querySelectorAll('.yy-pane').forEach(p => p.style.display = (p.dataset.yytab === tab) ? '' : 'none');
+}
 function mxSwitchTab(tab){
   document.querySelectorAll('.mx-tab').forEach(t => t.classList.toggle('active', t.dataset.mxtab === tab));
   document.getElementById('mx-pane-resource').style.display = (tab === 'resource') ? '' : 'none';
