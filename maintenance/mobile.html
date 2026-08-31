@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>维保任务（移动端）</title>
+<style>
+  :root{
+    --primary:#4165EC; --primary-hover:#3454cf;
+    --text:#36373B; --sub:#8F9098;
+    --bg:#F8F8F8; --input-bg:#F7F7FA; --white:#FFFFFF;
+    --border:#D8D8D8;
+    --green:#52C41A; --green-bg:#EAF7EE;
+    --orange:#FAAD14; --orange-bg:#FFF7E6;
+    --blue:#4165EC; --blue-bg:#EEF1FE;
+    --gray:#8F9098; --gray-bg:#F2F3F5;
+    --red:#F5222D; --red-bg:#FFF1F0;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html,body{margin:0; padding:0; background:#E6E8EC; font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif; color:var(--text);}
+  body{display:flex; justify-content:center; min-height:100vh;}
+  /* 手机外壳 */
+  .phone{width:100%; max-width:390px; min-height:100vh; background:var(--bg); position:relative; display:flex; flex-direction:column; overflow:hidden;}
+  @media(min-width:420px){ body{padding:24px 0;} .phone{height:calc(100vh - 48px); border-radius:24px; box-shadow:0 12px 40px rgba(0,0,0,.18); min-height:auto;} }
+
+  /* 顶部导航栏 */
+  .nav{height:48px; flex:0 0 48px; background:var(--white); border-bottom:1px solid #EEE; display:flex; align-items:center; padding:0 12px; position:relative; z-index:5;}
+  .nav .back{width:32px; height:32px; display:flex; align-items:center; justify-content:center; color:var(--text); cursor:pointer;}
+  .nav .title{position:absolute; left:0; right:0; text-align:center; font-size:16px; font-weight:600; pointer-events:none;}
+  .nav .right{margin-left:auto; display:flex; align-items:center; gap:8px;}
+
+  /* Tab 栏 */
+  .tabs{display:flex; background:var(--white); border-bottom:1px solid #EEE; flex:0 0 auto;}
+  .tab{flex:1; text-align:center; padding:12px 0; font-size:14px; color:var(--sub); position:relative; cursor:pointer;}
+  .tab.active{color:var(--primary); font-weight:600;}
+  .tab.active::after{content:""; position:absolute; left:50%; bottom:0; transform:translateX(-50%); width:32px; height:3px; border-radius:2px; background:var(--primary);}
+
+  /* 搜索栏 */
+  .searchbar{display:flex; gap:8px; padding:12px; flex:0 0 auto;}
+  .search{flex:1; display:flex; align-items:center; gap:6px; background:var(--input-bg); border:1px solid var(--border); border-radius:4px; padding:0 10px; height:36px;}
+  .search input{flex:1; border:0; background:transparent; outline:none; font-size:14px; color:var(--text);}
+  .search input::placeholder{color:var(--sub);}
+  .filter-btn{width:36px; height:36px; border:1px solid var(--border); border-radius:4px; background:var(--white); display:flex; align-items:center; justify-content:center; color:var(--sub); cursor:pointer;}
+
+  /* 滚动内容区 */
+  .scroll{flex:1 1 auto; overflow-y:auto; -webkit-overflow-scrolling:touch; padding:12px; padding-bottom:24px;}
+  .scroll.no-pad{padding:0;}
+
+  /* 任务卡片 */
+  .task-card{background:var(--white); border-radius:8px; padding:14px 14px 14px 18px; margin-bottom:12px; position:relative; cursor:pointer; overflow:hidden;}
+  .task-card::before{content:""; position:absolute; left:0; top:0; bottom:0; width:4px; background:var(--gray);}
+  .task-card.s-done::before{background:var(--green);}
+  .task-card.s-todo::before{background:var(--orange);}
+  .task-card.s-running::before{background:var(--blue);}
+  .task-card .row1{display:flex; align-items:center; justify-content:space-between; gap:8px;}
+  .task-card .name{font-size:15px; font-weight:600; color:var(--text); flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .task-card .meta{font-size:12px; color:var(--sub); margin-top:6px; display:flex; gap:16px;}
+  .tag{font-size:12px; padding:2px 8px; border-radius:4px; white-space:nowrap; flex:0 0 auto;}
+  .tag.green{color:var(--green); background:var(--green-bg);}
+  .tag.orange{color:var(--orange); background:var(--orange-bg);}
+  .tag.blue{color:var(--blue); background:var(--blue-bg);}
+  .tag.gray{color:var(--gray); background:var(--gray-bg);}
+  .tag.red{color:var(--red); background:var(--red-bg);}
+  .appr-row{display:flex; align-items:center; gap:10px; margin-top:8px;}
+  .appr-jump{font-size:12px; color:var(--primary); cursor:pointer; margin-left:auto;}
+
+  /* 详情 */
+  .section-title{font-size:15px; font-weight:600; color:var(--text); margin:16px 4px 10px;}
+  .info-card{background:var(--white); border-radius:8px; padding:4px 16px; margin-bottom:12px;}
+  .info-row{display:flex; padding:12px 0; border-bottom:1px solid #F0F0F0; font-size:14px;}
+  .info-row:last-child{border-bottom:0;}
+  .info-row .k{width:88px; flex:0 0 88px; color:var(--sub);}
+  .info-row .v{flex:1; color:var(--text);}
+
+  .dev-card{background:var(--white); border-radius:8px; padding:14px 16px; margin-bottom:12px; display:flex; align-items:center; gap:12px; cursor:pointer;}
+  .dev-card .dev-main{flex:1; min-width:0;}
+  .dev-card .dev-name{font-size:14px; font-weight:600; color:var(--text); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .dev-card .dev-sub{display:flex; align-items:center; gap:10px; margin-top:8px;}
+  .progress{flex:1; height:6px; background:#EEF0F3; border-radius:4px; overflow:hidden; max-width:140px;}
+  .progress > i{display:block; height:100%; background:var(--primary); border-radius:4px; transition:width .25s;}
+  .progress-txt{font-size:12px; color:var(--sub);}
+  .dev-card .arrow{color:var(--sub); flex:0 0 auto;}
+
+  /* 填写页 */
+  .std-card{background:var(--white); border-radius:8px; padding:16px; margin-bottom:12px;}
+  .std-card .std-name{font-size:15px; font-weight:600; color:var(--text); margin-bottom:14px;}
+  .field{margin-bottom:14px;}
+  .field:last-child{margin-bottom:0;}
+  .field label{display:block; font-size:13px; color:var(--sub); margin-bottom:7px;}
+  .field .ctrl{width:100%; height:38px; background:var(--input-bg); border:1px solid var(--border); border-radius:4px; padding:0 12px; font-size:14px; color:var(--text); outline:none;}
+  select.ctrl{appearance:none; -webkit-appearance:none; background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'><path d='M3 4.5L6 7.5L9 4.5' fill='none' stroke='%238F9098' stroke-width='1.4' stroke-linecap='round' stroke-linejoin='round'/></svg>"); background-repeat:no-repeat; background-position:right 12px center; padding-right:32px;}
+  textarea.ctrl{height:72px; padding:10px 12px; resize:none; line-height:1.5;}
+  .upload{display:inline-flex; align-items:center; gap:6px; color:var(--primary); font-size:14px; cursor:pointer; padding:8px 0;}
+  .up-prev{margin-top:8px; font-size:12px; color:var(--sub); display:flex; flex-wrap:wrap; gap:6px;}
+  .up-prev span{background:var(--input-bg); border:1px solid var(--border); border-radius:4px; padding:3px 8px;}
+
+  /* 底部按钮 */
+  .footer{flex:0 0 auto; padding:12px; background:var(--white); border-top:1px solid #EEE; display:flex; gap:12px;}
+  .btn{flex:1; height:44px; border-radius:4px; font-size:15px; border:0; cursor:pointer; display:flex; align-items:center; justify-content:center;}
+  .btn-primary{background:var(--primary); color:#fff;}
+  .btn-primary:active{background:var(--primary-hover);}
+  .btn-primary:disabled{background:#B9C5EE;}
+
+  /* 空态 / 尾 */
+  .empty{text-align:center; color:var(--sub); font-size:13px; padding:48px 0;}
+  .nomore{text-align:center; color:var(--sub); font-size:12px; padding:16px 0 8px;}
+
+  /* 视图切换 */
+  .view{display:none;}
+  .view.active{display:block;}
+
+  /* 卡片入场动画 */
+  @keyframes cardIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+  .task-card { animation: cardIn .32s both; }
+
+  /* 提交确认弹层 */
+  .confirm-pop { display: none; position: absolute; inset: 0; z-index: 45; }
+  .confirm-pop.show { display: flex; align-items: flex-end; }
+  .cf-sheet { position: relative; width: 100%; background: var(--white); border-radius: 12px 12px 0 0; padding: 20px 16px 24px; animation: slideUp .22s ease; }
+  .cf-title { font-size: 16px; font-weight: 600; text-align: center; }
+  .cf-tip { font-size: 13px; color: var(--sub); text-align: center; margin-top: 8px; line-height: 1.5; }
+  .cf-btns { display: flex; gap: 12px; margin-top: 20px; }
+  .cf-btn { flex: 1; height: 44px; border: 0; border-radius: 6px; font-size: 15px; }
+  .cf-btn.ghost { background: var(--gray-bg); color: var(--text); }
+  .cf-btn.primary { background: var(--primary); color: #fff; }
+  .cf-btn.primary:active { background: var(--primary-hover); }
+
+  /* toast */
+  .toast{position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); background:rgba(0,0,0,.8); color:#fff; font-size:14px; padding:10px 18px; border-radius:6px; opacity:0; pointer-events:none; transition:opacity .2s; z-index:50; white-space:nowrap;}
+  .toast.show{opacity:1;}
+
+  /* 筛选弹层 */
+  .filter-pop{display:none; position:absolute; inset:0; z-index:40;}
+  .filter-pop.show{display:flex; align-items:flex-end;}
+  .fp-mask{position:absolute; inset:0; background:rgba(0,0,0,.35);}
+  .fp-sheet{position:relative; width:100%; background:var(--white); border-radius:12px 12px 0 0; padding:18px 16px 24px; animation:slideUp .22s ease;}
+  @keyframes slideUp{from{transform:translateY(100%);}to{transform:translateY(0);}}
+  .fp-title{font-size:15px; font-weight:600; margin-bottom:14px;}
+  .fp-opts{display:flex; flex-wrap:wrap; gap:10px;}
+  .fp-opt{font-size:13px; padding:7px 16px; border-radius:18px; background:var(--gray-bg); color:var(--sub); cursor:pointer;}
+  .fp-opt.active{background:var(--primary); color:#fff;}
+  .fp-ok{margin-top:18px; width:100%; height:44px; border:0; border-radius:6px; background:var(--primary); color:#fff; font-size:15px;}
+  .task-card:active{transform:scale(.99);}
+  .task-card{transition:transform .12s;}
+
+  /* 逾期红标 (#8) */
+  .tag.overdue{color:var(--red); background:var(--red-bg);}
+
+  /* 底部双按钮 */
+  .btn-ghost{background:var(--gray-bg); color:var(--text);}
+  .btn-ghost:active{background:#E6E8EC;}
+  .footer .btn-ghost{flex:0 0 38%;}
+
+  /* 延期弹层 (#6) */
+  .delay-pop{display:none; position:absolute; inset:0; z-index:42;}
+  .delay-pop.show{display:flex; align-items:flex-end;}
+  .err-tip{color:var(--red); font-size:12px; margin-top:8px; display:none;}
+</style>
+</head>
+<body>
+<div class="phone">
+  <!-- 顶部导航 -->
+  <div class="nav" id="nav">
+    <div class="back" id="navBack" style="visibility:hidden;">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 5l-7 7 7 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <div class="title" id="navTitle">维保任务</div>
+    <div class="right" id="navRight"></div>
+  </div>
+
+  <!-- ===== 视图：列表 ===== -->
+  <div class="view active" id="view-list">
+    <div class="tabs">
+      <div class="tab active" data-tab="task">维保任务</div>
+      <div class="tab" data-tab="history">维保历史</div>
+    </div>
+    <div class="searchbar">
+      <div class="search">
+        <svg viewBox="0 0 16 16" width="15" height="15" fill="none" stroke="#8F9098" stroke-width="1.5"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5L14 14" stroke-linecap="round"/></svg>
+        <input id="listSearch" placeholder="输入关键字搜索" />
+      </div>
+      <div class="filter-btn" id="listFilter">
+        <svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 4h12M4 8h8M6 12h4" stroke-linecap="round"/></svg>
+      </div>
+    </div>
+    <div class="scroll" id="listScroll"></div>
+  </div>
+
+  <!-- ===== 视图：任务详情 ===== -->
+  <div class="view" id="view-detail">
+    <div class="scroll" id="detailScroll"></div>
+    <div class="footer" id="detailFooter" style="display:none;">
+      <button class="btn btn-ghost" id="btnDelay">申请延期</button>
+      <button class="btn btn-primary" id="btnSubmit">提交</button>
+    </div>
+  </div>
+
+  <!-- ===== 视图：设备填写 ===== -->
+  <div class="view" id="view-fill">
+    <div class="scroll" id="fillScroll"></div>
+    <div class="footer">
+      <button class="btn btn-primary" id="btnSave">保存</button>
+    </div>
+  </div>
+
+  <!-- 筛选弹层 -->
+  <div class="filter-pop" id="filterPop">
+    <div class="fp-mask" id="fpMask"></div>
+    <div class="fp-sheet">
+      <div class="fp-title">按状态筛选</div>
+      <div class="fp-opts" id="fpOpts">
+        <span class="fp-opt active" data-st="">全部</span>
+        <span class="fp-opt" data-st="unstart">未开始</span>
+        <span class="fp-opt" data-st="todo">待执行</span>
+        <span class="fp-opt" data-st="running">进行中</span>
+        <span class="fp-opt" data-st="done">已完成</span>
+      </div>
+      <button class="fp-ok" id="fpOk">确定</button>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <!-- 提交确认 -->
+  <div class="confirm-pop" id="confirmPop">
+    <div class="fp-mask" id="cfMask"></div>
+    <div class="cf-sheet">
+      <div class="cf-title">确认提交该维保任务？</div>
+      <div class="cf-tip">提交后任务将进入审批流程，且不可再修改填写内容。</div>
+      <div class="cf-btns">
+        <button class="cf-btn ghost" id="cfCancel">取消</button>
+        <button class="cf-btn primary" id="cfOk">确认提交</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 申请延期弹层 (#6) -->
+  <div class="delay-pop" id="delayPop">
+    <div class="fp-mask" id="delayMask"></div>
+    <div class="fp-sheet">
+      <div class="fp-title">申请延期</div>
+      <div class="field"><label>延期到日期 <span style="color:var(--red)">*</span></label>
+        <input type="date" class="ctrl" id="delayDate" /></div>
+      <div class="field"><label>延期原因 <span style="color:var(--red)">*</span></label>
+        <textarea class="ctrl" id="delayReason" placeholder="请输入延期原因"></textarea></div>
+      <div class="err-tip" id="delayErr"></div>
+      <button class="fp-ok" id="delayOk">确定</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ============ 数据 ============
+  const STATUS = {
+    done:    { t:'已完成', cls:'green' },
+    todo:    { t:'待执行', cls:'orange' },
+    running: { t:'进行中', cls:'blue' },
+    unstart: { t:'未开始', cls:'gray' },
+  };
+  // #7 审批状态字典
+  const APPROVAL = {
+    '审批中':    'tag-blue',
+    '审批通过':  'tag-green',
+    '审批不通过':'tag-red',
+    '已取消':    'tag-gray',
+  };
+
+  // 维保任务（进行中 / 待执行 / 已完成 / 审批中）
+  // dueTime=任务完成时间(来自生成引擎)  submitTime=维保员提交时间  approvalStatus=审批状态  delayRecords=延期留痕
+  const tasks = [
+    {
+      id:'WBTEST2026082002', name:'A-20260820', std:'测试维修标准', time:'2026-08-20', status:'running',
+      dueTime:'2026-08-20', submitTime:'', approvalStatus:null, approvalNo:'', delayCount:0, delayRecords:[],
+      devices:[
+        { name:'会议中心综合信息发布终端', filled:0, standards:[
+          { name:'检查运行状态', way:'', tool:'', note:'' },
+          { name:'检查滤网',     way:'', tool:'', note:'' },
+        ]},
+        { name:'133综合楼-中央空调机组', filled:0, standards:[
+          { name:'检查运行状态', way:'', tool:'', note:'' },
+          { name:'检查滤网',     way:'', tool:'', note:'' },
+        ]},
+      ]
+    },
+    {
+      id:'WBTEST2026082001', name:'B-20260820', std:'Codex暖通维保标准', time:'2026-08-20', status:'todo',
+      dueTime:'2026-08-25', submitTime:'', approvalStatus:null, approvalNo:'', delayCount:0, delayRecords:[],
+      devices:[
+        { name:'415观微院-新风机组', filled:0, standards:[
+          { name:'检查末端设备并清理滤网', way:'', tool:'', note:'' },
+          { name:'监测温度、湿度',         way:'', tool:'', note:'' },
+        ]},
+      ]
+    },
+    {
+      id:'WBTEST2026082003', name:'C-审批中演示', std:'测试维修标准', time:'2026-08-22', status:'done',
+      dueTime:'2026-08-20', submitTime:'2026-08-23', approvalStatus:'审批中', approvalNo:'SP20260822-03', delayCount:0, delayRecords:[],
+      devices:[
+        { name:'499学生公寓-给水泵', filled:2, standards:[
+          { name:'检查运行状态', way:'自主', tool:'扳手', note:'正常' },
+          { name:'检查滤网',     way:'自主', tool:'',     note:'已清理' },
+        ]},
+      ]
+    },
+    {
+      id:'WBTEST2026080301', name:'前端测试-暖通维保-已完成', std:'测试维修标准', time:'2026-08-03', status:'done',
+      dueTime:'2026-08-03', submitTime:'2026-08-03', approvalStatus:'审批通过', approvalNo:'SP20260803-01',
+      delayCount:1, delayRecords:[{applyTime:'2026-08-01 09:12', fromDue:'2026-07-30', toDue:'2026-08-03', reason:'设备停机协调'}],
+      devices:[
+        { name:'499学生公寓-给水泵', filled:2, standards:[
+          { name:'检查运行状态', way:'自主', tool:'扳手', note:'正常' },
+          { name:'检查滤网',     way:'自主', tool:'',     note:'已清理' },
+        ]},
+      ]
+    },
+  ];
+
+  // 维保历史（已结束：审批通过 / 审批不通过 / 已取消）
+  const history = [
+    { id:'WBTEST2026080301', name:'前端测试-暖通维保-已完成', std:'测试维修标准', time:'2026-08-03', status:'done',
+      dueTime:'2026-08-03', submitTime:'2026-08-03', approvalStatus:'审批通过', approvalNo:'SP20260803-01', delayCount:1,
+      devices:[{ name:'499学生公寓-给水泵', filled:2, standards:[{name:'检查运行状态'},{name:'检查滤网'}] }] },
+    { id:'WBTEST20260727004', name:'111-待分配测试任务-20260727', std:'Codex暖通...', time:'2026-07-27', status:'done',
+      dueTime:'2026-07-25', submitTime:'2026-07-26', approvalStatus:'审批不通过', approvalNo:'SP20260727-04', delayCount:0,
+      devices:[{ name:'517能源中心-配电柜', filled:1, standards:[{name:'巡检'}] }] },
+    { id:'WBTEST20260720004', name:'历史-已取消任务', std:'测试维修标准', time:'2026-07-20', status:'done',
+      dueTime:'2026-07-18', submitTime:'2026-07-19', approvalStatus:'已取消', approvalNo:'SP20260720-04', delayCount:0,
+      devices:[{ name:'518探理院-电梯', filled:0, standards:[{name:'巡检'}] }] },
+  ];
+
+  // ============ 工具 ============
+  const $ = s => document.querySelector(s);
+  let curTab = 'task';
+  let curFilter = '';
+  let curTask = null, curDeviceIdx = -1;
+  function toast(msg){
+    const el = $('#toast'); el.textContent = msg; el.classList.add('show');
+    clearTimeout(toast._t); toast._t = setTimeout(()=>el.classList.remove('show'), 1600);
+  }
+
+  // ============ 日期/状态工具 ============
+  function parseDate(s){ if(!s) return null; const [y,m,d]=s.split('-').map(Number); return new Date(y,m-1,d); }
+  function fmtDate(dt){ const p=n=>String(n).padStart(2,'0'); return `${dt.getFullYear()}-${p(dt.getMonth()+1)}-${p(dt.getDate())}`; }
+  function todayStr(){ return fmtDate(new Date()); }
+  function nowStr(){ const dt=new Date(); const p=n=>String(n).padStart(2,'0'); return `${fmtDate(dt)} ${p(dt.getHours())}:${p(dt.getMinutes())}`; }
+  function laterDue(){ // 严格晚于 max(dueTime, 今天) 的最小日期
+    const due = curTask && curTask.dueTime ? parseDate(curTask.dueTime) : null;
+    const t = new Date(); t.setHours(0,0,0,0);
+    const base = (due && due > t) ? due : t;
+    base.setDate(base.getDate() + 1);
+    return fmtDate(base);
+  }
+
+  // 逾期判定（#8）：仅未完成任务超完成时间标红；已完成不标（曾逾期仅留痕）
+  function isOverdueList(t){
+    if(t.status === 'done') return false;
+    const due = t.dueTime ? parseDate(t.dueTime) : null;
+    if(!due) return false;
+    const now = new Date(); now.setHours(0,0,0,0);
+    return now > due;
+  }
+
+  // #7 点击审批状态跳转工单详情（对接流程表单审批引擎，原型占位）
+  function jumpApproval(t){
+    toast('正在打开审批详情（工单 ' + (t.approvalNo || t.id) + '）');
+  }
+
+  // ============ 列表渲染 ============
+  function renderList(){
+    const src = curTab === 'task' ? tasks : history;
+    const kw = $('#listSearch').value.trim().toLowerCase();
+    const list = src.filter(t => (!kw || t.name.toLowerCase().includes(kw) || t.id.toLowerCase().includes(kw)) && (!curFilter || t.status === curFilter));
+    const box = $('#listScroll');
+    if(!list.length){ box.innerHTML = '<div class="empty">暂无数据</div>'; return; }
+    box.innerHTML = list.map((t, ci) => {
+      const s = STATUS[t.status];
+      const od = isOverdueList(t) ? '<span class="tag overdue">逾期</span>' : '';
+      return `<div class="task-card s-${t.status}" data-id="${t.id}" style="animation-delay:${ci * 40}ms">
+        <div class="row1">
+          <div class="name">${t.name}${od}</div>
+          <span class="tag ${s.cls}">${s.t}</span>
+        </div>
+        <div class="meta"><span>${t.id}</span><span>${t.time}</span></div>
+        ${curTab==='history' && t.approvalStatus ? `<div class="appr-row"><span class="tag ${APPROVAL[t.approvalStatus]}">${t.approvalStatus}</span><span class="appr-jump" data-appr="${t.id}">查看审批详情 ›</span></div>` : ''}
+      </div>`;
+    }).join('') + (curTab==='history' ? '<div class="nomore">没有更多了</div>' : '');
+    box.querySelectorAll('.task-card').forEach(c => c.addEventListener('click', () => openDetail(c.dataset.id)));
+    box.querySelectorAll('.appr-jump').forEach(a => a.addEventListener('click', e => { e.stopPropagation(); const t = (tasks.find(x=>x.id===a.dataset.appr))||(history.find(x=>x.id===a.dataset.appr)); if(t) jumpApproval(t); }));
+  }
+
+  // ============ 详情 ============
+  function openDetail(id){
+    curTask = (tasks.find(t=>t.id===id)) || (history.find(t=>t.id===id));
+    if(!curTask) return;
+    const s = STATUS[curTask.status];
+    $('#navTitle').textContent = '维保任务';
+    $('#navRight').innerHTML = `<span class="tag ${s.cls}">${s.t}</span>`;
+    $('#navBack').style.visibility = 'visible';
+
+    const total = curTask.devices.reduce((a,d)=>a+d.standards.length,0);
+    const done = curTask.devices.reduce((a,d)=>a+d.filled,0);
+    const devHtml = curTask.devices.map((d,i)=>{
+      const st = d.filled>=d.standards.length ? 'done' : (d.filled>0 ? 'running' : 'unstart');
+      const stt = STATUS[st];
+      const pct = d.standards.length ? Math.round(d.filled/d.standards.length*100) : 0;
+      return `<div class="dev-card" data-dev="${i}">
+        <div class="dev-main">
+          <div class="dev-name">${d.name}</div>
+          <div class="dev-sub">
+            <span class="tag ${stt.cls}">${stt.t}</span>
+            <div class="progress"><i style="width:${pct}%"></i></div>
+            <span class="progress-txt">${d.filled}/${d.standards.length} 项目</span>
+          </div>
+        </div>
+        <span class="arrow"><svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 4l4 4-4 4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+      </div>`;
+    }).join('');
+
+    const delayHtml = (curTask.delayRecords && curTask.delayRecords.length)
+      ? curTask.delayRecords.map(r => `
+        <div class="info-row" style="flex-direction:column; align-items:stretch; gap:4px; padding:12px 0;">
+          <div><span class="k" style="width:auto; margin-right:6px;">申请时间</span><span>${r.applyTime}</span></div>
+          <div><span class="k" style="width:auto; margin-right:6px;">延期时间</span><span>${r.fromDue} → ${r.toDue}</span></div>
+          <div><span class="k" style="width:auto; margin-right:6px;">延期原因</span><span>${r.reason}</span></div>
+          <div><span class="k" style="width:auto; margin-right:6px;">申请人</span><span>${r.applicant || '维保员'}</span></div>
+        </div>`).join('')
+      : '<div class="info-row"><div class="v" style="color:var(--sub)">暂无延期记录</div></div>';
+
+    $('#detailScroll').innerHTML = `
+      <div class="section-title">任务信息</div>
+      <div class="info-card">
+        <div class="info-row"><div class="k">任务编号</div><div class="v">${curTask.id}</div></div>
+        <div class="info-row"><div class="k">任务名称</div><div class="v">${curTask.name}</div></div>
+        <div class="info-row"><div class="k">维保标准</div><div class="v">${curTask.std}</div></div>
+        <div class="info-row"><div class="k">维保设备</div><div class="v">${curTask.devices.length} 台</div></div>
+        <div class="info-row"><div class="k">本次维保时间</div><div class="v">${curTask.time}</div></div>
+        <div class="info-row"><div class="k">完成时间</div><div class="v">${curTask.dueTime||'-'}${curTask.delayCount>0?'（已延期 '+curTask.delayCount+' 次）':''}</div></div>
+      </div>
+      <div class="section-title">维保设备</div>
+      ${devHtml}
+      <div class="section-title">延期记录</div>
+      <div class="info-card">${delayHtml}</div>
+    `;
+    // 底部：申请延期（待执行/进行中可申）+ 提交（任务 tab 且非已完成）
+    const canSubmit = curTab==='task' && curTask.status!=='done';
+    const canDelay = curTask.status==='todo' || curTask.status==='running';
+    $('#btnDelay').style.display = canDelay ? '' : 'none';
+    $('#btnSubmit').style.display = canSubmit ? '' : 'none';
+    $('#detailFooter').style.display = (canDelay || canSubmit) ? 'flex' : 'none';
+    $('#detailScroll').querySelectorAll('.dev-card').forEach(c =>
+      c.addEventListener('click', () => openFill(+c.dataset.dev)));
+    showView('detail');
+  }
+
+  // ============ 设备填写 ============
+  function openFill(devIdx){
+    curDeviceIdx = devIdx;
+    const d = curTask.devices[devIdx];
+    $('#navTitle').textContent = d.name;
+    $('#navRight').innerHTML = '';
+    const html = d.standards.map((st,i)=>`
+      <div class="std-card">
+        <div class="std-name">${st.name}</div>
+        <div class="field">
+          <label>维保方式</label>
+          <select class="ctrl" data-f="way">
+            <option value="">请选择</option>
+            <option ${st.way==='自主'?'selected':''}>自主</option>
+            <option ${st.way==='外包'?'selected':''}>外包</option>
+            <option ${st.way==='巡检'?'selected':''}>巡检</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>使用工具</label>
+          <input class="ctrl" data-f="tool" value="${st.tool||''}" placeholder="请输入" />
+        </div>
+        <div class="field">
+          <label>上传附件</label>
+          <div class="upload" data-upload="${i}">
+            <svg viewBox="0 0 16 16" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 10V3M5 6l3-3 3 3M3 11v1.5A1.5 1.5 0 004.5 14h7a1.5 1.5 0 001.5-1.5V11" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            上传图片
+          </div>
+          <div class="up-prev" data-prev="${i}"></div>
+        </div>
+        <div class="field">
+          <label>备注</label>
+          <textarea class="ctrl" data-f="note" placeholder="请输入">${st.note||''}</textarea>
+        </div>
+      </div>
+    `).join('');
+    $('#fillScroll').innerHTML = html;
+    $('#fillScroll').querySelectorAll('[data-upload]').forEach(u => u.addEventListener('click', ()=>{
+      const i = u.dataset.upload;
+      const prev = $(`[data-prev="${i}"]`);
+      const n = prev.children.length + 1;
+      const span = document.createElement('span'); span.textContent = `图片${n}.jpg`; prev.appendChild(span);
+      if(!curTask._up) curTask._up = {};
+      curTask._up[curDeviceIdx+'_'+i] = (curTask._up[curDeviceIdx+'_'+i]||0)+1;
+    }));
+    showView('fill');
+  }
+
+  function saveFill(){
+    const d = curTask.devices[curDeviceIdx];
+    d.standards.forEach((st,i)=>{
+      const card = $('#fillScroll').children[i];
+      st.way  = card.querySelector('[data-f="way"]').value;
+      st.tool = card.querySelector('[data-f="tool"]').value;
+      st.note = card.querySelector('[data-f="note"]').value;
+    });
+    d.filled = d.standards.length;
+    if(curTask.status==='todo') curTask.status='running';
+    toast('保存成功');
+    openDetail(curTask.id);
+  }
+
+  // ============ 提交 ============
+  function submitTask(){
+    const allDone = curTask.devices.every(d => d.filled >= d.standards.length);
+    if(!allDone){ toast('仍有设备未填写完成'); return; }
+    $('#confirmPop').classList.add('show');
+  }
+  function doSubmit(){
+    const today = todayStr();
+    curTask.status = 'done';
+    curTask.submitTime = today;
+    if(!curTask.dueTime) curTask.dueTime = curTask.time;
+    curTask.approvalStatus = '审批中';
+    curTask.approvalNo = 'SP' + today.replace(/-/g,'') + '-' + curTask.id.slice(-3);
+    $('#confirmPop').classList.remove('show');
+    toast('提交成功，已进入审批流程');
+    openDetail(curTask.id);
+  }
+
+  // ============ 申请延期（#6） ============
+  function openDelay(){
+    const d = $('#delayDate');
+    d.min = laterDue();
+    d.value = '';
+    $('#delayReason').value = '';
+    $('#delayErr').style.display = 'none';
+    $('#delayPop').classList.add('show');
+  }
+  function doDelay(){
+    const d = $('#delayDate').value;
+    const r = $('#delayReason').value.trim();
+    if(!d || !r){ $('#delayErr').textContent = !d ? '请选择延期到日期' : '请填写延期原因'; $('#delayErr').style.display='block'; return; }
+    const newDue = parseDate(d);
+    const minD = parseDate(laterDue());
+    if(newDue < minD){ $('#delayErr').textContent = '延期到日期须晚于当前完成时间'; $('#delayErr').style.display='block'; return; }
+    const oldDue = curTask.dueTime;
+    curTask.dueTime = d;
+    curTask.delayCount = (curTask.delayCount || 0) + 1;
+    curTask.delayRecords = curTask.delayRecords || [];
+    curTask.delayRecords.push({ applyTime: nowStr(), fromDue: oldDue, toDue: d, reason: r, applicant: '维保员' });
+    $('#delayPop').classList.remove('show');
+    toast('已延期至 ' + d.replace(/^\d{4}-(\d{2})-(\d{2})$/, '$1月$2日'));
+    openDetail(curTask.id);
+  }
+
+  // ============ 视图切换 ============
+  function showView(name){
+    ['list','detail','fill'].forEach(v => $('#view-'+v).classList.toggle('active', v===name));
+    if(name!=='detail'){ $('#navBack').style.visibility = name==='list' ? 'hidden' : 'visible'; }
+  }
+  function goList(){
+    curTab = 'task';
+    $('#navTitle').textContent = '维保任务';
+    $('#navRight').innerHTML = '';
+    $('#navBack').style.visibility = 'hidden';
+    $('.tabs').querySelectorAll('.tab').forEach(t=>t.classList.toggle('active', t.dataset.tab==='task'));
+    $('#listSearch').value = '';
+    showView('list'); renderList();
+  }
+
+  // ============ 事件 ============
+  $('#navBack').addEventListener('click', () => {
+    if($('#view-fill').classList.contains('active')){ openDetail(curTask.id); }
+    else if($('#view-detail').classList.contains('active')){ goList(); }
+  });
+  $('.tabs').querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => {
+    curTab = t.dataset.tab;
+    $('.tabs').querySelectorAll('.tab').forEach(x=>x.classList.toggle('active', x===t));
+    renderList();
+  }));
+  $('#listSearch').addEventListener('input', renderList);
+  $('#listFilter').addEventListener('click', () => { $('#filterPop').classList.add('show'); });
+  $('#fpMask').addEventListener('click', () => $('#filterPop').classList.remove('show'));
+  $('#fpOpts').querySelectorAll('.fp-opt').forEach(o => o.addEventListener('click', () => {
+    $('#fpOpts').querySelectorAll('.fp-opt').forEach(x => x.classList.toggle('active', x === o));
+    curFilter = o.dataset.st;
+  }));
+  $('#fpOk').addEventListener('click', () => { $('#filterPop').classList.remove('show'); renderList(); });
+  $('#btnSave').addEventListener('click', saveFill);
+  $('#btnSubmit').addEventListener('click', submitTask);
+  $('#btnDelay').addEventListener('click', openDelay);
+  $('#delayMask').addEventListener('click', () => $('#delayPop').classList.remove('show'));
+  $('#delayOk').addEventListener('click', doDelay);
+  $('#cfMask').addEventListener('click', () => $('#confirmPop').classList.remove('show'));
+  $('#cfCancel').addEventListener('click', () => $('#confirmPop').classList.remove('show'));
+  $('#cfOk').addEventListener('click', doSubmit);
+
+  renderList();
+</script>
+</body>
+</html>
