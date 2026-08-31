@@ -1,0 +1,2095 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<title>设备维保 - 智慧园区集成管理平台</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<style>
+  :root {
+    --primary: #4165EC;
+    --primary-hover: #3554D0;
+    --primary-light: #EAF0FF;
+    --text-main: #36373B;
+    --text-sub: #8F9098;
+    --text-white: #FFFFFF;
+    --bg-page: #F8F8F8;
+    --bg-card: #FFFFFF;
+    --bg-input: #F7F7FA;
+    --border: #D8D8D8;
+    --border-light: #ECECF1;
+    --radius-card: 8px;
+    --radius-btn: 4px;
+    --shadow-card: 0 1px 2px rgba(20, 26, 50, 0.04);
+    --shadow-card-2: 0 6px 22px rgba(20, 26, 50, 0.08);
+    --shadow-drawer: -4px 0 16px rgba(20, 26, 50, 0.08);
+    --shadow-modal: 0 8px 24px rgba(20, 26, 50, 0.12);
+    --surface-2: #FBFCFE;
+    --ring: rgba(65, 101, 236, 0.22);
+    --green: #2BB673; --orange: #F39A1F; --purple: #7C5CE0;
+    --red: #E65A5A; --gray-tag: #8F9098;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    font-family: -apple-system, "SF Pro SC", "PingFang SC", "Helvetica Neue", "Microsoft YaHei", sans-serif;
+    font-size: 14px; color: var(--text-main);
+    background:
+      radial-gradient(1100px 520px at 88% -8%, rgba(65,101,236,.07), transparent 60%),
+      radial-gradient(900px 480px at -5% 110%, rgba(124,92,224,.05), transparent 55%),
+      var(--bg-page);
+    -webkit-font-smoothing: antialiased;
+    overflow: hidden;
+  }
+  button { font-family: inherit; cursor: pointer; }
+  input, select, textarea { font-family: inherit; font-size: 14px; }
+
+  /* ============== Top Bar ============== */
+  .topbar {
+    position: fixed; top: 0; left: 0; right: 0; height: 48px;
+    background: linear-gradient(100deg, #3554D0, #4165EC 55%, #4F73F0);
+    color: var(--text-white);
+    display: flex; align-items: center; padding: 0 16px; z-index: 100;
+    box-shadow: 0 1px 10px rgba(20, 26, 50, 0.12);
+  }
+  .topbar .logo {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 15px; font-weight: 600; width: 224px; padding-right: 16px;
+  }
+  .topbar .logo .logo-icon {
+    width: 24px; height: 24px; border-radius: 4px;
+    background: rgba(255,255,255,.18);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .topbar .logo .logo-icon::before {
+    content: ''; width: 12px; height: 12px; border: 2px solid #fff; border-radius: 2px;
+  }
+  .topbar .topnav-toggle {
+    width: 32px; height: 32px; border-radius: 4px;
+    background: transparent; border: 0; color: #fff;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .topbar .topnav-toggle:hover { background: rgba(255,255,255,.1); }
+  .topbar .topnav-toggle svg { width: 16px; height: 16px; }
+  .topbar .breadcrumb {
+    margin-left: 12px; font-size: 14px; color: rgba(255,255,255,.92);
+    display: flex; align-items: center; gap: 8px; flex: 1;
+  }
+  .topbar .breadcrumb .crumb { opacity: .9; }
+  .topbar .breadcrumb .crumb.active { font-weight: 600; }
+  .topbar .topbar-right { display: flex; align-items: center; gap: 4px; }
+  .topbar .icon-btn {
+    width: 32px; height: 32px; border-radius: 4px;
+    background: transparent; border: 0; color: #fff;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .topbar .icon-btn:hover { background: rgba(255,255,255,.1); }
+  .topbar .icon-btn svg { width: 16px; height: 16px; }
+  .topbar .avatar {
+    display: flex; align-items: center; gap: 8px;
+    margin-left: 8px; padding: 0 8px;
+  }
+  .topbar .avatar .av {
+    width: 28px; height: 28px; border-radius: 50%;
+    background: linear-gradient(135deg,#FFD27A,#FF8C42);
+    color: #fff; font-size: 12px; font-weight: 600;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .topbar .avatar .name { font-size: 13px; }
+
+  /* ============== Side Nav ============== */
+  .sidenav {
+    position: fixed; top: 48px; left: 0; bottom: 0; width: 190px;
+    background: #fff; border-right: 1px solid var(--border-light);
+    padding: 8px 0; overflow-y: auto; z-index: 90;
+  }
+  .sidenav .group .title {
+    display: flex; align-items: center; gap: 8px;
+    padding: 10px 16px; color: var(--text-main); cursor: pointer;
+    user-select: none;
+  }
+  .sidenav .group .title .ico {
+    width: 18px; height: 18px; color: var(--text-sub);
+    display: inline-flex; align-items: center; justify-content: center;
+  }
+  .sidenav .group .title .caret {
+    margin-left: auto; color: var(--text-sub); transition: transform .15s;
+  }
+  .sidenav .group .title .caret svg { width: 12px; height: 12px; }
+  .sidenav .group.expanded .title .caret { transform: rotate(90deg); }
+  .sidenav .sub { display: none; background: #FAFBFD; }
+  .sidenav .group.expanded .sub { display: block; }
+  .sidenav .sub .item {
+    display: block; padding: 9px 16px 9px 44px;
+    color: var(--text-main); text-decoration: none; font-size: 14px;
+    border-left: 2px solid transparent;
+  }
+  .sidenav .sub .item:hover { color: var(--primary); }
+  .sidenav .sub .item.active {
+    background: var(--primary); color: #fff; border-left-color: var(--primary);
+  }
+  .sidenav .group.expanded > .sub .group { background: transparent; }
+  .sidenav .group.expanded > .sub .group > .title {
+    padding: 9px 16px 9px 28px; font-size: 14px;
+  }
+  .sidenav .group.expanded > .sub .group > .sub { display: block; }
+  .sidenav .group.expanded > .sub .group > .sub .item { padding-left: 56px; }
+
+  /* ============== Content ============== */
+  .content {
+    position: fixed; top: 48px; left: 190px; right: 0; bottom: 0;
+    display: flex; flex-direction: column;
+  }
+  .tabbar {
+    height: 40px; background: #fff;
+    border-bottom: 1px solid var(--border-light);
+    display: flex; align-items: stretch; padding: 0 8px;
+  }
+  .tabbar .scroll { display: flex; align-items: stretch; overflow-x: auto; }
+  .tabbar .tab {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 0 16px; color: var(--text-main); font-size: 13px;
+    cursor: pointer; user-select: none;
+    border-bottom: 2px solid transparent;
+  }
+  .tabbar .tab:hover { color: var(--primary); }
+  .tabbar .tab.active {
+    color: var(--primary); font-weight: 600;
+    border-bottom-color: var(--primary);
+    background: var(--primary-light);
+  }
+  .tabbar .tab .home-ico { width: 12px; height: 12px; display: inline-flex; align-items: center; }
+  .tabbar .tab .home-ico svg { width: 12px; height: 12px; }
+  .tabbar .arrows {
+    margin-left: auto; display: flex; align-items: center; gap: 4px; padding: 0 4px;
+  }
+  .tabbar .arrows .abtn {
+    width: 24px; height: 24px; border-radius: 3px;
+    background: transparent; border: 0; color: var(--text-sub);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .tabbar .arrows .abtn:hover { background: #F0F1F5; color: var(--primary); }
+  .tabbar .arrows .abtn svg { width: 12px; height: 12px; }
+
+  .page { flex: 1; padding: 16px 24px; overflow: auto; }
+  .card {
+    background: var(--bg-card);
+    border-radius: var(--radius-card);
+    box-shadow: var(--shadow-card);
+    padding: 20px 24px;
+    border: 1px solid transparent;
+    transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+    animation: riseIn .45s both;
+  }
+  .card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-card-2);
+    border-color: #EAEFFB;
+  }
+  .card .card-title {
+    font-size: 16px; font-weight: 600; color: var(--text-main);
+    margin: 0 0 16px;
+  }
+
+  /* ============== Filter Bar ============== */
+  .filter { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+  .filter .field { display: flex; align-items: center; gap: 8px; }
+  .filter .field label { font-size: 14px; color: var(--text-main); white-space: nowrap; }
+  .input, .select {
+    height: 32px; padding: 0 12px; min-width: 180px;
+    background: var(--bg-input); border: 1px solid var(--border);
+    border-radius: var(--radius-btn); color: var(--text-main);
+    outline: none; transition: border-color .15s;
+  }
+  .input::placeholder { color: var(--text-sub); }
+  .input:hover, .select:hover { border-color: #BFBFBF; }
+  .input:focus, .select:focus { border-color: var(--primary); background: #fff; }
+  .select {
+    padding-right: 28px; appearance: none;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'><path d='M3 4.5L6 7.5L9 4.5' stroke='%238F9098' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+    background-repeat: no-repeat; background-position: right 10px center;
+  }
+  .filter .actions { margin-left: auto; display: flex; gap: 8px; }
+
+  /* ============== Buttons ============== */
+  .btn {
+    height: 32px; padding: 0 14px; border-radius: var(--radius-btn);
+    border: 1px solid transparent; background: transparent; color: var(--text-main);
+    font-size: 14px; display: inline-flex; align-items: center; gap: 6px;
+  }
+  .btn-primary {
+    background: var(--primary); color: #fff; border-color: var(--primary);
+  }
+  .btn-primary:hover { background: var(--primary-hover); border-color: var(--primary-hover); }
+  .btn-primary:disabled { background: #B6C0EC; border-color: #B6C0EC; cursor: not-allowed; }
+  .btn-ghost { background: var(--bg-input); border-color: var(--border); }
+  .btn-ghost:hover { border-color: #BFBFBF; background: #F0F1F5; }
+  .btn-link { background: transparent; color: var(--primary); border: 0; padding: 0 6px; height: auto; }
+  .btn-link:hover { color: var(--primary-hover); }
+  .btn-danger { background: transparent; color: var(--red); border: 0; padding: 0 6px; height: auto; }
+  .btn-danger:hover { color: #cc4a4a; }
+  .btn .ico { display: inline-flex; align-items: center; }
+  .btn .ico svg { width: 14px; height: 14px; }
+
+  /* ============== Focus ============== */
+  .input:focus-visible, .select:focus-visible, .date-input:focus-visible, textarea.ctrl:focus-visible,
+  .btn:focus-visible, .btn-primary:focus-visible, .checkbox input:focus-visible + .box,
+  .icon-btn:focus-visible, .abtn:focus-visible, .tabbar .tab:focus-visible, .sidenav .item:focus-visible {
+    outline: none; box-shadow: 0 0 0 3px var(--ring);
+  }
+
+  /* ============== Table ============== */
+  .table-wrap {
+    margin-top: 16px;
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-card);
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+  .table { width: 100%; border-collapse: collapse; background: #fff; }
+  .table th, .table td {
+    padding: 12px 16px; text-align: left;
+    font-size: 14px; color: var(--text-main);
+    border-bottom: 1px solid var(--border-light);
+    vertical-align: middle;
+  }
+  .table th {
+    background: #F4F6FA; font-weight: 600; color: var(--text-main);
+    white-space: nowrap;
+  }
+  .table tbody tr:last-child td { border-bottom: 0; }
+  .table tbody tr:hover { background: #FAFBFE; }
+  .table .col-actions { text-align: right; white-space: nowrap; position: sticky; right: 0; background: #fff; z-index: 2; }
+  .table th.col-actions { background: #F4F6FA; z-index: 3; }
+  .table .col-actions .btn-link, .table .col-actions .btn-danger { margin-left: 4px; }
+  .table .col-num { width: 60px; color: var(--text-sub); }
+  .table .col-id { color: var(--text-sub); max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .table .col-check, .table th.col-check { width: 36px; position: sticky; left: 0; z-index: 2; }
+  .table th.col-check { background: #F4F6FA; z-index: 3; }
+  .table tbody tr:hover .col-check, .table tbody tr:hover .col-actions { background: #FAFBFE; }
+  .table .col-time { width: 90px; color: var(--text-sub); }
+  .table tbody tr { transition: background .15s; }
+  .table tbody tr:hover { background: #F6F8FE; }
+  .rep-dev { padding: 10px 0; border-bottom: 1px dashed #EEE; }
+  .rep-dev:last-child { border-bottom: 0; }
+  .rep-dev-name { font-size: 13px; font-weight: 600; color: var(--text-main); margin-bottom: 8px; }
+  .rep-item { background: #F7F8FB; border-radius: 6px; padding: 8px 10px; margin-bottom: 8px; }
+  .rep-item:last-child { margin-bottom: 0; }
+  .rep-std { font-size: 13px; color: var(--text-main); }
+  .rep-meta { display: flex; flex-wrap: wrap; gap: 12px; font-size: 12px; color: var(--text-sub); margin-top: 5px; }
+  .rep-note { font-size: 12px; color: var(--text-sub); margin-top: 5px; }
+  .flow-list { padding: 4px 0; }
+  .flow-item { display: flex; gap: 10px; padding: 8px 0; position: relative; }
+  .flow-item .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--primary); margin-top: 5px; flex: 0 0 auto; }
+  .flow-item::before { content: ''; position: absolute; left: 3.5px; top: 14px; bottom: -8px; width: 1px; background: #E6E8EC; }
+  .flow-item:last-child::before { display: none; }
+  .flow-act { font-size: 13px; color: var(--text-main); }
+  .flow-by { font-size: 12px; color: var(--text-sub); margin-top: 2px; }
+  .table .cell-ellipsis { max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+  .pagination {
+    display: flex; align-items: center; gap: 8px;
+    padding: 14px 16px; background: #fff;
+    font-size: 12px; color: var(--text-sub);
+  }
+  .pagination .pager { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+  .pagination .page-btn {
+    min-width: 28px; height: 28px; padding: 0 8px;
+    border: 1px solid var(--border-light); background: #fff; color: var(--text-main);
+    border-radius: 3px; display: inline-flex; align-items: center; justify-content: center;
+  }
+  .pagination .page-btn.active { color: var(--primary); border-color: var(--primary); font-weight: 600; }
+  .pagination .page-btn:hover:not(.active) { color: var(--primary); border-color: var(--primary); }
+  .pagination .page-jump { display: inline-flex; align-items: center; gap: 4px; color: var(--text-sub); }
+  .pagination .page-jump input {
+    width: 44px; height: 24px; text-align: center;
+    border: 1px solid var(--border-light); border-radius: 3px; background: #fff;
+  }
+  .pagination .page-size {
+    height: 24px; padding: 0 6px;
+    border: 1px solid var(--border-light); border-radius: 3px; background: #fff;
+    color: var(--text-main);
+  }
+
+  /* ============== Stats Summary (任务概览) ============== */
+  /* (task stats removed) */
+
+  /* 入场动画 */
+  @keyframes riseIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+
+  /* ============== Tags ============== */
+  .tag {
+    display: inline-block; padding: 2px 8px; border-radius: 11px;
+    font-size: 12px; line-height: 16px;
+  }
+  .tag-green  { background: #E6F8F0; color: var(--green); }
+  .tag-orange { background: #FFF1DE; color: var(--orange); }
+  .tag-gray   { background: #EFF0F3; color: var(--gray-tag); }
+  .tag-purple { background: #EFEAFD; color: var(--purple); }
+  .tag-red    { background: #FDECEC; color: var(--red); }
+  .tag-blue   { background: #EEF1FE; color: var(--primary); }
+  .tag-overdue{ background: #FDECEC; color: var(--red); }
+  .tag-approval { cursor: pointer; }
+
+  /* ============== Switch ============== */
+  .switch {
+    --w: 36px; --h: 18px;
+    position: relative; display: inline-block;
+    width: var(--w); height: var(--h);
+  }
+  .switch input { display: none; }
+  .switch .slider {
+    position: absolute; inset: 0;
+    background: #BFC4D0; border-radius: 999px; transition: background .15s;
+  }
+  .switch .slider::before {
+    content: ''; position: absolute;
+    width: 14px; height: 14px; left: 2px; top: 2px;
+    background: #fff; border-radius: 50%; transition: left .15s;
+  }
+  .switch input:checked + .slider { background: var(--primary); }
+  .switch input:checked + .slider::before { left: 20px; }
+  .switch .lbl-on  { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); font-size: 11px; color: #fff; display: none; }
+  .switch .lbl-off { position: absolute; left: 6px; top: 50%; transform: translateY(-50%); font-size: 11px; color: #fff; }
+  .switch input:checked ~ .lbl-on  { display: block; }
+  .switch input:checked ~ .lbl-off { display: none; }
+
+  /* ============== Checkbox / Radio ============== */
+  .checkbox {
+    display: inline-flex; align-items: center; gap: 6px; cursor: pointer;
+    user-select: none;
+  }
+  .checkbox .box {
+    width: 14px; height: 14px; border-radius: 2px;
+    border: 1px solid #DCDCDC; background: #fff; position: relative;
+  }
+  .checkbox input { display: none; }
+  .checkbox input:checked + .box { background: var(--primary); border-color: var(--primary); }
+  .checkbox input:checked + .box::after {
+    content: ''; position: absolute; left: 3px; top: 0;
+    width: 5px; height: 9px;
+    border-right: 2px solid #fff; border-bottom: 2px solid #fff;
+    transform: rotate(45deg);
+  }
+  .checkbox.partial .box { background: var(--primary); border-color: var(--primary); }
+  .checkbox.partial .box::after {
+    content: ''; position: absolute; left: 2px; top: 6px;
+    width: 8px; height: 2px; background: #fff;
+  }
+  .radio-group { display: inline-flex; gap: 16px; align-items: center; }
+  .radio {
+    display: inline-flex; align-items: center; gap: 6px; cursor: pointer;
+    user-select: none;
+  }
+  .radio .dot {
+    width: 14px; height: 14px; border-radius: 50%;
+    border: 1px solid #DCDCDC; background: #fff; position: relative;
+  }
+  .radio input { display: none; }
+  .radio input:checked + .dot { border-color: var(--primary); }
+  .radio input:checked + .dot::after {
+    content: ''; position: absolute; inset: 3px;
+    border-radius: 50%; background: var(--primary);
+  }
+
+  /* ============== Empty ============== */
+  .empty {
+    padding: 56px 0; text-align: center; color: var(--text-sub); font-size: 13px;
+  }
+  .empty svg { width: 72px; height: 72px; opacity: .3; display: block; margin: 0 auto 10px; }
+
+  /* ============== Drawer ============== */
+  .mask {
+    position: fixed; inset: 0; background: rgba(20, 26, 50, .32);
+    z-index: 200; opacity: 0; pointer-events: none; transition: opacity .2s;
+  }
+  .mask.show { opacity: 1; pointer-events: auto; }
+  .drawer {
+    position: fixed; top: 0; right: 0; bottom: 0; width: 600px;
+    background: #fff; box-shadow: var(--shadow-drawer);
+    transform: translateX(100%); transition: transform .25s;
+    z-index: 210; display: flex; flex-direction: column;
+  }
+  .drawer.show { transform: translateX(0); }
+  .drawer.wide { width: 720px; }
+  .drawer .head {
+    height: 48px; padding: 0 20px;
+    border-bottom: 1px solid var(--border-light);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .drawer .head .title {
+    font-size: 16px; font-weight: 600; color: var(--text-main);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .drawer .head .title .ico { color: var(--primary); display: inline-flex; }
+  .drawer .head .title .ico svg { width: 16px; height: 16px; }
+  .drawer .head .close {
+    background: transparent; border: 0; color: var(--text-sub);
+    width: 28px; height: 28px; border-radius: 4px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .drawer .head .close:hover { background: #F0F1F5; color: var(--text-main); }
+  .drawer .head .close svg { width: 14px; height: 14px; }
+  .drawer .body { flex: 1; overflow: auto; padding: 20px 24px 12px; }
+  .drawer .body.pad0 { padding: 0; }
+  .drawer .foot {
+    border-top: 1px solid var(--border-light);
+    padding: 12px 20px; display: flex; gap: 8px; justify-content: flex-end;
+  }
+
+  /* ============== Modal ============== */
+  .modal {
+    position: fixed; top: 80px; left: 50%; transform: translateX(-50%) scale(.97);
+    width: 760px; max-width: calc(100vw - 80px);
+    background: #fff; border-radius: 6px;
+    box-shadow: var(--shadow-modal);
+    z-index: 220; opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s;
+  }
+  .modal.show { opacity: 1; pointer-events: auto; transform: translateX(-50%) scale(1); }
+  .modal .head {
+    height: 48px; padding: 0 20px;
+    border-bottom: 1px solid var(--border-light);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .modal .head .title { font-size: 16px; font-weight: 600; }
+  .modal .head .close {
+    background: transparent; border: 0; color: var(--text-sub);
+    width: 28px; height: 28px; border-radius: 4px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .modal .head .close:hover { background: #F0F1F5; }
+  .modal .head .close svg { width: 14px; height: 14px; }
+  .modal .body { padding: 16px 20px; max-height: 60vh; overflow: auto; }
+  .modal .foot {
+    border-top: 1px solid var(--border-light);
+    padding: 12px 20px; display: flex; gap: 8px; justify-content: flex-end;
+  }
+
+  /* ============== Form ============== */
+  .form .row { margin-bottom: 18px; }
+  .form .row .lbl {
+    display: block; font-size: 14px; color: var(--text-main); margin-bottom: 6px;
+  }
+  .form .row .lbl .req { color: var(--red); margin-right: 4px; }
+  .form .row .input, .form .row .select, .form .row textarea { width: 100%; min-width: 0; }
+  .form .row textarea {
+    height: 80px; padding: 8px 12px; resize: vertical;
+    background: var(--bg-input); border: 1px solid var(--border); border-radius: var(--radius-btn);
+  }
+  .form .row .err { color: var(--red); font-size: 12px; margin-top: 4px; }
+
+  .form-block {
+    background: #F4F6FA; border-radius: 6px; padding: 16px 18px;
+  }
+  .form-block .row { margin-bottom: 0; }
+  .form-block .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .form-block .row + .row { margin-top: 12px; }
+  .form-block .with-unit { display: flex; align-items: center; gap: 8px; }
+  .form-block .with-unit .input { flex: 1; min-width: 0; }
+  .form-block .with-unit .unit { color: var(--text-sub); font-size: 14px; }
+
+  .date-input {
+    height: 32px; padding: 0 12px; width: 100%;
+    background: var(--bg-input); border: 1px solid var(--border);
+    border-radius: var(--radius-btn); color: var(--text-main);
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 14 14'><rect x='2' y='3' width='10' height='9' rx='1' stroke='%238F9098' stroke-width='1.2' fill='none'/><path d='M2 6h10M5 2v2M9 2v2' stroke='%238F9098' stroke-width='1.2' stroke-linecap='round'/></svg>");
+    background-repeat: no-repeat; background-position: right 10px center; background-origin: content-box;
+  }
+  .date-input::-webkit-calendar-picker-indicator { opacity: 0; }
+
+  /* ============== Checklist ============== */
+  .checklist { display: flex; flex-direction: column; gap: 8px; }
+  .checklist .ci { display: flex; align-items: center; gap: 8px; }
+  .checklist .ci .idx {
+    width: 24px; height: 24px; border-radius: 50%;
+    background: #F0F1F5; color: var(--text-sub);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px;
+  }
+  .checklist .ci .input { flex: 1; }
+  .checklist .ci .del {
+    background: transparent; border: 0; color: var(--text-sub);
+    width: 24px; height: 24px; border-radius: 4px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .checklist .ci .del:hover { color: var(--red); background: #FDECEC; }
+  .checklist .ci .del svg { width: 12px; height: 12px; }
+
+  /* ============== Fixed schedule rows ============== */
+  .fixed-list { display: flex; flex-direction: column; gap: 10px; }
+  .fixed-row {
+    display: grid; grid-template-columns: 140px 1fr 28px; gap: 12px; align-items: center;
+  }
+  .fixed-row .del {
+    background: transparent; border: 0; color: var(--text-sub);
+    width: 28px; height: 28px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .fixed-row .del:hover { color: var(--red); background: #FDECEC; }
+  .fixed-row .del svg { width: 14px; height: 14px; }
+  .fixed-row .del:disabled { color: #D8D8D8; background: transparent; cursor: not-allowed; }
+  .fixed-row .select, .fixed-row .date-input { min-width: 0; }
+  .add-row {
+    background: #F4F6FA; color: var(--primary);
+    height: 32px; padding: 0 12px; border-radius: var(--radius-btn);
+    border: 0; display: inline-flex; align-items: center; gap: 6px;
+    font-size: 14px;
+  }
+  .add-row:hover { background: #E8EEFD; }
+  .add-row svg { width: 12px; height: 12px; }
+
+  /* ============== Detail (read-only) ============== */
+  .detail-row { display: flex; padding: 10px 0; border-bottom: 1px solid var(--border-light); }
+  .detail-row:last-child { border-bottom: 0; }
+  .detail-row .k { width: 100px; color: var(--text-sub); font-size: 14px; }
+  .detail-row .v { flex: 1; color: var(--text-main); font-size: 14px; }
+  .detail-section {
+    font-size: 14px; color: var(--text-main); font-weight: 600;
+    margin: 16px 0 6px;
+  }
+
+  /* ============== Detail page (drawer body) ============== */
+  .detail-grid {
+    display: grid; grid-template-columns: 1fr 280px; gap: 16px; padding: 20px 24px;
+  }
+  .detail-grid .col { min-width: 0; }
+  .section {
+    background: #fff; border-radius: var(--radius-card);
+    box-shadow: var(--shadow-card);
+    margin-bottom: 16px;
+  }
+  .section .sec-head {
+    padding: 12px 18px; border-bottom: 1px solid var(--border-light);
+    display: flex; align-items: center; gap: 8px;
+    font-size: 14px; font-weight: 600; color: var(--text-main);
+  }
+  .section .sec-head .ico {
+    color: var(--primary); display: inline-flex;
+    width: 16px; height: 16px;
+  }
+  .section .sec-head .ico svg { width: 16px; height: 16px; }
+  .section .sec-body { padding: 16px 20px; }
+  .info-grid {
+    display: grid; grid-template-columns: 1fr 1fr 1fr; row-gap: 14px; column-gap: 16px;
+  }
+  .info-grid .row .k { font-size: 13px; color: var(--text-sub); margin-bottom: 4px; }
+  .info-grid .row .v { font-size: 14px; color: var(--text-main); }
+  .device-empty {
+    background: linear-gradient(180deg, #FBFCFE, #fff); border: 1px dashed #D8DCE6;
+    border-radius: 8px; padding: 40px 16px; text-align: center;
+    color: var(--text-sub); font-size: 13px;
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+  }
+  .device-empty svg { width: 32px; height: 32px; opacity: .35; }
+  .flow-empty {
+    padding: 72px 0; text-align: center; color: var(--text-sub); font-size: 13px;
+  }
+  .flow-empty svg { width: 56px; height: 56px; opacity: .3; display: block; margin: 0 auto 10px; }
+  .delay-list { display: flex; flex-direction: column; gap: 12px; }
+  .delay-item {
+    border: 1px solid var(--border-light); border-radius: 8px;
+    padding: 12px 14px; background: #FBFCFE;
+  }
+  .delay-item .dl-row { display: flex; gap: 10px; font-size: 14px; margin-bottom: 6px; }
+  .delay-item .dl-row:last-of-type { margin-bottom: 0; }
+  .delay-item .dl-k { color: var(--text-sub); font-size: 13px; min-width: 60px; flex: none; }
+  .delay-item .dl-v { color: var(--text-main); }
+  .delay-item .dl-meta { margin-top: 8px; font-size: 12px; color: var(--text-sub); }
+
+  /* ============== Assign ============== */
+  .assign-task-item {
+    font-size: 13px; color: var(--text-main);
+    background: #F4F6FA; border-radius: 4px;
+    padding: 6px 10px; margin-bottom: 6px;
+  }
+  .user-suggest {
+    position: absolute; top: 100%; left: 0; right: 0; z-index: 5;
+    background: #fff; border: 1px solid var(--border); border-radius: 4px;
+    box-shadow: 0 4px 12px rgba(20,26,50,.06);
+    max-height: 160px; overflow: auto; display: none;
+  }
+  .user-suggest.show { display: block; }
+  .user-suggest .it {
+    padding: 8px 12px; cursor: pointer; font-size: 14px;
+  }
+  .user-suggest .it:hover { background: var(--primary-light); color: var(--primary); }
+  .user-suggest .it .sub { color: var(--text-sub); font-size: 12px; margin-left: 6px; }
+
+  /* ============== Toast ============== */
+  .toast {
+    position: fixed; top: 60px; left: 50%; transform: translateX(-50%);
+    background: #fff; border-radius: 4px;
+    box-shadow: 0 4px 16px rgba(20,26,50,.12);
+    padding: 8px 16px; font-size: 14px; color: var(--text-main);
+    z-index: 300; opacity: 0; transition: opacity .2s, top .2s;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .toast.show { opacity: 1; top: 72px; }
+  .toast .dot { width: 8px; height: 8px; border-radius: 50%; }
+  .toast.warn .dot { background: var(--orange); }
+  .toast.success .dot { background: var(--green); }
+  .toast.error .dot { background: var(--red); }
+
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-thumb { background: #D8DBE3; border-radius: 4px; }
+  ::-webkit-scrollbar-thumb:hover { background: #BFC4D0; }
+  ::-webkit-scrollbar-track { background: transparent; }
+</style>
+</head>
+<body>
+
+<!-- ============== Top Bar ============== -->
+<header class="topbar">
+  <div class="logo">
+    <div class="logo-icon"></div>
+    <span>智慧园区集成管理平台</span>
+  </div>
+  <button class="topnav-toggle" title="折叠侧栏">
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+      <path d="M2 4h12M2 8h12M2 12h12" stroke-linecap="round"/>
+    </svg>
+  </button>
+  <div class="breadcrumb">
+    <span class="crumb">智能设备</span>
+    <span class="crumb">/</span>
+    <span class="crumb">设备维保</span>
+    <span class="crumb">/</span>
+    <span class="crumb active" id="crumbCur">维保标准管理</span>
+  </div>
+  <div class="topbar-right">
+    <button class="icon-btn" title="刷新">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M13.5 8a5.5 5.5 0 1 1-1.61-3.89M13.5 2.5v3h-3" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+    <button class="icon-btn" title="通知">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M3.5 12V8a4.5 4.5 0 0 1 9 0v4M2.5 12h11M8 14a1.5 1.5 0 0 1-1.5-1.5h3A1.5 1.5 0 0 1 8 14z" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+    <div class="avatar">
+      <div class="av">BM</div>
+      <div class="name">BMCT</div>
+    </div>
+  </div>
+</header>
+
+<!-- ============== Side Nav ============== -->
+<aside class="sidenav">
+  <div class="group expanded">
+    <div class="title">
+      <span class="ico">
+        <svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5">
+          <rect x="2" y="3" width="14" height="12" rx="1.5"/>
+          <path d="M5 6h8M5 9h8M5 12h5" stroke-linecap="round"/>
+        </svg>
+      </span>
+      <span>智能设备</span>
+      <span class="caret"><svg viewBox="0 0 12 12" fill="currentColor"><path d="M4 3l4 3-4 3V3z"/></svg></span>
+    </div>
+    <div class="sub">
+      <a class="item">物业报修</a>
+      <a class="item">设备台账</a>
+      <div class="group expanded">
+        <div class="title">
+          <span class="ico" style="width:14px;height:14px;">
+            <svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M9 2l2.2 4.5 5 .7-3.6 3.5.9 5L9 13.3 4.5 15.7l.9-5L1.8 7.2l5-.7L9 2z"/>
+            </svg>
+          </span>
+          <span>设备维保</span>
+          <span class="caret"><svg viewBox="0 0 12 12" fill="currentColor"><path d="M4 3l4 3-4 3V3z"/></svg></span>
+        </div>
+        <div class="sub">
+          <a class="item active" data-view="standard">维保标准管理</a>
+          <a class="item" data-view="plan">维保计划</a>
+          <a class="item" data-view="task">维保任务</a>
+        </div>
+      </div>
+      <a class="item">信息发布</a>
+      <a class="item">能耗管理</a>
+      <a class="item">系统管理</a>
+      <a class="item">基础设施</a>
+    </div>
+  </div>
+</aside>
+
+<!-- ============== Content ============== -->
+<main class="content">
+  <div class="tabbar">
+    <div class="scroll">
+      <div class="tab"><span class="home-ico"><svg viewBox="0 0 12 12" fill="currentColor"><path d="M6 1.5L1 5.5h1.5V10h3V7h1v3h3V5.5H11z"/></svg></span>首页</div>
+      <div class="tab" data-tab="standard">维保标准管理</div>
+      <div class="tab" data-tab="plan">维保计划</div>
+      <div class="tab" data-tab="task">维保任务</div>
+    </div>
+    <div class="arrows">
+      <button class="abtn"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7.5 3L4.5 6l3 3" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <button class="abtn"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4.5 3l3 3-3 3" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <button class="abtn"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2.5 6a3.5 3.5 0 0 1 6-2.5M9.5 6a3.5 3.5 0 0 1-6 2.5" stroke-linecap="round"/><path d="M8 2v2h-2M4 10V8h2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    </div>
+  </div>
+
+  <!-- ============== View: 维保标准管理 ============== -->
+  <div class="page view" id="view-standard" style="display:block;">
+    <div class="card">
+      <h2 class="card-title">维保标准管理</h2>
+      <div class="filter">
+        <div class="field">
+          <label>维保标准名称</label>
+          <input class="input" placeholder="请输入" />
+        </div>
+        <div class="field">
+          <label>所属专业</label>
+          <input class="input" placeholder="请输入" />
+        </div>
+        <div class="actions">
+          <button class="btn btn-primary">
+            <span class="ico"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="6" cy="6" r="4.5"/><path d="M9.5 9.5L12 12" stroke-linecap="round"/></svg></span>搜索
+          </button>
+          <button class="btn btn-ghost">
+            <span class="ico"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2.5 4.5h9M5 7h4M7 9.5h0" stroke-linecap="round"/></svg></span>重置
+          </button>
+        </div>
+      </div>
+      <div style="margin-top:16px;">
+        <button class="btn btn-primary" id="stdBtnNew">
+          <span class="ico"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="7" cy="7" r="5.5"/><path d="M7 4.5v5M4.5 7h5" stroke-linecap="round"/></svg></span>新建维保标准
+        </button>
+      </div>
+      <div class="table-wrap">
+        <table class="table">
+          <thead>
+            <tr>
+              <th class="col-num">序号</th>
+              <th>维保标准名称</th>
+              <th>所属专业</th>
+              <th>保养标准</th>
+              <th class="col-actions">操作</th>
+            </tr>
+          </thead>
+          <tbody id="stdTbody"></tbody>
+        </table>
+        <div class="pagination">
+          <span>共 <em id="stdTotal" style="color:var(--text-main);font-style:normal;">4</em> 条</span>
+          <div class="pager">
+            <select class="page-size"><option>10条/页</option><option>20条/页</option><option>50条/页</option></select>
+            <button class="page-btn"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7.5 3L4.5 6l3 3" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+            <button class="page-btn active">1</button>
+            <button class="page-btn"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4.5 3l3 3-3 3" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+            <span class="page-jump">前往<input value="1" />页</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============== View: 维保计划 ============== -->
+  <div class="page view" id="view-plan" style="display:none;">
+    <div class="card">
+      <h2 class="card-title">维保计划</h2>
+      <div class="filter">
+        <div class="field">
+          <label>维保计划名称</label>
+          <input class="input" placeholder="请输入" id="planFName" />
+        </div>
+        <div class="field">
+          <label>状态</label>
+          <select class="select" id="planFStatus">
+            <option value="">请选择</option>
+            <option value="1">启用</option>
+            <option value="0">停用</option>
+          </select>
+        </div>
+        <div class="actions">
+          <button class="btn btn-primary" id="planBtnSearch">
+            <span class="ico"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="6" cy="6" r="4.5"/><path d="M9.5 9.5L12 12" stroke-linecap="round"/></svg></span>搜索
+          </button>
+          <button class="btn btn-ghost" id="planBtnReset">
+            <span class="ico"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2.5 4.5h9M5 7h4M7 9.5h0" stroke-linecap="round"/></svg></span>重置
+          </button>
+        </div>
+      </div>
+      <div style="margin-top:16px;">
+        <button class="btn btn-primary" id="planBtnNew">
+          <span class="ico"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="7" cy="7" r="5.5"/><path d="M7 4.5v5M4.5 7h5" stroke-linecap="round"/></svg></span>新建维保计划
+        </button>
+      </div>
+      <div class="table-wrap">
+        <table class="table">
+          <thead>
+            <tr>
+              <th class="col-num">序号</th>
+              <th>计划编号</th>
+              <th>维保计划名称</th>
+              <th>排程类型</th>
+              <th>排程规则</th>
+              <th>维保标准</th>
+              <th>状态</th>
+              <th class="col-actions">操作</th>
+            </tr>
+          </thead>
+          <tbody id="planTbody"></tbody>
+        </table>
+        <div class="pagination">
+          <span>共 <em id="planTotal" style="color:var(--text-main);font-style:normal;">7</em> 条</span>
+          <div class="pager">
+            <select class="page-size"><option>10条/页</option><option>20条/页</option><option>50条/页</option></select>
+            <button class="page-btn"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7.5 3L4.5 6l3 3" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+            <button class="page-btn active">1</button>
+            <button class="page-btn"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4.5 3l3 3-3 3" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+            <span class="page-jump">前往<input value="1" />页</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============== View: 维保任务 ============== -->
+  <div class="page view" id="view-task" style="display:none;">
+    <div class="card">
+    <h2 class="card-title">维保任务</h2>
+    <div class="filter">
+        <div class="field">
+          <label>任务名称</label>
+          <input class="input" id="taskFName" placeholder="请输入" />
+        </div>
+        <div class="field">
+          <label>任务状态</label>
+          <select class="select" id="taskFStatus">
+            <option value="">请选择</option>
+            <option value="todo">待指派</option>
+            <option value="running">待执行</option>
+            <option value="done">已完成</option>
+            <option value="cancelled">已取消</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>任务时长</label>
+          <input class="input" id="taskFTime" placeholder="请输入" />
+        </div>
+        <div class="actions">
+          <button class="btn btn-primary" id="taskBtnSearch">
+            <span class="ico"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="6" cy="6" r="4.5"/><path d="M9.5 9.5L12 12" stroke-linecap="round"/></svg></span>搜索
+          </button>
+          <button class="btn btn-ghost" id="taskBtnReset">
+            <span class="ico"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2.5 4.5h9M5 7h4M7 9.5h0" stroke-linecap="round"/></svg></span>重置
+          </button>
+        </div>
+      </div>
+      <div style="margin-top:16px;">
+        <button class="btn btn-ghost" id="taskBtnBatch" disabled>
+          <span class="ico"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 5l5-3 5 3M2 5v6h10V5M5 8h4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>批量指派
+        </button>
+      </div>
+      <div class="table-wrap">
+        <table class="table">
+          <thead>
+            <tr>
+              <th class="col-check"><label class="checkbox" id="taskCkAll"><input type="checkbox" /><span class="box"></span></label></th>
+              <th class="col-num">序号</th>
+              <th>任务编号</th>
+              <th>任务名称</th>
+              <th>维保日期</th>
+              <th>排程类型</th>
+              <th>维保标准</th>
+              <th>任务状态</th>
+              <th>审批状态</th>
+              <th>任务时长</th>
+              <th class="col-actions">操作</th>
+            </tr>
+          </thead>
+          <tbody id="taskTbody"></tbody>
+        </table>
+        <div class="pagination">
+          <span>共 <em id="taskTotal" style="color:var(--text-main);font-style:normal;">15</em> 条</span>
+          <div class="pager">
+            <select class="page-size"><option>10条/页</option><option>20条/页</option><option>50条/页</option></select>
+            <button class="page-btn"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7.5 3L4.5 6l3 3" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+            <button class="page-btn active">1</button>
+            <button class="page-btn">2</button>
+            <button class="page-btn"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4.5 3l3 3-3 3" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+            <span class="page-jump">前往<input value="1" />页</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- ============== Mask ============== -->
+<div class="mask" id="mask"></div>
+
+<!-- ============== Drawer: 维保标准管理 新建 ============== -->
+<aside class="drawer" id="stdDrawerNew">
+  <div class="head">
+    <div class="title">
+      <span class="ico"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 3h10v10H3z M3 6h10 M6 3v10" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+      <span id="stdNewTitle">添加维保标准</span>
+    </div>
+    <button class="close" data-close>
+      <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 3l8 8M11 3l-8 8" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+  <div class="body">
+    <form class="form" id="stdForm" onsubmit="return false">
+      <div class="row">
+        <label class="lbl"><span class="req">*</span>维保标准名称</label>
+        <input class="input" name="name" placeholder="请输入" />
+        <div class="err" data-err="name" style="display:none;">请输入维保标准名称</div>
+      </div>
+      <div class="row">
+        <label class="lbl"><span class="req">*</span>所属专业</label>
+        <input class="input" name="major" placeholder="请输入" />
+        <div class="err" data-err="major" style="display:none;">请输入所属专业</div>
+      </div>
+      <div class="row">
+        <label class="lbl"><span class="req">*</span>保养标准</label>
+        <div class="checklist" id="stdClist"></div>
+        <div style="margin-top:8px;">
+          <button class="add-row" type="button" id="stdAddItem">
+            <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="6" cy="6" r="5"/><path d="M6 4v4M4 6h4" stroke-linecap="round"/></svg>添加标准
+          </button>
+        </div>
+        <div class="err" data-err="items" style="display:none;">请填写保养标准</div>
+      </div>
+    </form>
+  </div>
+  <div class="foot">
+    <button class="btn btn-ghost" data-close>取消</button>
+    <button class="btn btn-primary" id="stdBtnSubmit">提交</button>
+  </div>
+</aside>
+
+<!-- ============== Drawer: 维保标准管理 详情 ============== -->
+<aside class="drawer" id="stdDrawerDetail">
+  <div class="head">
+    <div class="title">
+      <span class="ico"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6"/><path d="M8 5v3.5M8 11h.01" stroke-linecap="round"/></svg></span>
+      维保标准详情
+    </div>
+    <button class="close" data-close>
+      <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 3l8 8M11 3l-8 8" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+  <div class="body">
+    <div class="detail-row"><div class="k">维保标准名称</div><div class="v" id="stdDName">-</div></div>
+    <div class="detail-row"><div class="k">所属专业</div><div class="v" id="stdDMajor">-</div></div>
+    <div class="detail-section">保养标准</div>
+    <div class="detail-list" id="stdDList"></div>
+  </div>
+  <div class="foot">
+    <button class="btn btn-primary" data-close>关闭</button>
+  </div>
+</aside>
+
+<!-- ============== Drawer: 维保计划 新建/编辑 ============== -->
+<aside class="drawer" id="planDrawerForm">
+  <div class="head">
+    <div class="title">
+      <span class="ico"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 3h10v10H3z" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+      <span id="planFormTitle">新建维保计划</span>
+    </div>
+    <button class="close" data-close>
+      <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 3l8 8M11 3l-8 8" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+  <div class="body">
+    <form class="form" id="planForm" onsubmit="return false">
+      <div class="row">
+        <label class="lbl"><span class="req">*</span>维保计划名称</label>
+        <input class="input" name="name" placeholder="请输入" />
+        <div class="err" data-err="name" style="display:none;">请输入维保计划名称</div>
+      </div>
+      <div class="row">
+        <label class="lbl"><span class="req">*</span>维保标准</label>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+          <select class="select" name="major" id="planSelMajor"><option value="">请选择专业</option></select>
+          <select class="select" name="std" id="planSelStd"><option value="">请选择标准</option></select>
+        </div>
+        <div class="err" data-err="std" style="display:none;">请选择维保标准</div>
+      </div>
+      <div class="row">
+        <label class="lbl"><span class="req">*</span>排程类型</label>
+        <div class="form-block">
+          <div class="row" style="margin-bottom:0;">
+            <div class="radio-group">
+              <label class="radio"><input type="radio" name="sched" value="loop" checked /><span class="dot"></span>周期循环</label>
+              <label class="radio"><input type="radio" name="sched" value="fixed" /><span class="dot"></span>日历定点</label>
+            </div>
+          </div>
+          <div class="row" id="planRowLoop">
+            <div class="grid2">
+              <div>
+                <label class="lbl" style="font-size:13px;"><span class="req">*</span>开始时间</label>
+                <input type="date" class="date-input" name="startDate" />
+              </div>
+              <div>
+                <label class="lbl" style="font-size:13px;"><span class="req">*</span>间隔时间</label>
+                <div class="with-unit">
+                  <input type="number" class="input" name="interval" placeholder="请输入" min="1" />
+                  <span class="unit">天</span>
+                </div>
+              </div>
+            </div>
+            <div class="err" data-err="loop" style="display:none;">请输入开始时间和间隔时间</div>
+          </div>
+          <div class="row" id="planRowFixed" style="display:none;">
+            <div class="fixed-list" id="planFixedList"></div>
+            <div style="margin-top:10px;">
+              <button class="add-row" type="button" id="planAddFixed">
+                <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="6" cy="6" r="5"/><path d="M6 4v4M4 6h4" stroke-linecap="round"/></svg>添加日期
+              </button>
+            </div>
+            <div class="err" data-err="fixed" style="display:none;">请至少添加一条日期规则</div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <label class="lbl"><span class="req">*</span>巡检要求</label>
+        <div class="radio-group">
+          <label class="radio"><input type="radio" name="req" value="one" checked /><span class="dot"></span>逐个</label>
+          <label class="radio"><input type="radio" name="req" value="batch" /><span class="dot"></span>批量</label>
+        </div>
+      </div>
+      <div class="row">
+        <label class="lbl"><span class="req">*</span>巡检设备</label>
+        <div class="form-actions">
+          <button class="btn-pick" type="button" id="planBtnPick">
+            <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 2v8M2 6h8" stroke-linecap="round"/></svg>从设备选择
+          </button>
+        </div>
+        <div class="err" data-err="dev" style="display:none;">巡检设备不能为空</div>
+        <div class="table-wrap mini" id="planDevWrap" style="display:none;">
+          <table class="table simple">
+            <thead>
+              <tr>
+                <th class="col-num">序号</th>
+                <th>设备类型</th>
+                <th>设备名称</th>
+                <th>设备位置</th>
+                <th class="col-actions">操作</th>
+              </tr>
+            </thead>
+            <tbody id="planDevTbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </form>
+  </div>
+  <div class="foot">
+    <button class="btn btn-ghost" data-close>取消</button>
+    <button class="btn btn-primary" id="planBtnSave">保存</button>
+  </div>
+</aside>
+
+<!-- ============== Drawer: 维保计划 详情 ============== -->
+<aside class="drawer" id="planDrawerDetail">
+  <div class="head">
+    <div class="title">
+      <span class="ico"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6"/><path d="M8 5v3.5M8 11h.01" stroke-linecap="round"/></svg></span>
+      维保计划详情
+    </div>
+    <button class="close" data-close>
+      <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 3l8 8M11 3l-8 8" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+  <div class="body">
+    <div class="detail-row"><div class="k">计划编号</div><div class="v" id="planDId">-</div></div>
+    <div class="detail-row"><div class="k">维保计划名称</div><div class="v" id="planDName">-</div></div>
+    <div class="detail-row"><div class="k">维保标准</div><div class="v" id="planDStd">-</div></div>
+    <div class="detail-row"><div class="k">排程类型</div><div class="v" id="planDSched">-</div></div>
+    <div class="detail-row"><div class="k">排程规则</div><div class="v" id="planDRule">-</div></div>
+    <div class="detail-row"><div class="k">巡检要求</div><div class="v" id="planDReq">-</div></div>
+    <div class="detail-row"><div class="k">巡检设备</div><div class="v" id="planDDev">-</div></div>
+  </div>
+  <div class="foot">
+    <button class="btn btn-ghost" data-close>返回</button>
+  </div>
+</aside>
+
+<!-- ============== Modal: 选择设备 ============== -->
+<div class="modal" id="planModalPick">
+  <div class="head">
+    <div class="title">选择设备</div>
+    <button class="close" data-close>
+      <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 3l8 8M11 3l-8 8" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+  <div class="body">
+    <div class="filter" style="margin-bottom:12px;">
+      <div class="field"><label>设备名称</label><input class="input" placeholder="请输入" id="planPickName" /></div>
+      <div class="field"><label>设备ID</label><input class="input" placeholder="请输入" id="planPickId" /></div>
+      <div class="actions">
+        <button class="btn btn-primary" id="planPickSearch">查询</button>
+        <button class="btn btn-ghost" id="planPickReset">重置</button>
+      </div>
+    </div>
+    <div class="table-wrap" style="margin-top:0;">
+      <table class="table simple">
+        <thead>
+          <tr>
+            <th style="width:40px;"><label class="checkbox"><input type="checkbox" id="planPickAll" /><span class="box"></span></label></th>
+            <th>设备ID</th><th>设备名称</th><th>设备类型</th><th>设备位置</th>
+          </tr>
+        </thead>
+        <tbody id="planPickTbody"></tbody>
+      </table>
+      <div class="pagination">
+        <span>已选 <em id="planPickSel" style="color:var(--primary);font-style:normal;">0</em> 台设备</span>
+        <span style="margin-left:8px;">共 <em style="color:var(--text-main);font-style:normal;">94</em> 条</span>
+        <div class="pager">
+          <select class="page-size"><option>10条/页</option></select>
+          <button class="page-btn"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7.5 3L4.5 6l3 3" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <button class="page-btn active">1</button>
+          <button class="page-btn">2</button>
+          <button class="page-btn">3</button>
+          <button class="page-btn">4</button>
+          <button class="page-btn">5</button>
+          <button class="page-btn">6</button>
+          <span style="color:var(--text-sub);">…</span>
+          <button class="page-btn">10</button>
+          <button class="page-btn"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4.5 3l3 3-3 3" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <span class="page-jump">前往<input value="1" />页</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="foot">
+    <button class="btn btn-ghost" data-close>取消</button>
+    <button class="btn btn-primary" id="planBtnPickOk">确定</button>
+  </div>
+</div>
+
+<!-- ============== Drawer: 维保任务 详情 ============== -->
+<aside class="drawer wide" id="taskDrawerDetail">
+  <div class="head">
+    <div class="title">
+      <span class="ico"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6"/><path d="M8 5v3.5M8 11h.01" stroke-linecap="round"/></svg></span>
+      维保任务详情
+    </div>
+    <button class="close" data-close>
+      <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 3l8 8M11 3l-8 8" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+  <div class="body pad0">
+    <div class="detail-grid">
+      <div class="col">
+        <div class="section">
+          <div class="sec-head">
+            <span class="ico"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="12" height="10" rx="1.5"/><path d="M5 6h6M5 9h4" stroke-linecap="round"/></svg></span>
+            基本信息
+          </div>
+          <div class="sec-body">
+            <div class="info-grid">
+              <div class="row"><div class="k">任务编号</div><div class="v" id="taskDId">-</div></div>
+              <div class="row"><div class="k">任务名称</div><div class="v" id="taskDName">-</div></div>
+              <div class="row"><div class="k">维保日期</div><div class="v" id="taskDDate">-</div></div>
+              <div class="row"><div class="k">任务状态</div><div class="v" id="taskDStatus">-</div></div>
+              <div class="row"><div class="k">维保标准</div><div class="v" id="taskDStd">-</div></div>
+              <div class="row"><div class="k">维保人</div><div class="v" id="taskDUser">-</div></div>
+              <div class="row"><div class="k">完成时间</div><div class="v" id="taskDDue">-</div></div>
+              <div class="row"><div class="k">审批状态</div><div class="v" id="taskDApproval">-</div></div>
+            </div>
+          </div>
+        </div>
+        <div class="section">
+          <div class="sec-head">
+            <span class="ico"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 12l3-2 2 2 3-4 4 5" stroke-linecap="round" stroke-linejoin="round"/><path d="M11 2.5l1.5 1.5-4 4L7 7l4-4.5z" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            维保报告
+          </div>
+          <div class="sec-body" id="taskDReport"></div>
+        </div>
+        <div class="section">
+          <div class="sec-head">
+            <span class="ico"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2.5" y="3" width="11" height="10" rx="1.5"/><path d="M2.5 6h11M5.5 1.5v3M10.5 1.5v3" stroke-linecap="round"/></svg></span>
+            延期记录
+          </div>
+          <div class="sec-body" id="taskDDelays"></div>
+        </div>
+      </div>
+      <div class="col">
+        <div class="section">
+          <div class="sec-head">
+            <span class="ico"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 4h10M3 8h10M3 12h7" stroke-linecap="round"/></svg></span>
+            流转记录
+          </div>
+          <div class="sec-body" id="taskDFlow"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="foot">
+    <button class="btn btn-ghost" data-close>返回</button>
+  </div>
+</aside>
+
+<!-- ============== Modal: 批量指派 ============== -->
+<div class="modal" id="taskModalAssign" style="width:480px;">
+  <div class="head">
+    <div class="title">批量指派任务</div>
+    <button class="close" data-close>
+      <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 3l8 8M11 3l-8 8" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+  <div class="body">
+    <div style="font-size:14px; color:var(--text-main); margin-bottom:8px;">任务</div>
+    <div id="taskAssignList" style="max-height:140px; overflow:auto; margin-bottom:16px;"></div>
+    <div class="form">
+      <div class="row" style="margin-bottom:0; position:relative;">
+        <label class="lbl"><span class="req">*</span>指派人员</label>
+        <input class="input" id="taskAssignUser" placeholder="请输入姓名搜索人员" autocomplete="off" style="width:100%;" />
+        <div class="user-suggest" id="taskUserSuggest"></div>
+        <div class="err" data-err="assign" style="display:none;">请选择指派人员</div>
+      </div>
+    </div>
+  </div>
+  <div class="foot">
+    <button class="btn btn-ghost" data-close>取消</button>
+    <button class="btn btn-primary" id="taskBtnAssignOk">确定</button>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"><span class="dot"></span><span class="msg"></span></div>
+
+<script>
+  // ============== 全局 Toast & Drawer 工具 ==============
+  const mask = document.getElementById('mask');
+  const toastEl = document.getElementById('toast');
+  function toast(msg, type='success') {
+    toastEl.className = 'toast show ' + type;
+    toastEl.querySelector('.msg').textContent = msg;
+    clearTimeout(toast._t);
+    toast._t = setTimeout(() => toastEl.classList.remove('show'), 1800);
+  }
+  function openDrawer(d) { d.classList.add('show'); mask.classList.add('show'); }
+  function openModal(m)  { m.classList.add('show'); mask.classList.add('show'); }
+  function closeAll() {
+    document.querySelectorAll('.drawer.show, .modal.show').forEach(d => d.classList.remove('show'));
+    mask.classList.remove('show');
+  }
+  document.querySelectorAll('[data-close]').forEach(el => el.addEventListener('click', closeAll));
+  mask.addEventListener('click', closeAll);
+
+  // ============== 视图切换 ==============
+  const views = ['standard', 'plan', 'task'];
+  const crumbText = { standard: '维保标准管理', plan: '维保计划', task: '维保任务' };
+  function switchView(name) {
+    closeAll();
+    views.forEach(v => {
+      document.getElementById('view-' + v).style.display = (v === name) ? 'block' : 'none';
+    });
+    document.querySelectorAll('.sidenav .item[data-view]').forEach(el => {
+      el.classList.toggle('active', el.dataset.view === name);
+    });
+    document.querySelectorAll('.tabbar .tab[data-tab]').forEach(el => {
+      el.classList.toggle('active', el.dataset.tab === name);
+    });
+    document.getElementById('crumbCur').textContent = crumbText[name];
+  }
+  document.querySelectorAll('.sidenav .item[data-view]').forEach(el =>
+    el.addEventListener('click', () => switchView(el.dataset.view)));
+  document.querySelectorAll('.tabbar .tab[data-tab]').forEach(el =>
+    el.addEventListener('click', () => switchView(el.dataset.tab)));
+
+  // =========================================================
+  // 模块一：维保标准管理
+  // =========================================================
+  (function(){
+    const data = [
+      { name: 'T 维保要求081902', major: '测试验证', items: ['设备test-6','设备检修-定期检查','设备test-5','设备test-1'] },
+      { name: 'T 维保要求',     major: '测试',     items: ['验证设备在线'] },
+      { name: '测试维修标准',   major: '维修',     items: ['检查滤网','检查运行状态'] },
+      { name: 'Codex暖通维保标准-20260724', major: 'Codex暖通专业', items: ['检查末端设备并清理滤网','监测温度、...'] },
+    ];
+    const tbody = document.getElementById('stdTbody');
+    function render() {
+      tbody.innerHTML = data.map((r, i) => {
+        const cell = r.items.length > 2
+          ? r.items.slice(0,2).map((t,j)=>`${j+1}、${t}`).join('&nbsp;&nbsp;') + `&nbsp;&nbsp;...&nbsp;&nbsp;`
+          : r.items.map((t,j)=>`${j+1}、${t}`).join('&nbsp;&nbsp;');
+        return `
+          <tr>
+            <td class="col-num">${i+1}</td>
+            <td>${r.name}</td>
+            <td>${r.major}</td>
+            <td class="cell-ellipsis" title="${r.items.join(' / ')}">${cell}</td>
+            <td class="col-actions"><a class="btn-link" data-detail="${i}">详情</a></td>
+          </tr>`;
+      }).join('');
+      document.getElementById('stdTotal').textContent = data.length;
+    }
+    render();
+
+    const drawerNew = document.getElementById('stdDrawerNew');
+    const drawerDetail = document.getElementById('stdDrawerDetail');
+    const clist = document.getElementById('stdClist');
+
+    document.getElementById('stdBtnNew').addEventListener('click', () => {
+      document.getElementById('stdNewTitle').textContent = '添加维保标准';
+      document.getElementById('stdForm').reset();
+      document.querySelectorAll('#stdDrawerNew [data-err]').forEach(el => el.style.display='none');
+      clist.innerHTML = '';
+      addItemRow();
+      openDrawer(drawerNew);
+    });
+    function addItemRow(value='') {
+      const idx = clist.children.length + 1;
+      const row = document.createElement('div');
+      row.className = 'ci';
+      row.innerHTML = `
+        <span class="idx">${idx}</span>
+        <input class="input" placeholder="请输入保养内容、保养标准" value="${value||''}" />
+        <button class="del" type="button" title="删除">
+          <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M2.5 3h7M4.5 3V2h3v1M3.5 3l.5 7h4l.5-7M5.5 5v3M6.5 5v3" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>`;
+      row.querySelector('.del').addEventListener('click', () => { row.remove(); renumber(); });
+      clist.appendChild(row);
+    }
+    function renumber() {
+      [...clist.children].forEach((row, i) => row.querySelector('.idx').textContent = i + 1);
+    }
+    document.getElementById('stdAddItem').addEventListener('click', () => addItemRow());
+
+    document.getElementById('stdBtnSubmit').addEventListener('click', () => {
+      const form = document.getElementById('stdForm');
+      const name = form.name.value.trim();
+      const major = form.major.value.trim();
+      const items = [...clist.querySelectorAll('input')].map(i => i.value.trim()).filter(Boolean);
+      let ok = true;
+      function setErr(k, show) {
+        const el = document.querySelector(`#stdDrawerNew [data-err="${k}"]`);
+        if (el) el.style.display = show ? 'block' : 'none';
+        if (show) ok = false;
+      }
+      setErr('name', !name);
+      setErr('major', !major);
+      setErr('items', items.length === 0);
+      if (!ok) return;
+      data.unshift({ name, major, items });
+      render();
+      closeAll();
+      toast('保存成功', 'success');
+    });
+
+    tbody.addEventListener('click', e => {
+      const t = e.target.closest('[data-detail]');
+      if (!t) return;
+      const r = data[+t.dataset.detail];
+      document.getElementById('stdDName').textContent = r.name;
+      document.getElementById('stdDMajor').textContent = r.major;
+      document.getElementById('stdDList').innerHTML = r.items.map((it,i) => `
+        <div class="detail-row"><div class="k">${i+1}.</div><div class="v">${it}</div></div>`).join('');
+      openDrawer(drawerDetail);
+    });
+  })();
+
+  // =========================================================
+  // 模块二：维保计划
+  // =========================================================
+  (function(){
+    const standards = {
+      '测试验证': ['T 维保要求081902'],
+      '测试':     ['T 维保要求'],
+      '维修':     ['测试维修标准'],
+      'Codex暖通专业': ['Codex暖通维保标准-20260724'],
+    };
+    const devices = [
+      { id: 'CCTV-ELEV-001', name: '电梯监控摄像头', type: '摄像头', loc: '一区电梯' },
+      { id: 'ENERGY-METER-001', name: '会议中心1号电表', type: '电表', loc: '会议中心' },
+      { id: 'TER-ELEVATOR-002', name: '园区电梯信息发布终端', type: '信息发布终端', loc: '智慧场馆' },
+      { id: 'TER-ELEVATOR-001', name: '酒店电梯信息发布终端', type: '信息发布终端', loc: '酒店' },
+      { id: 'TER-PARK-002', name: '会议中心综合信息发布终端', type: '信息发布终端', loc: '会议中心' },
+      { id: 'TER-PARK-001', name: '园区大厅综合信息发布终端', type: '信息发布终端', loc: '智慧场馆' },
+      { id: 'TER-CANTEEN-002', name: '二食堂大厅菜单发布终端', type: '信息发布终端', loc: '二食堂-大厅' },
+      { id: 'TER-CANTEEN-001', name: '一食堂大厅菜单发布终端', type: '信息发布终端', loc: '一食堂-大厅' },
+      { id: 'hh-AM107-1', name: 'hh-空气质量探测器1', type: '空气质量探测器', loc: '智慧场馆' },
+    ];
+    while (devices.length < 94) {
+      const base = devices[devices.length % 9];
+      devices.push({ id: base.id + '-' + (devices.length+1), name: base.name + '-' + (devices.length+1), type: base.type, loc: base.loc });
+    }
+    const data = [
+      { id: 'BM2089972849...', name: 'T 维保计划创建0819...', sched: 'loop', rule: '2026年08月19日；每2天', std: 'T 维保要求0819...', enabled: true, req:'one', devices: [] },
+      { id: 'BM2084112236...', name: 'ceshi', sched: 'fixed', rule: '每月；3日', std: '测试维修标准', enabled: true, req:'one', devices: [] },
+      { id: 'BM2083110255...', name: '333', sched: 'fixed', rule: '每年；8月1日', std: '测试维修标准', enabled: true, req:'one', devices: [] },
+      { id: 'BM2083110194...', name: '222', sched: 'fixed', rule: '每年；8月1日', std: 'Codex暖通维保...', enabled: true, req:'one', devices: [] },
+      { id: 'BM2083033571...', name: '111', sched: 'fixed', rule: '每年；8月1日、...', std: 'Codex暖通维保...', enabled: true, req:'one', devices: [] },
+      { id: 'BM2083016631...', name: '测试定点每月', sched: 'fixed', rule: '每月；3日、7日', std: '测试维修标准', enabled: true, req:'one', devices: [] },
+      { id: 'BM2082752941...', name: '111', sched: 'loop', rule: '2026年07月24日...', std: '测试维修标准', enabled: true, req:'one', devices: [] },
+    ];
+    const tbody = document.getElementById('planTbody');
+    function render() {
+      tbody.innerHTML = data.map((r, i) => `
+        <tr>
+          <td class="col-num">${i+1}</td>
+          <td class="col-id" title="${r.id}">${r.id}</td>
+          <td>${r.name}</td>
+          <td>${r.sched === 'loop' ? '周期循环' : '日历定点'}</td>
+          <td>${r.rule}</td>
+          <td class="cell-ellipsis" title="${r.std}">${r.std}</td>
+          <td>
+            <label class="switch">
+              <input type="checkbox" data-toggle="${i}" ${r.enabled?'checked':''}/>
+              <span class="slider"></span>
+            </label>
+          </td>
+          <td class="col-actions">
+            <a class="btn-link" data-detail="${i}">详情</a>
+            <a class="btn-link" data-edit="${i}">编辑</a>
+            <a class="btn-danger" data-del="${i}">删除</a>
+          </td>
+        </tr>
+      `).join('');
+      document.getElementById('planTotal').textContent = data.length;
+    }
+    render();
+
+    const selMajor = document.getElementById('planSelMajor');
+    const selStd   = document.getElementById('planSelStd');
+    Object.keys(standards).forEach(m => {
+      const o = document.createElement('option');
+      o.value = m; o.textContent = m;
+      selMajor.appendChild(o);
+    });
+    function refreshStd(major, cur) {
+      selStd.innerHTML = '<option value="">请选择标准</option>';
+      (standards[major] || []).forEach(s => {
+        const o = document.createElement('option');
+        o.value = s; o.textContent = s;
+        selStd.appendChild(o);
+      });
+      if (cur) selStd.value = cur;
+    }
+    selMajor.addEventListener('change', () => refreshStd(selMajor.value));
+
+    const rowLoop = document.getElementById('planRowLoop');
+    const rowFixed = document.getElementById('planRowFixed');
+    document.querySelectorAll('#planForm input[name="sched"]').forEach(r => {
+      r.addEventListener('change', () => {
+        const loop = document.querySelector('#planForm input[name="sched"][value="loop"]').checked;
+        const fixed = document.querySelector('#planForm input[name="sched"][value="fixed"]').checked;
+        rowLoop.style.display = loop ? '' : 'none';
+        rowFixed.style.display = fixed ? '' : 'none';
+      });
+    });
+
+    const drawerForm = document.getElementById('planDrawerForm');
+    const drawerDetail = document.getElementById('planDrawerDetail');
+    const modalPick = document.getElementById('planModalPick');
+
+    // ===== 日历定点行 =====
+    const fixedList = document.getElementById('planFixedList');
+    const fixedFreqOptions = [
+      { v: 'monthly', t: '每月' },
+      { v: 'yearly',  t: '每年' },
+    ];
+    function addFixedRow(freq, date, focusSelect) {
+      const row = document.createElement('div');
+      row.className = 'fixed-row';
+      const opts = fixedFreqOptions.map(o =>
+        `<option value="${o.v}" ${o.v===freq?'selected':''}>${o.t}</option>`).join('');
+      row.innerHTML = `
+        <select class="select">${opts}</select>
+        <input type="date" class="date-input" value="${date||''}" />
+        <button class="del" type="button" title="删除">
+          <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3.5 7h7" stroke-linecap="round"/></svg>
+        </button>`;
+      row.querySelector('.del').addEventListener('click', () => {
+        if (fixedList.children.length <= 1) return;
+        row.remove();
+        setFixedDisabled();
+      });
+      fixedList.appendChild(row);
+      if (focusSelect) row.querySelector('select').focus();
+      setFixedDisabled();
+    }
+    function resetFixed() {
+      fixedList.innerHTML = '';
+      addFixedRow('yearly', '');
+    }
+    function readFixed() {
+      return [...fixedList.querySelectorAll('.fixed-row')].map(r => ({
+        freq: r.querySelector('select').value,
+        date: r.querySelector('input').value
+      }));
+    }
+    function setFixedDisabled() {
+      [...fixedList.querySelectorAll('.del')].forEach(b => b.disabled = fixedList.children.length <= 1);
+    }
+    document.getElementById('planAddFixed').addEventListener('click', () => addFixedRow('yearly', '', true));
+
+    document.getElementById('planBtnNew').addEventListener('click', () => {
+      document.getElementById('planFormTitle').textContent = '新建维保计划';
+      document.getElementById('planForm').reset();
+      document.querySelectorAll('#planDrawerForm [data-err]').forEach(el => el.style.display='none');
+      refreshStd('');
+      document.querySelector('#planForm input[name="sched"][value="loop"]').checked = true;
+      rowLoop.style.display = ''; rowFixed.style.display = 'none';
+      resetFixed();
+      selectedDevs = []; renderDevs();
+      openDrawer(drawerForm);
+    });
+
+    tbody.addEventListener('click', e => {
+      const ed = e.target.closest('[data-edit]');
+      if (ed) {
+        const r = data[+ed.dataset.edit];
+        document.getElementById('planFormTitle').textContent = '编辑维保计划';
+        const f = document.getElementById('planForm');
+        f.name.value = r.name;
+        const m = Object.keys(standards).find(k => standards[k].some(s => r.std.startsWith(s.slice(0,4))));
+        selMajor.value = m || '';
+        refreshStd(selMajor.value, r.std);
+        if (r.sched === 'loop') {
+          document.querySelector('#planForm input[name="sched"][value="loop"]').checked = true;
+          rowLoop.style.display = ''; rowFixed.style.display = 'none';
+          const mm = r.rule.match(/(\d{4})年(\d{2})月(\d{2})日/);
+          if (mm) f.startDate.value = `${mm[1]}-${mm[2]}-${mm[3]}`;
+          const n = r.rule.match(/每(\d+)天/);
+          if (n) f.interval.value = n[1];
+        } else {
+          document.querySelector('#planForm input[name="sched"][value="fixed"]').checked = true;
+          rowLoop.style.display = 'none'; rowFixed.style.display = '';
+          const freqMap = { '每月':'monthly','每年':'yearly' };
+          const seg = r.rule.split(/[；;]/);
+          const freq = freqMap[(seg[0]||'').trim()] || 'yearly';
+          const days = (seg[1] || '').split(/[、,]/).filter(Boolean);
+          resetFixed();
+          if (days.length) {
+            fixedList.innerHTML = '';
+            days.forEach(d => {
+              let v = '';
+              if (freq === 'yearly') {
+                const mm = d.match(/(\d+)月(\d+)日/);
+                if (mm) v = `2026-${String(mm[1]).padStart(2,'0')}-${String(mm[2]).padStart(2,'0')}`;
+              } else if (freq === 'monthly') {
+                const mm = d.match(/(\d+)日/);
+                if (mm) v = `2026-08-${String(mm[1]).padStart(2,'0')}`;
+              } else {
+                v = '2026-08-20';
+              }
+              addFixedRow(freq, v);
+            });
+          }
+        }
+        const reqRadio = document.querySelector(`#planForm input[name="req"][value="${r.req}"]`);
+        if (reqRadio) reqRadio.checked = true;
+        selectedDevs = (r.devices || []).slice();
+        renderDevs();
+        openDrawer(drawerForm);
+        return;
+      }
+      const dt = e.target.closest('[data-detail]');
+      if (dt) {
+        const r = data[+dt.dataset.detail];
+        document.getElementById('planDId').textContent = r.id;
+        document.getElementById('planDName').textContent = r.name;
+        document.getElementById('planDStd').textContent = r.std;
+        document.getElementById('planDSched').textContent = r.sched==='loop' ? '周期循环' : '日历定点';
+        document.getElementById('planDRule').textContent = r.rule;
+        document.getElementById('planDReq').textContent = r.req==='one' ? '逐个' : '批量';
+        document.getElementById('planDDev').textContent = (r.devices && r.devices.length)
+          ? r.devices.map(d=>d.name).join('、') : '-';
+        openDrawer(drawerDetail);
+        return;
+      }
+      const dl = e.target.closest('[data-del]');
+      if (dl) {
+        if (confirm('确认删除该维保计划？')) {
+          data.splice(+dl.dataset.del, 1);
+          render();
+          toast('删除成功', 'success');
+        }
+        return;
+      }
+      const tg = e.target.closest('[data-toggle]');
+      if (tg) data[+tg.dataset.toggle].enabled = tg.checked;
+    });
+
+    // ===== 选择设备 =====
+    let selectedDevs = [];
+    let pickChecked = new Set();
+    const pickTbody = document.getElementById('planPickTbody');
+    const pickSel = document.getElementById('planPickSel');
+    function renderPick() {
+      pickTbody.innerHTML = devices.slice(0,10).map((d, i) => {
+        const checked = pickChecked.has(d.id) ? 'checked' : '';
+        return `<tr>
+          <td><label class="checkbox"><input type="checkbox" data-pick="${d.id}" ${checked}/><span class="box"></span></label></td>
+          <td>${d.id}</td><td>${d.name}</td><td>${d.type}</td><td>${d.loc}</td>
+        </tr>`;
+      }).join('');
+      pickSel.textContent = pickChecked.size;
+    }
+    renderPick();
+    pickTbody.addEventListener('change', e => {
+      const cb = e.target.closest('[data-pick]');
+      if (!cb) return;
+      if (cb.checked) pickChecked.add(cb.dataset.pick); else pickChecked.delete(cb.dataset.pick);
+      pickSel.textContent = pickChecked.size;
+    });
+    document.getElementById('planPickAll').addEventListener('change', e => {
+      if (e.target.checked) devices.slice(0,10).forEach(d => pickChecked.add(d.id));
+      else devices.slice(0,10).forEach(d => pickChecked.delete(d.id));
+      renderPick();
+    });
+    document.getElementById('planPickSearch').addEventListener('click', renderPick);
+    document.getElementById('planPickReset').addEventListener('click', () => {
+      document.getElementById('planPickName').value = '';
+      document.getElementById('planPickId').value = '';
+      renderPick();
+    });
+    document.getElementById('planBtnPick').addEventListener('click', () => {
+      pickChecked = new Set(selectedDevs.map(d => d.id));
+      renderPick();
+      openModal(modalPick);
+    });
+    document.getElementById('planBtnPickOk').addEventListener('click', () => {
+      selectedDevs = devices.filter(d => pickChecked.has(d.id));
+      renderDevs();
+      closeAll();
+    });
+
+    const devTbody = document.getElementById('planDevTbody');
+    const devWrap  = document.getElementById('planDevWrap');
+    function renderDevs() {
+      if (!selectedDevs.length) { devWrap.style.display = 'none'; return; }
+      devWrap.style.display = '';
+      devTbody.innerHTML = selectedDevs.map((d, i) => `
+        <tr>
+          <td>${i+1}</td><td>${d.type}</td><td>${d.name}</td><td>${d.loc}</td>
+          <td class="col-actions"><a class="btn-danger" data-rm="${d.id}">删除</a></td>
+        </tr>`).join('');
+    }
+    devTbody.addEventListener('click', e => {
+      const rm = e.target.closest('[data-rm]');
+      if (!rm) return;
+      selectedDevs = selectedDevs.filter(d => d.id !== rm.dataset.rm);
+      renderDevs();
+    });
+
+    document.getElementById('planBtnSave').addEventListener('click', () => {
+      const f = document.getElementById('planForm');
+      const name = f.name.value.trim();
+      const std = selStd.value;
+      const sched = [...document.querySelectorAll('#planForm input[name="sched"]')].find(r=>r.checked).value;
+      const req = [...document.querySelectorAll('#planForm input[name="req"]')].find(r=>r.checked).value;
+      let ok = true;
+      function setErr(k, show) {
+        const el = document.querySelector(`#planDrawerForm [data-err="${k}"]`);
+        if (el) el.style.display = show ? 'block' : 'none';
+        if (show) ok = false;
+      }
+      setErr('name', !name);
+      setErr('std', !std);
+      let fixedRules = [];
+      if (sched === 'loop') {
+        setErr('loop', !f.startDate.value || !f.interval.value);
+      } else {
+        fixedRules = readFixed();
+        const allEmpty = fixedRules.every(r => !r.date);
+        setErr('fixed', fixedRules.length === 0 || allEmpty);
+      }
+      setErr('dev', selectedDevs.length === 0);
+      if (!ok) return;
+
+      let rule;
+      if (sched === 'loop') {
+        const d = f.startDate.value;
+        const date = d.replace(/-/g,'.').replace(/(\d{4})\.(\d{2})\.(\d{2})/, '$1年$2月$3日');
+        rule = `${date}；每${f.interval.value}天`;
+      } else {
+        const freqName = { monthly:'每月', yearly:'每年' };
+        const groups = {};
+        fixedRules.filter(r => r.date).forEach(r => {
+          (groups[r.freq] = groups[r.freq] || []).push(r.date);
+        });
+        const parts = Object.keys(groups).map(fk => {
+          const t = freqName[fk];
+          const segs = groups[fk].map(d => {
+            const m = d.match(/(\d{4})-(\d{2})-(\d{2})/);
+            if (!m) return d;
+            if (fk === 'yearly')  return `${parseInt(m[2])}月${parseInt(m[3])}日`;
+            if (fk === 'monthly') return `${parseInt(m[3])}日`;
+            return d;
+          });
+          return `${t}；${segs.join('、')}`;
+        });
+        rule = parts.join('；') || '指定日期';
+      }
+      const payload = {
+        id: 'BM' + Date.now(),
+        name, sched, rule, std, enabled: true, req, devices: selectedDevs
+      };
+      data.unshift(payload);
+      render();
+      closeAll();
+      toast('保存成功', 'success');
+    });
+  })();
+
+  // =========================================================
+  // 模块三：维保任务
+  // =========================================================
+  (function(){
+    const statusMap = {
+      todo:      { t: '待指派', tag: 'tag-orange' },
+      running:   { t: '待执行', tag: 'tag-purple' },
+      done:      { t: '已完成', tag: 'tag-green'  },
+      cancelled: { t: '已取消', tag: 'tag-gray'   },
+    };
+    // #7 审批状态字典
+    const APPROVAL = {
+      '审批中':    'tag-blue',
+      '审批通过':  'tag-green',
+      '审批不通过':'tag-red',
+      '已取消':    'tag-gray',
+    };
+    // #8 逾期判定：仅未结束且完成时间早于今天标红（已取消/已完成不标）
+    function isOverdue(r) {
+      if (r.status === 'done' || r.status === 'cancelled') return false;
+      if (!r.dueTime) return false;
+      const t = new Date();
+      const today = `${t.getFullYear()}-${String(t.getMonth()+1).padStart(2,'0')}-${String(t.getDate()).padStart(2,'0')}`;
+      return r.dueTime < today;
+    }
+    // #7 点击审批状态跳转工单详情（对接流程表单审批引擎，原型占位）
+    function jumpApproval(r) {
+      toast('正在打开审批详情（工单 ' + (r.approvalNo || r.id) + '）', 'info');
+    }
+    const data = [
+      { id: 'WBTEST2026080301', name: '111-待分配测试任务-20260803', date: '2026-08-03', sched: '周期循环', std: '测试维修标准', status: 'done', duration: 9589, dueTime:'2026-08-03', submitTime:'2026-08-03', approvalStatus:'审批通过', approvalNo:'SP20260803-01', delayCount:1, delayRecords:[{applyTime:'2026-08-01 09:12', fromDue:'2026-07-30', toDue:'2026-08-03', reason:'设备停机协调'}] },
+      { id: 'WBTEST2026080302', name: '222-待分配测试任务-20260803', date: '2026-08-03', sched: '日历定点', std: 'Codex暖通...', status: 'todo', duration: null, dueTime:'2026-08-10' },
+      { id: 'WBTEST2026080303', name: '测试定点每月-20260803', date: '2026-08-03', sched: '日历定点', std: '测试维修标准', status: 'cancelled', duration: null, dueTime:'2026-08-05', approvalStatus:'已取消', approvalNo:'SP20260803-03' },
+      { id: 'WBTEST2026080304', name: '333-待分配测试任务-20260803', date: '2026-08-03', sched: '日历定点', std: '测试维修标准', status: 'running', duration: null, dueTime:'2026-08-12' },
+      { id: 'WBTEST2026080305', name: '444-待分配测试任务-20260803', date: '2026-08-03', sched: '日历定点', std: 'Codex暖通...', status: 'todo', duration: null, dueTime:'2026-08-22' },
+      { id: 'WBTEST2026080306', name: '555-待分配测试任务-20260803', date: '2026-08-03', sched: '日历定点', std: '测试维修标准', status: 'todo', duration: null, dueTime:'2026-08-22' },
+      { id: 'WBTEST2026080307', name: '666-待分配测试任务-20260803', date: '2026-08-03', sched: '日历定点', std: '测试维修标准', status: 'running', duration: null, dueTime:'2026-08-15', submitTime:'2026-08-18', approvalStatus:'审批中', approvalNo:'SP20260803-07' },
+      { id: 'WBTEST2026080308', name: '777-待分配测试任务-20260803', date: '2026-08-03', sched: '日历定点', std: 'Codex暖通...', status: 'running', duration: null, dueTime:'2026-08-20' },
+      { id: 'WBTEST2026080309', name: '888-待分配测试任务-20260803', date: '2026-08-03', sched: '日历定点', std: '测试维修标准', status: 'todo', duration: null, dueTime:'2026-08-25' },
+      { id: 'WBTEST2026080310', name: '999-待分配测试任务-20260803', date: '2026-08-03', sched: '日历定点', std: '测试维修标准', status: 'cancelled', duration: null, dueTime:'2026-08-05', approvalStatus:'已取消', approvalNo:'SP20260803-10' },
+      { id: 'WBTEST2026080311', name: 'A-20260803', date: '2026-08-03', sched: '日历定点', std: '测试维修标准', status: 'done', duration: 6240, dueTime:'2026-08-03', submitTime:'2026-08-03', approvalStatus:'审批通过', approvalNo:'SP20260803-11' },
+      { id: 'WBTEST2026080312', name: 'B-20260803', date: '2026-08-03', sched: '日历定点', std: 'Codex暖通...', status: 'running', duration: null, dueTime:'2026-08-18' },
+      { id: 'WBTEST2026080313', name: 'C-20260803', date: '2026-08-03', sched: '日历定点', std: '测试维修标准', status: 'todo', duration: null, dueTime:'2026-08-28' },
+      { id: 'WBTEST2026080314', name: 'D-20260803', date: '2026-08-03', sched: '日历定点', std: '测试维修标准', status: 'cancelled', duration: null, dueTime:'2026-08-05', approvalStatus:'已取消', approvalNo:'SP20260803-14' },
+      { id: 'WBTEST2026080315', name: 'E-20260803', date: '2026-08-03', sched: '日历定点', std: 'Codex暖通...', status: 'done', duration: 3120, dueTime:'2026-08-03', submitTime:'2026-08-04', approvalStatus:'审批不通过', approvalNo:'SP20260803-15' },
+    ];
+    // 任务扩展数据：维保报告（设备+标准项执行结果）与流转记录
+    const taskExtras = {
+      'WBTEST2026080301': {
+        devices: [
+          { name: '499学生公寓-给水泵', items: [
+            { std: '检查运行状态', way: '自主', tool: '扳手', note: '正常', att: 2 },
+            { std: '检查滤网',     way: '自主', tool: '—',   note: '已清理', att: 1 },
+          ]},
+        ],
+        flow: [
+          { act: '任务创建',         by: '系统',   time: '2026-08-03 09:12' },
+          { act: '指派给 张工',      by: '派单人', time: '2026-08-03 09:40' },
+          { act: '提交维保结果',     by: '张工',   time: '2026-08-03 14:05' },
+          { act: '审批通过·任务结束', by: '主管',   time: '2026-08-03 16:20' },
+        ],
+      },
+      'WBTEST2026080304': {
+        devices: [
+          { name: '133综合楼-中央空调机组', items: [
+            { std: '检查运行状态', way: '自主', tool: '—', note: '进行中', att: 0 },
+          ]},
+        ],
+        flow: [
+          { act: '任务创建',    by: '系统',   time: '2026-08-03 09:12' },
+          { act: '指派给 王工', by: '派单人', time: '2026-08-03 10:02' },
+        ],
+      },
+      'WBTEST2026080302': { flow: [
+        { act: '任务创建', by: '系统', time: '2026-08-03 09:12' },
+      ]},
+      'WBTEST2026080303': { flow: [
+        { act: '任务创建',   by: '系统',   time: '2026-08-03 09:12' },
+        { act: '任务取消',   by: '派单人', time: '2026-08-03 11:30' },
+      ]},
+    };
+    function fmtDur(sec) {
+      sec = Number(sec) || 0;
+      const h = Math.floor(sec / 3600), m = Math.round((sec % 3600) / 60);
+      if (h > 0) return `${h}小时${m > 0 ? m + '分' : ''}`;
+      if (m > 0) return `${m}分钟`;
+      return `${sec}秒`;
+    }
+    function renderReport(ex) {
+      const box = document.getElementById('taskDReport');
+      const devs = ex && ex.devices;
+      if (!devs || !devs.length) {
+        box.innerHTML = `<div class="device-empty">
+          <svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.5">
+            <rect x="4" y="6" width="20" height="14" rx="1.5"/>
+            <path d="M9 10h10M9 14h10M9 18h6" stroke-linecap="round"/>
+          </svg>暂无设备</div>`;
+        return;
+      }
+      box.innerHTML = devs.map(d => `
+        <div class="rep-dev">
+          <div class="rep-dev-name">${d.name}</div>
+          ${d.items.map(it => `
+            <div class="rep-item">
+              <div class="rep-std">${it.std}</div>
+              <div class="rep-meta">
+                <span>方式：${it.way || '—'}</span>
+                <span>工具：${it.tool || '—'}</span>
+                <span>附件：${it.att ? it.att + ' 个' : '—'}</span>
+              </div>
+              ${it.note ? `<div class="rep-note">备注：${it.note}</div>` : ''}
+            </div>`).join('')}
+        </div>`).join('');
+    }
+    function renderFlow(ex) {
+      const box = document.getElementById('taskDFlow');
+      const fl = ex && ex.flow;
+      if (!fl || !fl.length) {
+        box.innerHTML = `<div class="flow-empty">
+          <svg viewBox="0 0 60 60" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M14 18h32M14 30h32M14 42h32" stroke-linecap="round"/>
+          </svg>暂无记录</div>`;
+        return;
+      }
+      box.innerHTML = `<div class="flow-list">` + fl.map(f => `
+        <div class="flow-item">
+          <span class="dot"></span>
+          <div class="flow-body">
+            <div class="flow-act">${f.act}</div>
+            <div class="flow-by">${f.by} · ${f.time}</div>
+          </div>
+        </div>`).join('') + `</div>`;
+    }
+
+    function renderDelays(r) {
+      const box = document.getElementById('taskDDelays');
+      const recs = r.delayRecords || [];
+      if (!recs.length) {
+        box.innerHTML = `<div class="flow-empty">暂无延期记录</div>`;
+        return;
+      }
+      box.innerHTML = `<div class="delay-list">` + recs.map(d => `
+        <div class="delay-item">
+          <div class="dl-row"><span class="dl-k">申请时间</span><span class="dl-v">${d.applyTime || '—'}</span></div>
+          <div class="dl-row"><span class="dl-k">延期时间</span><span class="dl-v">${d.fromDue} → ${d.toDue}</span></div>
+          <div class="dl-row"><span class="dl-k">延期原因</span><span class="dl-v">${d.reason || '—'}</span></div>
+          <div class="dl-row"><span class="dl-k">申请人</span><span class="dl-v">${d.applicant || '维保员'}</span></div>
+        </div>`).join('') + `</div>`;
+    }
+
+    const tbody = document.getElementById('taskTbody');
+    const ckAll = document.getElementById('taskCkAll');
+    const btnBatchAssign = document.getElementById('taskBtnBatch');
+    const checkedIds = new Set();
+
+    function render() {
+      tbody.innerHTML = data.map((r, i) => {
+        const s = statusMap[r.status] || statusMap.todo;
+        const od = isOverdue(r) ? '<span class="tag tag-overdue" title="已逾期">逾期</span> ' : '';
+        const app = r.approvalStatus ? APPROVAL[r.approvalStatus] : null;
+        const appTag = app
+          ? `<span class="tag ${app} tag-approval" data-approval="${i}">${r.approvalStatus}</span>`
+          : `<span class="tag tag-gray">待提交</span>`;
+        return `<tr>
+          <td class="col-check"><label class="checkbox"><input type="checkbox" data-pick="${i}" ${checkedIds.has(i)?'checked':''}/><span class="box"></span></label></td>
+          <td class="col-num">${i+1}</td>
+          <td class="col-id" title="${r.id}">${r.id}</td>
+          <td class="cell-ellipsis" title="${r.name}">${od}${r.name}</td>
+          <td>${r.date}</td>
+          <td>${r.sched}</td>
+          <td class="cell-ellipsis" title="${r.std}">${r.std}</td>
+          <td><span class="tag ${s.tag}">${s.t}</span></td>
+          <td>${appTag}</td>
+          <td class="col-time">${r.duration != null ? fmtDur(r.duration) : '—'}</td>
+          <td class="col-actions">
+            <a class="btn-link" data-detail="${i}">详情</a>
+            <a class="btn-link" data-assign="${i}">指派</a>
+            <a class="btn-danger" data-cancel="${i}">取消任务</a>
+          </td>
+        </tr>`;
+      }).join('');
+      document.getElementById('taskTotal').textContent = data.length;
+      refreshCkAll();
+      tbody.querySelectorAll('[data-approval]').forEach(a => a.addEventListener('click', () => jumpApproval(data[+a.dataset.approval])));
+    }
+    function refreshCkAll() {
+      const rowChecks = tbody.querySelectorAll('[data-pick]');
+      const all = rowChecks.length;
+      const checked = [...rowChecks].filter(c => c.checked).length;
+      const ckAllInput = ckAll.querySelector('input');
+      ckAllInput.checked = all > 0 && checked === all;
+      ckAll.classList.toggle('partial', checked > 0 && checked < all);
+      btnBatchAssign.disabled = checked === 0;
+    }
+    render();
+
+    tbody.addEventListener('change', e => {
+      const cb = e.target.closest('[data-pick]');
+      if (!cb) return;
+      const i = +cb.dataset.pick;
+      if (cb.checked) checkedIds.add(i); else checkedIds.delete(i);
+      refreshCkAll();
+    });
+    ckAll.querySelector('input').addEventListener('change', e => {
+      if (e.target.checked) data.forEach((_, i) => checkedIds.add(i));
+      else checkedIds.clear();
+      render();
+    });
+
+    tbody.addEventListener('click', e => {
+      const dt = e.target.closest('[data-detail]');
+      if (dt) { openDetail(+dt.dataset.detail); return; }
+      const as = e.target.closest('[data-assign]');
+      if (as) { openAssign([+as.dataset.assign]); return; }
+      const cn = e.target.closest('[data-cancel]');
+      if (cn) {
+        if (confirm('确认取消该任务？')) {
+          data[+cn.dataset.cancel].status = 'cancelled';
+          render();
+          toast('任务已取消', 'success');
+        }
+      }
+    });
+
+    document.getElementById('taskBtnBatch').addEventListener('click', () => {
+      if (checkedIds.size === 0) { toast('请选择需要指派的任务', 'warn'); return; }
+      openAssign([...checkedIds]);
+    });
+
+    const drawerDetail = document.getElementById('taskDrawerDetail');
+    const modalAssign = document.getElementById('taskModalAssign');
+    function openDetail(i) {
+      const r = data[i];
+      const s = statusMap[r.status] || statusMap.todo;
+      document.getElementById('taskDId').textContent = r.id;
+      document.getElementById('taskDName').textContent = r.name;
+      document.getElementById('taskDDate').textContent = r.date;
+      document.getElementById('taskDStatus').innerHTML = `<span class="tag ${s.tag}">${s.t}</span>`;
+      document.getElementById('taskDStd').textContent = r.std;
+      document.getElementById('taskDUser').textContent = r.assignee || '—';
+      document.getElementById('taskDDue').textContent = r.dueTime || '—';
+      document.getElementById('taskDApproval').innerHTML = r.approvalStatus
+        ? `<span class="tag ${APPROVAL[r.approvalStatus]}">${r.approvalStatus}</span>` : '待提交';
+      const ex = taskExtras[r.id] || {};
+      renderReport(ex);
+      renderFlow(ex);
+      renderDelays(r);
+      openDrawer(drawerDetail);
+    }
+
+    const assignList = document.getElementById('taskAssignList');
+    const assignUser = document.getElementById('taskAssignUser');
+    const userSuggest = document.getElementById('taskUserSuggest');
+    const userPool = [
+      { name: '张工', dept: '工程部' },
+      { name: '李守浩', dept: '产品部' },
+      { name: '王工', dept: '运维部' },
+      { name: '赵工', dept: '工程部' },
+      { name: '钱工', dept: '机电班' },
+    ];
+    let currentAssign = [];
+    function openAssign(indices) {
+      currentAssign = indices;
+      assignList.innerHTML = indices.map(i => {
+        const r = data[i];
+        return `<div class="assign-task-item">${r.name} - ${r.date}</div>`;
+      }).join('');
+      assignUser.value = '';
+      document.querySelector('#taskModalAssign [data-err="assign"]').style.display = 'none';
+      userSuggest.classList.remove('show');
+      openModal(modalAssign);
+      setTimeout(() => assignUser.focus(), 50);
+    }
+    function renderSuggest(q) {
+      const list = userPool.filter(u => !q || u.name.includes(q));
+      if (!list.length) { userSuggest.classList.remove('show'); return; }
+      userSuggest.innerHTML = list.map(u => `<div class="it" data-user="${u.name}">${u.name}<span class="sub">${u.dept}</span></div>`).join('');
+      userSuggest.classList.add('show');
+    }
+    assignUser.addEventListener('input', e => renderSuggest(e.target.value.trim()));
+    assignUser.addEventListener('focus', e => renderSuggest(e.target.value.trim()));
+    assignUser.addEventListener('blur', () => setTimeout(() => userSuggest.classList.remove('show'), 200));
+    userSuggest.addEventListener('mousedown', e => {
+      const it = e.target.closest('[data-user]');
+      if (!it) return;
+      assignUser.value = it.dataset.user;
+      userSuggest.classList.remove('show');
+    });
+
+    document.getElementById('taskBtnAssignOk').addEventListener('click', () => {
+      const u = assignUser.value.trim();
+      if (!u) {
+        document.querySelector('#taskModalAssign [data-err="assign"]').style.display = 'block';
+        return;
+      }
+      const now = new Date();
+      const ts = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+      currentAssign.forEach(i => {
+        data[i].status = 'running';
+        data[i].assignee = u;
+        (taskExtras[data[i].id] = taskExtras[data[i].id] || { flow: [] }).flow.push(
+          { act: `指派给 ${u}`, by: '派单人', time: ts });
+      });
+      checkedIds.clear();
+      render();
+      closeAll();
+      toast(`已批量指派 ${currentAssign.length} 个任务给 ${u}`, 'success');
+    });
+
+    document.getElementById('taskBtnSearch').addEventListener('click', () => {
+      const n = document.getElementById('taskFName').value.trim().toLowerCase();
+      const s = document.getElementById('taskFStatus').value;
+      const t = document.getElementById('taskFTime').value.trim();
+      const filtered = data.filter(r =>
+        (!n || r.name.toLowerCase().includes(n) || r.id.toLowerCase().includes(n)) &&
+        (!s || r.status === s) &&
+        (!t || String(r.duration == null ? '' : r.duration).includes(t)));
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="10">
+          <div class="empty">
+            <svg viewBox="0 0 80 80" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 30h52v32a4 4 0 0 1-4 4H18a4 4 0 0 1-4-4V30z" stroke-linejoin="round"/>
+              <path d="M14 30l8-12h36l8 12" stroke-linejoin="round"/>
+              <path d="M40 42v14M40 60h.01" stroke-linecap="round"/>
+            </svg>暂无数据
+          </div>
+        </td></tr>`;
+      } else {
+        tbody.innerHTML = filtered.map((r) => {
+          const i = data.indexOf(r);
+          const sx = statusMap[r.status] || statusMap.todo;
+          return `<tr>
+            <td class="col-check"><label class="checkbox"><input type="checkbox" data-pick="${i}" ${checkedIds.has(i)?'checked':''}/><span class="box"></span></label></td>
+            <td class="col-num">${i+1}</td>
+            <td class="col-id" title="${r.id}">${r.id}</td>
+            <td class="cell-ellipsis" title="${r.name}">${r.name}</td>
+            <td>${r.date}</td>
+            <td>${r.sched}</td>
+            <td class="cell-ellipsis" title="${r.std}">${r.std}</td>
+            <td><span class="tag ${sx.tag}">${sx.t}</span></td>
+            <td class="col-time">${r.duration != null ? fmtDur(r.duration) : '—'}</td>
+            <td class="col-actions">
+              <a class="btn-link" data-detail="${i}">详情</a>
+              <a class="btn-link" data-assign="${i}">指派</a>
+              <a class="btn-danger" data-cancel="${i}">取消任务</a>
+            </td>
+          </tr>`;
+        }).join('');
+      }
+      document.getElementById('taskTotal').textContent = filtered.length;
+      refreshCkAll();
+    });
+    document.getElementById('taskBtnReset').addEventListener('click', () => {
+      document.getElementById('taskFName').value = '';
+      document.getElementById('taskFStatus').value = '';
+      document.getElementById('taskFTime').value = '';
+      render();
+    });
+  })();
+</script>
+</body>
+</html>
