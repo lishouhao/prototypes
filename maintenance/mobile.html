@@ -434,7 +434,7 @@
         <div class="info-row"><div class="k">维保标准</div><div class="v">${curTask.std}</div></div>
         <div class="info-row"><div class="k">维保设备</div><div class="v">${curTask.devices.length} 台</div></div>
         <div class="info-row"><div class="k">本次维保时间</div><div class="v">${curTask.time}</div></div>
-        <div class="info-row"><div class="k">完成时间</div><div class="v">${curTask.dueTime||'-'}${curTask.delayCount>0?'（已延期 '+curTask.delayCount+' 次）':''}</div></div>
+        <div class="info-row"><div class="k">完成时间</div><div class="v">${curTask.dueTime||'-'}</div></div>
       </div>
       <div class="section-title">维保设备</div>
       ${devHtml}
