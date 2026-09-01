@@ -1,0 +1,1415 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>控制计划 - 智慧园区</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+      background: #f0f2f5;
+      color: rgba(0, 0, 0, 0.85);
+    }
+    .layout { display: flex; min-height: 100vh; }
+
+    /* ====== 侧边栏 ====== */
+    .sidebar {
+      width: 208px;
+      background: #001529;
+      color: rgba(255,255,255,0.65);
+      flex-shrink: 0;
+      overflow-y: auto;
+    }
+    .logo {
+      height: 64px;
+      display: flex;
+      align-items: center;
+      padding-left: 24px;
+      color: #fff;
+      font-size: 18px;
+      font-weight: 600;
+      background: #002140;
+    }
+    .menu-section { padding: 4px 0; }
+    .menu-item {
+      position: relative;
+      padding: 12px 24px 12px 48px;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .menu-item:hover { color: #fff; background: rgba(255,255,255,0.08); }
+    .menu-item.active { color: #fff; background: #1890ff; }
+    .menu-item .icon { width: 16px; text-align: center; }
+    .submenu { background: #000c17; }
+    .submenu .menu-item { padding-left: 64px; font-size: 13px; }
+
+    /* ====== 主区域 ====== */
+    .main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+
+    /* 顶部Tab */
+    .top-tabs {
+      background: #fff;
+      border-bottom: 1px solid #e8e8e8;
+      display: flex;
+      align-items: center;
+      padding: 0 24px;
+      height: 48px;
+      gap: 4px;
+      overflow-x: auto;
+      flex-shrink: 0;
+    }
+    .top-tab {
+      padding: 8px 16px;
+      cursor: pointer;
+      font-size: 14px;
+      color: rgba(0,0,0,0.65);
+      border-radius: 4px 4px 0 0;
+      white-space: nowrap;
+      transition: all 0.2s;
+    }
+    .top-tab:hover { color: #1890ff; }
+    .top-tab.active {
+      color: #1890ff;
+      font-weight: 500;
+      border-bottom: 2px solid #1890ff;
+    }
+
+    /* 内容区 */
+    .content { flex: 1; padding: 24px; overflow-y: auto; }
+
+    /* 页面标题 + 操作栏 */
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    .page-title { font-size: 20px; font-weight: 600; margin: 0; }
+
+    /* 视图切换 Tab */
+    .view-tabs {
+      display: inline-flex;
+      background: #f0f0f0;
+      border-radius: 4px;
+      padding: 2px;
+      margin-bottom: 16px;
+    }
+    .view-tab {
+      padding: 6px 20px;
+      cursor: pointer;
+      font-size: 14px;
+      border-radius: 3px;
+      transition: all 0.2s;
+      color: rgba(0,0,0,0.65);
+      user-select: none;
+    }
+    .view-tab:hover { color: #1890ff; }
+    .view-tab.active {
+      background: #fff;
+      color: #1890ff;
+      font-weight: 500;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+    }
+
+    /* 搜索栏 */
+    .search-bar {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 16px;
+      align-items: center;
+    }
+    .search-input {
+      width: 300px;
+      height: 32px;
+      border: 1px solid #d9d9d9;
+      border-radius: 4px;
+      padding: 0 11px;
+      font-size: 14px;
+      outline: none;
+      transition: all 0.3s;
+    }
+    .search-input:focus { border-color: #1890ff; box-shadow: 0 0 0 2px rgba(24,144,255,0.1); }
+    .btn {
+      height: 32px;
+      padding: 0 15px;
+      border-radius: 4px;
+      font-size: 14px;
+      cursor: pointer;
+      border: 1px solid #d9d9d9;
+      background: #fff;
+      transition: all 0.3s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn-primary {
+      background: #1890ff;
+      border-color: #1890ff;
+      color: #fff;
+    }
+    .btn-primary:hover { background: #40a9ff; border-color: #40a9ff; }
+
+    /* ====== 列表视图 ====== */
+    .list-view { display: block; }
+    .list-view.hidden { display: none; }
+
+    .table-wrap {
+      background: #fff;
+      border-radius: 4px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+    thead th {
+      background: #fafafa;
+      border-bottom: 1px solid #e8e8e8;
+      padding: 12px 16px;
+      font-weight: 500;
+      color: rgba(0,0,0,0.85);
+      text-align: left;
+      white-space: nowrap;
+    }
+    tbody td {
+      padding: 12px 16px;
+      border-bottom: 1px solid #f0f0f0;
+      color: rgba(0,0,0,0.65);
+    }
+    tbody tr:hover { background: #e6f7ff; }
+    .tag {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      line-height: 20px;
+    }
+    .tag-blue { background: #e6f7ff; color: #1890ff; border: 1px solid #91d5ff; }
+    .link-action {
+      color: #1890ff;
+      cursor: pointer;
+      margin-right: 12px;
+      font-size: 13px;
+    }
+    .link-action:hover { color: #40a9ff; }
+    .link-danger { color: #ff4d4f; }
+    .link-danger:hover { color: #ff7875; }
+
+    /* 分页 */
+    .pagination {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      padding: 16px;
+      gap: 8px;
+      font-size: 14px;
+      color: rgba(0,0,0,0.65);
+    }
+    .page-btn {
+      min-width: 32px;
+      height: 32px;
+      border: 1px solid #d9d9d9;
+      border-radius: 4px;
+      background: #fff;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+    .page-btn:hover { color: #1890ff; border-color: #1890ff; }
+    .page-btn.active { background: #1890ff; border-color: #1890ff; color: #fff; }
+    .page-btn.disabled { color: rgba(0,0,0,0.25); border-color: #d9d9d9; cursor: not-allowed; }
+
+    /* ====== 日历视图 ====== */
+    .calendar-view { display: none; }
+    .calendar-view.show { display: block; }
+
+    .calendar-card {
+      background: #fff;
+      border-radius: 4px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+      padding: 20px;
+    }
+    .calendar-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .calendar-title {
+      font-size: 18px;
+      font-weight: 600;
+    }
+    .calendar-nav {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    .cal-nav-btn {
+      width: 32px;
+      height: 32px;
+      border: 1px solid #d9d9d9;
+      border-radius: 4px;
+      background: #fff;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+    .cal-nav-btn:hover { color: #1890ff; border-color: #1890ff; }
+    .cal-today-btn {
+      padding: 0 12px;
+      height: 32px;
+      border: 1px solid #d9d9d9;
+      border-radius: 4px;
+      background: #fff;
+      cursor: pointer;
+      font-size: 13px;
+      transition: all 0.2s;
+    }
+    .cal-today-btn:hover { color: #1890ff; border-color: #1890ff; }
+
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      border-top: 1px solid #e8e8e8;
+      border-left: 1px solid #e8e8e8;
+    }
+    .cal-weekday {
+      padding: 12px 8px;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 500;
+      color: rgba(0,0,0,0.45);
+      background: #fafafa;
+      border-right: 1px solid #e8e8e8;
+      border-bottom: 1px solid #e8e8e8;
+    }
+    .cal-day {
+      min-height: 120px;
+      padding: 6px 6px 4px;
+      border-right: 1px solid #e8e8e8;
+      border-bottom: 1px solid #e8e8e8;
+      vertical-align: top;
+      cursor: default;
+      transition: background 0.2s;
+    }
+    .cal-day:hover { background: #e6f7ff; }
+    .cal-day.other-month { background: #fafafa; }
+    .cal-day.today .day-num {
+      background: #1890ff;
+      color: #fff;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .day-num {
+      font-size: 14px;
+      color: rgba(0,0,0,0.85);
+      margin-bottom: 4px;
+      display: inline-block;
+      width: 28px;
+      text-align: center;
+    }
+    .cal-day.other-month .day-num { color: rgba(0,0,0,0.25); }
+
+    /* 日历中的计划卡片 */
+    .cal-event {
+      font-size: 12px;
+      padding: 3px 6px;
+      border-radius: 3px;
+      margin-bottom: 3px;
+      cursor: pointer;
+      line-height: 1.4;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      border-left: 3px solid;
+      transition: all 0.2s;
+    }
+    .cal-event:hover {
+      transform: scale(1.02);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.12);
+      white-space: normal;
+    }
+    .cal-event.blue, .cal-event.green, .cal-event.orange, .cal-event.purple {
+      background: #e6f7ff; border-color: #1890ff; color: #0050b3;
+    }
+    .event-time { opacity: 0.65; font-size: 11px; }
+
+    /* 更多提示 */
+    .cal-more {
+      font-size: 12px;
+      color: #1890ff;
+      cursor: pointer;
+      text-align: center;
+      padding: 2px 0;
+    }
+    .cal-more:hover { text-decoration: underline; }
+
+    /* ====== 查看弹框 ====== */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.45);
+      z-index: 1000;
+      justify-content: center;
+      align-items: flex-start;
+      padding-top: 80px;
+    }
+    .modal-overlay.show { display: flex; }
+    .modal-dialog {
+      background: #fff;
+      border-radius: 8px;
+      width: 760px;
+      max-width: 92vw;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+      animation: modalIn 0.25s ease-out;
+    }
+    @keyframes modalIn {
+      from { opacity: 0; transform: translateY(-20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 24px;
+      border-bottom: 1px solid #e8e8e8;
+    }
+    .modal-title { font-size: 16px; font-weight: 600; margin: 0; }
+    .modal-close {
+      width: 32px; height: 32px;
+      border: none; background: none;
+      cursor: pointer; font-size: 18px;
+      color: rgba(0,0,0,0.45);
+      border-radius: 4px;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.2s;
+    }
+    .modal-close:hover { background: #f5f5f5; color: rgba(0,0,0,0.75); }
+
+    .modal-body { padding: 24px; }
+
+    /* 表单项 */
+    .form-row {
+      display: flex;
+      align-items: flex-start;
+      margin-bottom: 20px;
+    }
+    .form-label {
+      width: 80px;
+      padding-top: 8px;
+      flex-shrink: 0;
+      font-size: 14px;
+      color: rgba(0,0,0,0.85);
+    }
+    .form-label .required { color: #ff4d4f; margin-right: 4px; }
+    .form-control { flex: 1; }
+
+    /* 输入框 */
+    .input-text {
+      height: 32px;
+      border: 1px solid #d9d9d9;
+      border-radius: 4px;
+      padding: 0 11px;
+      font-size: 14px;
+      outline: none;
+      transition: all 0.3s;
+      width: 100%;
+      max-width: 480px;
+    }
+    .input-text:focus { border-color: #1890ff; box-shadow: 0 0 0 2px rgba(24,144,255,0.1); }
+    .char-count {
+      text-align: right;
+      font-size: 12px;
+      color: rgba(0,0,0,0.35);
+      margin-top: 4px;
+    }
+
+    /* Select */
+    .select-box {
+      height: 32px;
+      border: 1px solid #d9d9d9;
+      border-radius: 4px;
+      padding: 0 8px;
+      font-size: 14px;
+      outline: none;
+      min-width: 90px;
+      transition: all 0.3s;
+      margin-right: 12px;
+      background: #fff;
+    }
+    .select-box:focus { border-color: #1890ff; box-shadow: 0 0 0 2px rgba(24,144,255,0.1); }
+    .time-input {
+      height: 32px;
+      border: 1px solid #d9d9d9;
+      border-radius: 4px;
+      padding: 0 11px;
+      font-size: 14px;
+      width: 120px;
+      outline: none;
+      transition: all 0.3s;
+    }
+    .time-input:focus { border-color: #1890ff; box-shadow: 0 0 0 2px rgba(24,144,255,0.1); }
+
+    /* 星期标签 */
+    .weekday-tags {
+      display: inline-flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .wd-tag {
+      height: 28px;
+      padding: 0 10px;
+      border: 1px solid #d9d9d9;
+      border-radius: 4px;
+      font-size: 13px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: #fafafa;
+      color: rgba(0,0,0,0.65);
+    }
+    .wd-tag .tag-close {
+      cursor: pointer;
+      color: rgba(0,0,0,0.35);
+      font-size: 12px;
+    }
+    .wd-tag .tag-close:hover { color: #ff4d4f; }
+
+    /* 穿梭框 */
+    .transfer-box {
+      display: flex;
+      gap: 16px;
+      align-items: stretch;
+    }
+    .transfer-panel {
+      flex: 1;
+      border: 1px solid #d9d9d9;
+      border-radius: 4px;
+      overflow: hidden;
+      min-height: 220px;
+      display: flex;
+      flex-direction: column;
+    }
+    .transfer-head {
+      padding: 8px 12px;
+      background: #fafafa;
+      border-bottom: 1px solid #e8e8e8;
+      font-size: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .transfer-count { color: #1890ff; font-weight: 500; }
+    .transfer-clear {
+      color: #1890ff;
+      cursor: pointer;
+      font-size: 13px;
+    }
+    .transfer-clear:hover { color: #40a9ff; }
+    .transfer-search {
+      padding: 8px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .transfer-search input {
+      width: 100%;
+      height: 28px;
+      border: 1px solid #d9d9d9;
+      border-radius: 4px;
+      padding: 0 8px;
+      font-size: 13px;
+      outline: none;
+    }
+    .transfer-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 4px 0;
+      min-height: 140px;
+    }
+    .transfer-item {
+      padding: 6px 12px;
+      font-size: 13px;
+      color: rgba(0,0,0,0.65);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: background 0.15s;
+    }
+    .transfer-item:hover { background: #e6f7ff; }
+    .transfer-item.selected { background: #bae7ff; }
+    .transfer-checkbox {
+      width: 16px; height: 16px;
+      border: 1px solid #d9d9d9;
+      border-radius: 3px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-size: 12px;
+      background: #fff;
+    }
+    .transfer-checkbox.checked {
+      background: #1890ff;
+      border-color: #1890ff;
+      color: #fff;
+    }
+    .transfer-btns {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      justify-content: center;
+    }
+    .transfer-btn {
+      width: 36px; height: 36px;
+      border: 1px solid #d9d9d9;
+      border-radius: 4px;
+      background: #fff;
+      cursor: pointer;
+      font-size: 16px;
+      color: rgba(0,0,0,0.45);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+    .transfer-btn:hover:not(:disabled) { color: #1890ff; border-color: #1890ff; }
+    .transfer-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .transfer-pagination {
+      padding: 8px 12px;
+      border-top: 1px solid #f0f0f0;
+      text-align: center;
+      font-size: 13px;
+      color: rgba(0,0,0,0.45);
+    }
+
+    /* 开关 */
+    .switch-wrap {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+    }
+    .switch {
+      width: 44px; height: 22px;
+      border-radius: 11px;
+      background: #1890ff;
+      position: relative;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .switch::after {
+      content: '';
+      position: absolute;
+      top: 2px; left: 22px;
+      width: 16px; height: 16px;
+      border-radius: 50%;
+      background: #fff;
+      transition: left 0.3s;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    }
+    .switch.off { background: #bfbfbf; }
+    .switch.off::after { left: 2px; }
+
+    /* 弹框底部 */
+    .modal-footer {
+      padding: 12px 24px;
+      border-top: 1px solid #e8e8e8;
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+    .btn-modal {
+      height: 32px;
+      padding: 0 16px;
+      border-radius: 4px;
+      font-size: 14px;
+      cursor: pointer;
+      border: 1px solid #d9d9d9;
+      background: #fff;
+      transition: all 0.3s;
+    }
+    .btn-modal-primary {
+      background: #1890ff;
+      border-color: #1890ff;
+      color: #fff;
+    }
+    .btn-modal-primary:hover { background: #40a9ff; border-color: #40a9ff; }
+    .btn-modal:hover:not(.btn-modal-primary) { color: #1890ff; border-color: #1890ff; }
+
+    /* ====== 场景详情二级弹框 ====== */
+    .modal-overlay.scene-modal { z-index: 1100; }
+    .modal-dialog.scene-dialog { width: 960px; }
+
+    /* 场景信息头 */
+    .scene-info-bar {
+      background: #fafafa;
+      padding: 12px 24px;
+      border-bottom: 1px solid #e8e8e8;
+      font-size: 14px;
+      color: rgba(0,0,0,0.65);
+      display: flex;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+    .scene-info-item { display: flex; gap: 6px; }
+    .scene-info-label { color: rgba(0,0,0,0.45); }
+    .scene-info-val { color: rgba(0,0,0,0.85); font-weight: 500; }
+
+    /* 操作步骤 */
+    .step-block {
+      border: 1px solid #e8e8e8;
+      border-radius: 4px;
+      margin-bottom: 16px;
+      background: #fff;
+    }
+    .step-header {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 16px;
+      border-bottom: 1px solid #f0f0f0;
+      font-size: 13px;
+      color: rgba(0,0,0,0.55);
+    }
+    .step-header .step-radio {
+      width: 15px; height: 15px;
+      border: 1.5px solid #d9d9d9;
+      border-radius: 50%;
+      cursor: pointer;
+      position: relative;
+      flex-shrink: 0;
+    }
+    .step-header .step-radio.checked {
+      border-color: #1890ff;
+    }
+    .step-header .step-radio.checked::after {
+      content: '';
+      position: absolute; top: 2.5px; left: 2.5px;
+      width: 7px; height: 7px;
+      background: #1890ff;
+      border-radius: 50%;
+    }
+
+    .step-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 16px 0;
+      flex-wrap: wrap;
+    }
+    .step-field {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 13px;
+    }
+    .step-field .s-label { color: #ff4d4f; margin-right: 2px; white-space: nowrap; }
+    .step-field .s-name { color: rgba(0,0,0,0.85); white-space: nowrap; }
+    .step-input-sm {
+      height: 28px;
+      border: 1px solid #d9d9d9;
+      border-radius: 4px;
+      padding: 0 8px;
+      font-size: 13px;
+      outline: none;
+      min-width: 100px;
+      transition: all 0.3s;
+    }
+    .step-input-sm:focus { border-color: #1890ff; box-shadow: 0 0 0 2px rgba(24,144,255,0.1); }
+    .step-input-xs { min-width: 70px; width: 70px; }
+    .add-parallel-btn {
+      color: #1890ff;
+      cursor: pointer;
+      font-size: 13px;
+      padding: 8px 16px 12px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .add-parallel-btn:hover { text-decoration: underline; }
+
+    .add-next-step {
+      color: #1890ff;
+      cursor: pointer;
+      font-size: 13px;
+      padding: 10px 16px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .add-next-step:hover { text-decoration: underline; }
+
+    /* 预览时间线 */
+    .preview-section {
+      margin-top: 20px;
+      border-top: 1px dashed #e8e8e8;
+      padding-top: 20px;
+    }
+    .preview-title {
+      font-size: 14px;
+      font-weight: 500;
+      color: rgba(0,0,0,0.85);
+      margin-bottom: 20px;
+    }
+    .timeline {
+      position: relative;
+      padding: 20px 40px 10px;
+    }
+    .timeline::before {
+      content: '';
+      position: absolute;
+      top: 18px; left: 50px; right: 50px;
+      height: 2px;
+      background: #e8e8e8;
+    }
+    .timeline-node {
+      position: relative;
+      display: inline-block;
+      text-align: center;
+      width: 120px;
+      vertical-align: top;
+    }
+    .timeline-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      background: #1890ff;
+      display: inline-block;
+      position: relative;
+      z-index: 1;
+      margin-bottom: 8px;
+    }
+    .timeline-dot.start-end { background: #1890ff; }
+    .timeline-dot.mid { background: #1890ff; }
+    .timeline-label {
+      font-size: 13px;
+      color: rgba(0,0,0,0.85);
+      line-height: 1.5;
+    }
+    .timeline-sublabel {
+      font-size: 12px;
+      color: rgba(0,0,0,0.45);
+    }
+    .timeline-num {
+      position: absolute;
+      top: -22px; left: 50%; transform: translateX(-50%);
+      font-size: 12px;
+      color: rgba(0,0,0,0.45);
+    }
+  </style>
+</head>
+<body>
+<div class="layout">
+  <!-- 侧边栏 -->
+  <div class="sidebar">
+    <div class="logo">智慧园区</div>
+    <div class="menu-section">
+      <div class="menu-item"><span class="icon">&#x1F69A;</span> 车辆通行</div>
+      <div class="menu-item active"><span class="icon">&#x1F50D;</span> 巡检管理</div>
+      <div class="submenu">
+        <div class="menu-item">设备查询</div>
+        <div class="menu-item">设备台账</div>
+        <div class="menu-item">设备地图</div>
+        <div class="menu-item">设备信息</div>
+        <div class="menu-item">设备资产</div>
+        <div class="menu-item">设备告警</div>
+        <div class="menu-item">设备看板</div>
+        <div class="menu-item">设备验核</div>
+        <div class="menu-item">场景校验</div>
+        <div class="menu-item" style="background:#1890ff;color:#fff;">&#x1F4CB; 控制计划</div>
+        <div class="menu-item">设备分组</div>
+        <div class="menu-item">一键标签</div>
+      </div>
+      <div class="menu-item"><span class="icon">&#x1F4CB;</span> 工单管理</div>
+      <div class="menu-item"><span class="icon">&#x1F3E2;</span> 物业管理</div>
+      <div class="menu-item"><span class="icon">&#x26A1;</span> 智慧能耗</div>
+      <div class="menu-item"><span class="icon">&#x1F464;</span> 访客管理</div>
+    </div>
+  </div>
+
+  <!-- 主区域 -->
+  <div class="main">
+    <!-- 顶部Tab -->
+    <div class="top-tabs">
+      <div class="top-tab">首页</div>
+      <div class="top-tab">智能识别结果</div>
+      <div class="top-tab">一键巡检</div>
+      <div class="top-tab">工单详情</div>
+      <div class="top-tab">巡检记录浏览</div>
+      <div class="top-tab">巡检任务</div>
+      <div class="top-tab">巡检计划</div>
+      <div class="top-tab">场景数据</div>
+      <div class="top-tab active">控制计划</div>
+      <div class="top-tab">设备分组</div>
+      <div class="top-tab">异常管理</div>
+      <div class="top-tab">告警管理</div>
+    </div>
+
+    <!-- 内容 -->
+    <div class="content">
+      <div class="page-header">
+        <h1 class="page-title">控制计划</h1>
+      </div>
+
+      <!-- 视图切换 Tab -->
+      <div class="view-tabs">
+        <div class="view-tab active" onclick="switchView('list')">&#x1F4CB; 列表</div>
+        <div class="view-tab" onclick="switchView('calendar')">&#x1F4C5; 日历</div>
+      </div>
+
+      <!-- 搜索栏 -->
+      <div class="search-bar">
+        <input class="search-input" placeholder="计划名称" />
+        <button class="btn btn-primary">&#x1F50D; 搜索</button>
+        <button class="btn">&#x21BB; 重置</button>
+        <div style="flex:1"></div>
+        <button class="btn btn-primary">+ 新建计划</button>
+      </div>
+
+      <!-- ========== 列表视图 ========== -->
+      <div class="list-view" id="listView">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>计划名称</th>
+                <th>类联场景</th>
+                <th>执行时间</th>
+                <th>重复规则</th>
+                <th>计划状态</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>测试</td>
+                <td>T 场景检D060405</td>
+                <td>10:00:00</td>
+                <td>每周3</td>
+                <td><span class="tag tag-blue">启用</span></td>
+                <td>
+                  <span class="link-action">&#x1F441; 查看</span>
+                  <span class="link-action">&#x270F; 编辑</span>
+                  <span class="link-action link-danger">&#x1F5D1; 删除</span>
+                </td>
+              </tr>
+              <tr>
+                <td>T 计划名称D060406</td>
+                <td>T 场景检D060405</td>
+                <td>18:00:00</td>
+                <td>每天</td>
+                <td><span class="tag tag-blue">启用</span></td>
+                <td>
+                  <span class="link-action">&#x1F441; 查看</span>
+                  <span class="link-action">&#x270F; 编辑</span>
+                  <span class="link-action link-danger">&#x1F5D1; 删除</span>
+                </td>
+              </tr>
+              <tr>
+                <td>电表归置</td>
+                <td>电表控件1</td>
+                <td>21:15:00</td>
+                <td>每天</td>
+                <td><span class="tag tag-blue">启用</span></td>
+                <td>
+                  <span class="link-action">&#x1F441; 查看</span>
+                  <span class="link-action">&#x270F; 编辑</span>
+                  <span class="link-action link-danger">&#x1F5D1; 删除</span>
+                </td>
+              </tr>
+              <tr>
+                <td>按计划计22</td>
+                <td>T 场景检D041001(1,场景验证04...</td>
+                <td>22:00:00</td>
+                <td>每天</td>
+                <td><span class="tag tag-blue">启用</span></td>
+                <td>
+                  <span class="link-action">&#x1F441; 查看</span>
+                  <span class="link-action">&#x270F; 编辑</span>
+                  <span class="link-action link-danger">&#x1F5D1; 删除</span>
+                </td>
+              </tr>
+              <tr>
+                <td>T 场景化检D041002</td>
+                <td>T 场景检D041001</td>
+                <td>10:00:00</td>
+                <td>每周1,2,3,4,5,6,7</td>
+                <td><span class="tag tag-blue">启用</span></td>
+                <td>
+                  <span class="link-action">&#x1F441; 查看</span>
+                  <span class="link-action">&#x270F; 编辑</span>
+                  <span class="link-action link-danger">&#x1F5D1; 删除</span>
+                </td>
+              </tr>
+              <tr>
+                <td>T 设备控制计划</td>
+                <td>T 场景检D041001</td>
+                <td:00</td>
+                <td>每天</td>
+                <td><span class="tag tag-blue">启用</span></td>
+                <td>
+                  <span class="link-action">&#x1F441; 查看</span>
+                  <span class="link-action">&#x270F; 编辑</span>
+                  <span class="link-action link-danger">&#x1F5D1; 删除</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="pagination">
+          <span>共 6 条</span>
+          <select style="border:1px solid #d9d9d9;border-radius:4px;padding:2px 8px;font-size:14px;">
+            <option>10条/页</option>
+          </select>
+          <button class="page-btn disabled">&lt;</button>
+          <button class="page-btn active">1</button>
+          <button class="page-btn disabled">&gt;</button>
+          <span style="margin-left:8px;">前往</span>
+          <input type="text" value="1" style="width:48px;border:1px solid #d9d9d9;border-radius:4px;text-align:center;font-size:14px;" />
+        </div>
+      </div>
+
+      <!-- ========== 日历视图 ========== -->
+      <div class="calendar-view" id="calendarView">
+        <div class="calendar-card">
+          <div class="calendar-header">
+            <div class="calendar-title" id="calTitle">2026年9月</div>
+            <div class="calendar-nav">
+              <button class="cal-nav-btn" onclick="changeMonth(-1)">&laquo;</button>
+              <button class="cal-today-btn" onclick="goToday()">今天</button>
+              <button class="cal-nav-btn" onclick="changeMonth(1)">&raquo;</button>
+            </div>
+          </div>
+
+          <div class="calendar-grid" id="calGrid">
+            <!-- 由 JS 渲染 -->
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ====== 查看弹框 ====== -->
+  <div class="modal-overlay" id="viewModal" onclick="closeModalOnOverlay(event)">
+    <div class="modal-dialog" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <h3 class="modal-title">查看</h3>
+        <button class="modal-close" onclick="closeModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <!-- 计划名称 -->
+        <div class="form-row">
+          <label class="form-label"><span class="required">*</span> 计划名称</label>
+          <div class="form-control">
+            <input type="text" class="input-text" id="mPlanName" readonly />
+            <div class="char-count"><span id="mNameLen">0</span> / 20</div>
+          </div>
+        </div>
+
+        <!-- 执行周期 -->
+        <div class="form-row">
+          <label class="form-label"><span class="required">*</span> 执行周期</label>
+          <div class="form-control">
+            <select class="select-box" id="mCycle" disabled>
+              <option value="daily">每天</option>
+              <option value="weekly">每周</option>
+              <option value="monthly">每月</option>
+            </select>
+            <div class="weekday-tags" id="mWeekdays"></div>
+            <input type="time" class="time-input" id="mTime" disabled />
+          </div>
+        </div>
+
+        <!-- 关联场景（穿梭框） -->
+        <div class="form-row">
+          <label class="form-label"><span class="required">*</span> 关联场景</label>
+          <div class="form-control">
+            <div class="transfer-box">
+              <!-- 待选列表 -->
+              <div class="transfer-panel">
+                <div class="transfer-head">
+                  <span>待选列表 (<span id="srcCount">5</span>)</span>
+                </div>
+                <div class="transfer-search">
+                  <input placeholder="请输入关键词搜索" id="sceneSearch" oninput="filterScenes()" />
+                </div>
+                <div class="transfer-list" id="srcList"></div>
+                <div class="transfer-pagination">&lt; &nbsp; 1 &nbsp; &gt;</div>
+              </div>
+              <!-- 中间按钮 -->
+              <div class="transfer-btns">
+                <button class="transfer-btn" id="btnRight" disabled>&gt;</button>
+                <button class="transfer-btn" id="btnLeft" disabled>&lt;</button>
+              </div>
+              <!-- 已选列表 -->
+              <div class="transfer-panel">
+                <div class="transfer-head">
+                  <span>已选列表 (<span id="dstCount">1</span>)</span>
+                  <span class="transfer-clear">清空</span>
+                </div>
+                <div class="transfer-list" id="dstList"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 是否启用 -->
+        <div class="form-row">
+          <label class="form-label">是否启用</label>
+          <div class="form-control">
+            <div class="switch-wrap">
+              <div class="switch" id="mEnabled"></div>
+              <span id="mEnabledText">启用</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-modal" onclick="closeModal()">取消</button>
+        <button class="btn-modal btn-modal-primary" onclick="closeModal()">确认</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== 场景详情二级弹框 ====== -->
+  <div class="modal-overlay scene-modal" id="sceneModal" onclick="closeSceneModalOnOverlay(event)">
+    <div class="modal-dialog scene-dialog" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <h3 class="modal-title">查看</h3>
+        <button class="modal-close" onclick="closeSceneModal()">&times;</button>
+      </div>
+
+      <!-- 场景信息头 -->
+      <div class="scene-info-bar">
+        <span class="scene-info-item"><span class="scene-info-label">场景标签:</span> <span class="scene-info-val" id="sLabel">T 场景控制D060405</span></span>
+        <span class="scene-info-item"><span class="scene-info-label">场景名称:</span> <span class="scene-info-val" id="sName">T 场景控制D060405</span></span>
+        <span class="scene-info-item"><span class="scene-info-label">场景类型:</span> <span class="scene-info-val" id="sType">批量控制</span></span>
+      </div>
+
+      <div class="modal-body">
+        <!-- 步骤1: 开 -->
+        <div class="step-block">
+          <div class="step-header">
+            <span class="step-radio checked"></span>
+            <span>步骤 1</span>
+          </div>
+          <div class="step-row">
+            <div class="step-field"><span class="s-label">*</span><span class="s-name">标签</span> <input class="step-input-sm" value="开" readonly /></div>
+            <div class="step-field"><span class="s-label">*</span><span class="s-name">设备组</span> <select class="step-input-sm"><option>电表分组</option></select></div>
+            <div class="step-field"><span class="s-label">*</span><span class="s-name">操作</span> <select class="step-input-sm"><option selected>open</option><option>close</option></select></div>
+            <div class="step-field"><span class="s-label">*</span><span class="s-name">参数</span> <input class="step-input-sm step-input-xs" value="1" /></div>
+            <div class="step-field"><span class="s-label">*</span><span class="s-name">等待</span> <input class="step-input-sm step-input-xs" value="10" /> 秒</div>
+          </div>
+          <div class="add-parallel-btn">&#x2795; 添加并行操作</div>
+        </div>
+
+        <!-- 步骤2: 关 -->
+        <div class="step-block">
+          <div class="step-header">
+            <span class="step-radio checked"></span>
+            <span>步骤 2</span>
+          </div>
+          <div class="step-row">
+            <div class="step-field"><span class="s-label">*</span><span class="s-name">标签</span> <input class="step-input-sm" value="关" readonly /></div>
+            <div class="step-field"><span class="s-label">*</span><span class="s-name">设备组</span> <select class="step-input-sm"><option>电表分组</option></select></div>
+            <div class="step-field"><span class="s-label">*</span><span class="s-name">操作</span> <select class="step-input-sm"><option>open</option><option selected>close</option></select></div>
+            <div class="step-field"><span class="s-label">*</span><span class="s-name">参数</span> <input class="step-input-sm step-input-xs" value="0" /></div>
+            <div class="step-field"><span class="s-label">*</span><span class="s-name">等待</span> <input class="step-input-sm step-input-xs" value="10" /> 秒</div>
+          </div>
+          <div class="add-parallel-btn">&#x2795; 添加并行操作</div>
+        </div>
+
+        <!-- 添加下一步 -->
+        <div class="add-next-step">&#x2795; 添加下一步</div>
+
+        <!-- 关闭预览 - 时间线 -->
+        <div class="preview-section">
+          <div class="preview-title">关闭预览</div>
+          <div class="timeline">
+            <div class="timeline-node">
+              <div class="timeline-dot start-end"></div>
+              <div class="timeline-label">开始场景</div>
+            </div>
+            <div class="timeline-node">
+              <span class="timeline-num">1</span>
+              <div class="timeline-dot mid"></div>
+              <div class="timeline-label">开<br><span class="timeline-sublabel">开</span></div>
+            </div>
+            <div class="timeline-node">
+              <span class="timeline-num">2</span>
+              <div class="timeline-dot mid"></div>
+              <div class="timeline-label">关<br><span class="timeline-sublabel">关</span></div>
+            </div>
+            <div class="timeline-node">
+              <div class="timeline-dot start-end"></div>
+              <div class="timeline-label">结束场景</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-modal" onclick="closeSceneModal()">取消</button>
+        <button class="btn-modal" onclick="closeSceneModal()">上一步</button>
+        <button class="btn-modal btn-modal-primary" onclick="closeSceneModal()">确认</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ====== 视图切换 ======
+function switchView(view) {
+  const tabs = document.querySelectorAll('.view-tab');
+  tabs.forEach(t => t.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+
+  if (view === 'list') {
+    document.getElementById('listView').classList.remove('hidden');
+    document.getElementById('calendarView').classList.remove('show');
+  } else {
+    document.getElementById('listView').classList.add('hidden');
+    document.getElementById('calendarView').classList.add('show');
+    renderCalendar(currentYear, currentMonth);
+  }
+}
+
+// ====== 日历逻辑 ======
+let currentYear = 2026;
+let currentMonth = 8;
+
+const plans = [
+  { name: '测试',           time: '10:00', rule: 'weekly', days: [3],         type: 'blue',   scene: 'T 场景检D060405', enabled: true, scenes: ['T 场景检D060405'] },
+  { name: 'T 计划名称D060406', time: '18:00', rule: 'daily',  days: [0,1,2,3,4,5,6], type: 'green',  scene: 'T 场景检D060405', enabled: true, scenes: ['T 场景检D060405'] },
+  { name: '电表归置',       time: '21:15', rule: 'daily',  days: [0,1,2,3,4,5,6], type: 'orange', scene: '电表控件1',        enabled: true, scenes: ['电表控件1'] },
+  { name: '按计划计22',     time: '22:00', rule: 'daily',  days: [0,1,2,3,4,5,6], type: 'purple', scene: 'T 场景检D041001',   enabled: true, scenes: ['T 场景检D041001(1,场景验证04...'] },
+  { name: 'T 场景化检D041002',time:'10:00', rule: 'weekly', days: [1,2,3,4,5,6,0],type: 'blue',   scene: 'T 场景检D041001',   enabled: true, scenes: ['T 场景检D041001'] },
+  { name: 'T 设备控制计划',  time: '10:00', rule: 'daily',  days: [0,1,2,3,4,5,6], type: 'green',  scene: 'T 场景检D041001',   enabled: true, scenes: ['T 场景检D041001'] },
+];
+
+const allScenes = [
+  'T 场景控制D060405',
+  '电表控件1',
+  '1',
+  'T 场景检D041001',
+  'T 场景化检D041002',
+];
+const weekdayNames = ['日','一','二','三','四','五','六'];
+
+function getPlansForDate(year, month, day) {
+  const date = new Date(year, month, day);
+  const weekday = date.getDay();
+  return plans.filter(p => {
+    if (p.rule === 'daily') return true;
+    if (p.rule === 'weekly') return p.days.includes(weekday);
+    return false;
+  });
+}
+
+function renderCalendar(year, month) {
+  const grid = document.getElementById('calGrid');
+  grid.innerHTML = '';
+  document.getElementById('calTitle').textContent = year + '年' + (month + 1) + '月';
+
+  const weekdays = ['日','一','二','三','四','五','六'];
+  weekdays.forEach(w => {
+    const th = document.createElement('div');
+    th.className = 'cal-weekday';
+    th.textContent = w;
+    grid.appendChild(th);
+  });
+
+  const firstDay = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const daysInPrevMonth = new Date(year, month, 0).getDate();
+  const today = new Date();
+  const isCurrentMonth = today.getFullYear() === year && today.getMonth() === month;
+
+  for (let i = firstDay - 1; i >= 0; i--) {
+    const cell = document.createElement('div');
+    cell.className = 'cal-day other-month';
+    cell.innerHTML = '<span class="day-num">' + (daysInPrevMonth - i) + '</span>';
+    grid.appendChild(cell);
+  }
+
+  for (let d = 1; d <= daysInMonth; d++) {
+    const cell = document.createElement('div');
+    const isToday = isCurrentMonth && d === today.getDate();
+    cell.className = 'cal-day' + (isToday ? ' today' : '');
+    let html = '<span class="day-num">' + d + '</span>';
+
+    const dayPlans = getPlansForDate(year, month, d);
+    dayPlans.slice(0, 3).forEach((p) => {
+      html += '<div class="cal-event ' + p.type + '" onclick="openPlanDetail(' + plans.indexOf(p) + ')" title="' + p.name + ' (' + p.time + ')">' +
+              '<span class="event-time">' + p.time + '</span> ' + p.name + '</div>';
+    });
+    if (dayPlans.length > 3) {
+      html += '<div class="cal-more">+' + (dayPlans.length - 3) + ' 更多</div>';
+    }
+    cell.innerHTML = html;
+    grid.appendChild(cell);
+  }
+
+  const totalCells = firstDay + daysInMonth;
+  for (let i = 1; i <= (7 - (totalCells % 7)) % 7; i++) {
+    const cell = document.createElement('div');
+    cell.className = 'cal-day other-month';
+    cell.innerHTML = '<span class="day-num">' + i + '</span>';
+    grid.appendChild(cell);
+  }
+}
+
+function changeMonth(delta) {
+  currentMonth += delta;
+  if (currentMonth > 11) { currentMonth = 0; currentYear++; }
+  if (currentMonth < 0) { currentMonth = 11; currentYear--; }
+  renderCalendar(currentYear, currentMonth);
+}
+function goToday() {
+  const now = new Date();
+  currentYear = now.getFullYear(); currentMonth = now.getMonth();
+  renderCalendar(currentYear, currentMonth);
+}
+
+// ====== 查看弹框 ======
+function openPlanDetail(index) {
+  const p = plans[index];
+  document.getElementById('mPlanName').value = p.name;
+  document.getElementById('mNameLen').textContent = p.name.length;
+  document.getElementById('mCycle').value = p.rule;
+  document.getElementById('mTime').value = p.time + ':00';
+
+  // 星期标签
+  const wdContainer = document.getElementById('mWeekdays');
+  wdContainer.innerHTML = '';
+  if (p.rule === 'weekly' && p.days) {
+    p.days.forEach(d => {
+      const tag = document.createElement('div');
+      tag.className = 'wd-tag';
+      tag.innerHTML = '周' + weekdayNames[d] + ' <span class="tag-close">&times;</span>';
+      wdContainer.appendChild(tag);
+    });
+  }
+  wdContainer.style.display = p.rule === 'weekly' ? 'inline-flex' : 'none';
+
+  // 启用开关
+  const sw = document.getElementById('mEnabled');
+  sw.className = p.enabled ? 'switch' : 'switch off';
+  document.getElementById('mEnabledText').textContent = p.enabled ? '启用' : '停用';
+
+  // 穿梭框
+  renderTransferLists(p);
+
+  document.getElementById('viewModal').classList.add('show');
+}
+
+function renderTransferLists(plan) {
+  const srcList = document.getElementById('srcList');
+  const dstList = document.getElementById('dstList');
+  srcList.innerHTML = ''; dstList.innerHTML = '';
+
+  const selectedScenes = plan.scenes || [];
+  document.getElementById('dstCount').textContent = selectedScenes.length;
+  const availableScenes = allScenes.filter(s => !selectedScenes.includes(s));
+  document.getElementById('srcCount').textContent = availableScenes.length;
+
+  availableScenes.forEach(s => srcList.appendChild(createTransferItem(s, false)));
+  selectedScenes.forEach(s => dstList.appendChild(createTransferItem(s, true)));
+}
+
+function createTransferItem(text, isChecked) {
+  const item = document.createElement('div');
+  item.className = 'transfer-item';
+  item.dataset.name = text;
+  item.innerHTML = '<span class="transfer-checkbox ' + (isChecked ? 'checked' : '') + '">' + (isChecked ? '&#x2713;' : '') + '</span><span>' + text + '</span>';
+  // 单击选中/取消（用于穿梭）
+  item.addEventListener('click', function(e) {
+    e.stopPropagation();
+    const cb = this.querySelector('.transfer-checkbox');
+    cb.classList.toggle('checked');
+    cb.textContent = cb.classList.contains('checked') ? '&#x2713;' : '';
+    this.classList.toggle('selected');
+    updateTransferBtns();
+  });
+  // 双击打开场景详情
+  item.addEventListener('dblclick', function(e) {
+    e.stopPropagation();
+    openSceneModal(this.dataset.name);
+  });
+  return item;
+}
+
+function filterScenes() {
+  const kw = document.getElementById('sceneSearch').value.toLowerCase();
+  document.querySelectorAll('#srcList .transfer-item').forEach(item => {
+    item.style.display = item.dataset.name.toLowerCase().includes(kw) ? '' : 'none';
+  });
+}
+
+function updateTransferBtns() {
+  document.getElementById('btnRight').disabled = !document.querySelectorAll('#srcList .transfer-item.selected').length;
+  document.getElementById('btnLeft').disabled = !document.querySelectorAll('#dstList .transfer-item.selected').length;
+}
+
+function closeModal() { document.getElementById('viewModal').classList.remove('show'); }
+function closeModalOnOverlay(e) { if (e.target === e.currentTarget) closeModal(); }
+
+// ====== 场景详情二级弹框 ======
+function openSceneModal(sceneName) {
+  // 填充场景信息
+  document.getElementById('sLabel').textContent = sceneName;
+  document.getElementById('sName').textContent = sceneName;
+  // 根据场景名推断类型
+  const typeMap = {
+    'T 场景控制D060405': '批量控制',
+    '电表控件1': '单点控制',
+    '1': '单点控制',
+    'T 场景检D041001': '批量控制',
+    'T 场景化检D041002': '批量控制',
+  };
+  document.getElementById('sType').textContent = typeMap[sceneName] || '批量控制';
+  document.getElementById('sceneModal').classList.add('show');
+}
+function closeSceneModal() { document.getElementById('sceneModal').classList.remove('show'); }
+function closeSceneModalOnOverlay(e) { if (e.target === e.currentTarget) closeSceneModal(); }
+
+document.getElementById('btnRight').onclick = function() { moveItems('srcList', 'dstList'); };
+document.getElementById('btnLeft').onclick = function() { moveItems('dstList', 'srcList'); };
+
+function moveItems(fromId, toId) {
+  const from = document.getElementById(fromId), to = document.getElementById(toId);
+  from.querySelectorAll('.transfer-item.selected').forEach(item => {
+    item.classList.remove('selected');
+    const cb = item.querySelector('.transfer-checkbox');
+    const chk = toId === 'dstList';
+    cb.classList.toggle('checked', chk);
+    cb.textContent = chk ? '&#x2713;' : '';
+    to.appendChild(item);
+  });
+  document.getElementById('srcCount').textContent = document.querySelectorAll('#srcList .transfer-item').length;
+  document.getElementById('dstCount').textContent = document.querySelectorAll('#dstList .transfer-item').length;
+  updateTransferBtns();
+}
+
+renderCalendar(currentYear, currentMonth);
+</script>
+</body>
+</html>
