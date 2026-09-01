@@ -1,0 +1,1069 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>车辆黑白名单 - 智慧园区</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+      background: #f0f2f5;
+      color: rgba(0, 0, 0, 0.85);
+    }
+    .layout {
+      display: flex;
+      min-height: 100vh;
+    }
+    .sidebar {
+      width: 208px;
+      background: #001529;
+      color: rgba(255, 255, 255, 0.65);
+      flex-shrink: 0;
+      overflow-y: auto;
+    }
+    .logo {
+      height: 64px;
+      display: flex;
+      align-items: center;
+      padding-left: 24px;
+      color: #fff;
+      font-size: 18px;
+      font-weight: 600;
+      background: #002140;
+    }
+    .menu-section { padding: 12px 0; }
+    .menu-title {
+      padding: 8px 24px;
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.45);
+      text-transform: uppercase;
+    }
+    .menu-item {
+      position: relative;
+      padding: 12px 24px 12px 48px;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-size: 14px;
+    }
+    .menu-item:hover { color: #fff; background: #1890ff; }
+    .menu-item.active { color: #fff; background: #1890ff; }
+    .menu-item.has-children::after {
+      content: '›';
+      position: absolute;
+      right: 24px;
+      top: 12px;
+      font-size: 16px;
+    }
+    .submenu { background: #000c17; }
+    .submenu .menu-item { padding-left: 64px; font-size: 13px; }
+    .submenu .menu-item.active { background: #1890ff; }
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+    .header {
+      height: 64px;
+      background: #fff;
+      border-bottom: 1px solid #f0f0f0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+    }
+    .breadcrumb {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      color: rgba(0, 0, 0, 0.45);
+    }
+    .breadcrumb a { color: rgba(0, 0, 0, 0.45); text-decoration: none; }
+    .breadcrumb a:hover { color: #1890ff; }
+    .breadcrumb .current { color: rgba(0, 0, 0, 0.85); font-weight: 500; }
+    .user-area {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      color: rgba(0, 0, 0, 0.65);
+      font-size: 14px;
+    }
+    .avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: #1890ff;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 500;
+    }
+    .page-tabs {
+      display: flex;
+      gap: 8px;
+      padding: 16px 24px 0;
+    }
+    .page-tab {
+      padding: 8px 16px;
+      border: 1px solid #d9d9d9;
+      background: #fff;
+      color: rgba(0, 0, 0, 0.65);
+      border-radius: 2px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .page-tab.active {
+      background: #1890ff;
+      color: #fff;
+      border-color: #1890ff;
+    }
+    .content {
+      flex: 1;
+      padding: 16px 24px 24px;
+      overflow: auto;
+    }
+    .two-col {
+      display: flex;
+      gap: 24px;
+      align-items: flex-start;
+    }
+    .card {
+      background: #fff;
+      border-radius: 2px;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+    }
+    .left-card { width: 380px; flex-shrink: 0; }
+    .right-card { flex: 1; min-width: 0; }
+    .card-header {
+      padding: 16px 24px;
+      border-bottom: 1px solid #f0f0f0;
+      font-size: 16px;
+      font-weight: 500;
+      color: rgba(0, 0, 0, 0.85);
+    }
+    .card-body { padding: 24px; }
+    .tabs {
+      display: flex;
+      border-bottom: 1px solid #f0f0f0;
+      margin-bottom: 16px;
+    }
+    .tab {
+      flex: 1;
+      text-align: center;
+      padding: 10px 0;
+      cursor: pointer;
+      font-size: 14px;
+      color: rgba(0, 0, 0, 0.65);
+      border-bottom: 2px solid transparent;
+      transition: all 0.3s;
+    }
+    .tab:hover { color: #1890ff; }
+    .tab.active { color: #1890ff; border-bottom-color: #1890ff; }
+    .search-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+    .input {
+      flex: 1;
+      height: 32px;
+      padding: 0 12px;
+      border: 1px solid #d9d9d9;
+      border-radius: 2px;
+      font-size: 14px;
+      color: rgba(0, 0, 0, 0.65);
+      outline: none;
+      transition: all 0.3s;
+    }
+    .input:focus { border-color: #40a9ff; box-shadow: 0 0 0 2px rgba(24,144,255,0.2); }
+    .input::placeholder { color: rgba(0, 0, 0, 0.25); }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 16px;
+      height: 32px;
+      border-radius: 2px;
+      font-size: 14px;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: all 0.3s;
+      line-height: 1.5;
+      white-space: nowrap;
+    }
+    .btn-primary { background: #1890ff; color: #fff; border-color: #1890ff; }
+    .btn-primary:hover { background: #40a9ff; border-color: #40a9ff; }
+    .btn-default { background: #fff; color: rgba(0, 0, 0, 0.65); border-color: #d9d9d9; }
+    .btn-default:hover { color: #1890ff; border-color: #1890ff; }
+    .btn + .btn { margin-left: 8px; }
+    .btn-icon { padding: 0 8px; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+    th, td {
+      padding: 12px 16px;
+      text-align: left;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    th {
+      background: #fafafa;
+      color: rgba(0, 0, 0, 0.85);
+      font-weight: 500;
+    }
+    tbody tr:hover { background: #fafafa; }
+    tbody tr.selected { background: #e6f7ff; }
+    .link {
+      color: #1890ff;
+      cursor: pointer;
+      margin-right: 12px;
+    }
+    .link:hover { color: #40a9ff; }
+    .link.danger { color: #ff4d4f; }
+    .link.danger:hover { color: #ff7875; }
+    .toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    .filters {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    .filter-item { display: flex; align-items: center; gap: 8px; }
+    .filter-item label { font-size: 14px; color: rgba(0, 0, 0, 0.65); }
+    .select {
+      height: 32px;
+      padding: 0 12px;
+      border: 1px solid #d9d9d9;
+      border-radius: 2px;
+      font-size: 14px;
+      color: rgba(0, 0, 0, 0.65);
+      background: #fff;
+      outline: none;
+      min-width: 120px;
+    }
+    .select:focus { border-color: #40a9ff; box-shadow: 0 0 0 2px rgba(24,144,255,0.2); }
+    .pagination {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 8px;
+      margin-top: 16px;
+      font-size: 14px;
+      color: rgba(0, 0, 0, 0.65);
+    }
+    .pagination .page-input {
+      width: 48px;
+      text-align: center;
+    }
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.45);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+    .modal-overlay.show { display: flex; }
+    .modal {
+      background: #fff;
+      border-radius: 2px;
+      width: 560px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    .modal-header {
+      padding: 16px 24px;
+      border-bottom: 1px solid #f0f0f0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 16px;
+      font-weight: 500;
+    }
+    .modal-close {
+      font-size: 20px;
+      color: rgba(0,0,0,0.45);
+      cursor: pointer;
+    }
+    .modal-close:hover { color: rgba(0,0,0,0.85); }
+    .modal-body { padding: 24px; }
+    .modal-footer {
+      padding: 10px 24px 24px;
+      display: flex;
+      justify-content: flex-end;
+    }
+    .form-item {
+      display: flex;
+      align-items: flex-start;
+      margin-bottom: 16px;
+    }
+    .form-label {
+      width: 100px;
+      padding-top: 5px;
+      text-align: right;
+      margin-right: 16px;
+      font-size: 14px;
+      color: rgba(0, 0, 0, 0.85);
+    }
+    .form-label .required { color: #ff4d4f; margin-right: 4px; }
+    .form-control {
+      flex: 1;
+      min-width: 0;
+    }
+    .form-control .input,
+    .form-control .select {
+      width: 100%;
+    }
+    .form-control textarea {
+      width: 100%;
+      min-height: 80px;
+      padding: 8px 12px;
+      border: 1px solid #d9d9d9;
+      border-radius: 2px;
+      font-size: 14px;
+      resize: vertical;
+      outline: none;
+    }
+    .form-control textarea:focus { border-color: #40a9ff; box-shadow: 0 0 0 2px rgba(24,144,255,0.2); }
+    .readonly-text {
+      padding-top: 5px;
+      font-size: 14px;
+      color: rgba(0,0,0,0.65);
+    }
+    .upload-box {
+      width: 96px;
+      height: 96px;
+      border: 1px dashed #d9d9d9;
+      border-radius: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: rgba(0,0,0,0.45);
+      font-size: 24px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .upload-box:hover { border-color: #1890ff; color: #1890ff; }
+    .upload-tip {
+      font-size: 12px;
+      color: rgba(0,0,0,0.45);
+      margin-top: 4px;
+    }
+    .upload-area {
+      border: 1px dashed #d9d9d9;
+      border-radius: 2px;
+      padding: 24px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s;
+      margin-bottom: 16px;
+    }
+    .upload-area:hover { border-color: #1890ff; }
+    .upload-area p { margin: 0 0 8px; color: rgba(0,0,0,0.65); font-size: 14px; }
+    .upload-area .hint { font-size: 12px; color: rgba(0,0,0,0.45); }
+    .preview-table { max-height: 240px; overflow-y: auto; margin-bottom: 16px; }
+    .empty-tip {
+      text-align: center;
+      color: rgba(0,0,0,0.45);
+      font-size: 14px;
+      padding: 40px 0;
+    }
+    .message {
+      position: fixed;
+      top: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #fff;
+      padding: 10px 16px;
+      border-radius: 2px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      font-size: 14px;
+      z-index: 2000;
+      display: none;
+    }
+    .message.show { display: block; }
+    .message.success { border-left: 4px solid #52c41a; }
+    .message.error { border-left: 4px solid #ff4d4f; }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="logo">智慧园区</div>
+      <div class="menu-section">
+        <div class="menu-item"><span style="margin-right:8px">🏠</span>首页</div>
+        <div class="menu-title">智慧安防</div>
+        <div class="menu-item has-children">视频监控</div>
+        <div class="menu-item has-children">安防看板</div>
+        <div class="menu-item has-children">视频巡更</div>
+        <div class="menu-item has-children">人员安全</div>
+        <div class="menu-item has-children active">车辆安全</div>
+        <div class="submenu">
+          <div class="menu-item active">车辆黑名单</div>
+          <div class="menu-item">车辆布控</div>
+          <div class="menu-item">车辆检索</div>
+          <div class="menu-item">车辆轨迹</div>
+        </div>
+        <div class="menu-item has-children">安防设备</div>
+        <div class="menu-item">设备地图</div>
+        <div class="menu-item has-children">安防告警</div>
+      </div>
+    </aside>
+    <div class="main">
+      <header class="header">
+        <div class="breadcrumb">
+          <span>智慧安防</span>
+          <span>/</span>
+          <span>车辆安全</span>
+          <span>/</span>
+          <span class="current">车辆黑名单</span>
+        </div>
+        <div class="user-area">
+          <span style="color:#1890ff;cursor:pointer">意见反馈</span>
+          <span>下载中继插件</span>
+          <span style="font-size:18px">🔔</span>
+          <div class="avatar">管</div>
+          <span>管理员</span>
+        </div>
+      </header>
+      <div class="page-tabs">
+        <div class="page-tab">首页</div>
+        <div class="page-tab active">黑白名单</div>
+        <div class="page-tab">人员布控</div>
+        <div class="page-tab">车辆黑名单</div>
+      </div>
+      <div class="content">
+        <div class="two-col">
+          <div class="card left-card">
+            <div class="card-header">车辆黑白名单</div>
+            <div class="card-body">
+              <div class="tabs">
+                <div class="tab active" data-type="black">黑名单组</div>
+                <div class="tab" data-type="white">白名单组</div>
+              </div>
+              <div class="search-row">
+                <input class="input" id="groupSearchInput" placeholder="名单名称">
+                <button class="btn btn-default" id="groupSearchBtn">搜索</button>
+                <button class="btn btn-primary" id="addGroupBtn">添加</button>
+              </div>
+              <table>
+                <thead>
+                  <tr>
+                    <th style="width:60px">序号</th>
+                    <th id="groupColName">黑名单分组</th>
+                    <th style="width:100px">操作</th>
+                  </tr>
+                </thead>
+                <tbody id="groupTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+          <div class="card right-card">
+            <div class="card-header" id="rightTitle">车辆名单 - T车辆黑名单0604</div>
+            <div class="card-body">
+              <div class="filters">
+                <div class="filter-item">
+                  <label>车牌号码</label>
+                  <input class="input" id="plateInput" placeholder="请输入" style="width:180px">
+                </div>
+                <div class="filter-item">
+                  <label>车辆品牌</label>
+                  <select class="select" id="brandFilter">
+                    <option value="">请选择</option>
+                    <option>奥迪</option>
+                    <option>宝马</option>
+                    <option>奔驰</option>
+                    <option>丰田</option>
+                    <option>本田</option>
+                    <option>大众</option>
+                    <option>特斯拉</option>
+                    <option>比亚迪</option>
+                  </select>
+                </div>
+                <button class="btn btn-primary" id="vehicleSearchBtn">搜索</button>
+                <button class="btn btn-default" id="vehicleResetBtn">重置</button>
+              </div>
+              <div class="toolbar">
+                <div></div>
+                <div>
+                  <button class="btn btn-primary" id="addVehicleBtn">新增车辆</button>
+                  <button class="btn btn-default" id="batchImportBtn">批量导入</button>
+                </div>
+              </div>
+              <table>
+                <thead>
+                  <tr>
+                    <th style="width:60px">序号</th>
+                    <th>车牌号码</th>
+                    <th>车主姓名</th>
+                    <th>车辆品牌</th>
+                    <th style="width:120px">操作</th>
+                  </tr>
+                </thead>
+                <tbody id="vehicleTableBody"></tbody>
+              </table>
+              <div class="pagination">
+                <span>共 <span id="totalCount">1</span> 条</span>
+                <select class="select" style="width:auto">
+                  <option>10条/页</option>
+                  <option>20条/页</option>
+                  <option>50条/页</option>
+                </select>
+                <button class="btn btn-default btn-icon">&lt;</button>
+                <button class="btn btn-primary btn-icon">1</button>
+                <button class="btn btn-default btn-icon">&gt;</button>
+                <span>前往</span>
+                <input class="input page-input" value="1">
+                <span>页</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 名单组弹窗 -->
+  <div class="modal-overlay" id="groupModal">
+    <div class="modal">
+      <div class="modal-header">
+        <span id="groupModalTitle">新增黑名单</span>
+        <span class="modal-close" data-close="groupModal">&times;</span>
+      </div>
+      <div class="modal-body">
+        <div class="form-item">
+          <div class="form-label"><span class="required">*</span><span id="groupNameLabel">黑名单组名称</span></div>
+          <div class="form-control">
+            <input class="input" id="groupNameInput" placeholder="请输入">
+          </div>
+        </div>
+        <div class="form-item">
+          <div class="form-label">告警规则</div>
+          <div class="form-control">
+            <select class="select" id="groupAlertRule">
+              <option value="">请选择</option>
+              <option>实时拦截</option>
+              <option>静默跟踪</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-item">
+          <div class="form-label">备注</div>
+          <div class="form-control">
+            <textarea id="groupRemarkInput" placeholder="备注"></textarea>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-default" data-close="groupModal">取消</button>
+        <button class="btn btn-primary" id="saveGroupBtn">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 车辆弹窗 -->
+  <div class="modal-overlay" id="vehicleModal">
+    <div class="modal">
+      <div class="modal-header">
+        <span id="vehicleModalTitle">新增车辆</span>
+        <span class="modal-close" data-close="vehicleModal">&times;</span>
+      </div>
+      <div class="modal-body">
+        <div class="form-item">
+          <div class="form-label">名单组</div>
+          <div class="form-control">
+            <div class="readonly-text" id="vehicleGroupName">T车辆黑名单0604</div>
+          </div>
+        </div>
+        <div class="form-item">
+          <div class="form-label"><span class="required">*</span>车牌号</div>
+          <div class="form-control">
+            <input class="input" id="vehiclePlateInput" placeholder="请输入">
+          </div>
+        </div>
+        <div class="form-item">
+          <div class="form-label"><span class="required">*</span>车主姓名</div>
+          <div class="form-control">
+            <input class="input" id="vehicleOwnerInput" placeholder="请输入">
+          </div>
+        </div>
+        <div class="form-item">
+          <div class="form-label">车辆类型</div>
+          <div class="form-control">
+            <select class="select" id="vehicleTypeSelect">
+              <option value="">请选择状态</option>
+              <option>小型汽车</option>
+              <option>大型汽车</option>
+              <option>新能源汽车</option>
+              <option>摩托车</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-item">
+          <div class="form-label">车辆品牌</div>
+          <div class="form-control">
+            <select class="select" id="vehicleBrandSelect">
+              <option value="">请选择</option>
+              <option>奥迪</option>
+              <option>宝马</option>
+              <option>奔驰</option>
+              <option>丰田</option>
+              <option>本田</option>
+              <option>大众</option>
+              <option>特斯拉</option>
+              <option>比亚迪</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-item">
+          <div class="form-label">车牌类型</div>
+          <div class="form-control">
+            <select class="select" id="plateTypeSelect">
+              <option value="">请选择</option>
+              <option>蓝牌</option>
+              <option>绿牌</option>
+              <option>黄牌</option>
+              <option>白牌</option>
+              <option>黑牌</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-item">
+          <div class="form-label">车牌颜色</div>
+          <div class="form-control">
+            <select class="select" id="plateColorSelect">
+              <option value="">请选择</option>
+              <option>蓝色</option>
+              <option>绿色</option>
+              <option>黄色</option>
+              <option>白色</option>
+              <option>黑色</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-item">
+          <div class="form-label">车身颜色</div>
+          <div class="form-control">
+            <select class="select" id="bodyColorSelect">
+              <option value="">请选择</option>
+              <option>黑色</option>
+              <option>白色</option>
+              <option>银色</option>
+              <option>红色</option>
+              <option>蓝色</option>
+              <option>灰色</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-item">
+          <div class="form-label">备注</div>
+          <div class="form-control">
+            <textarea id="vehicleRemarkInput" placeholder="请输入备注"></textarea>
+          </div>
+        </div>
+        <div class="form-item">
+          <div class="form-label">车辆照片</div>
+          <div class="form-control">
+            <div class="upload-box" id="vehiclePhotoUpload">+</div>
+            <div class="upload-tip">支持 jpg/png，单张不超过 5M</div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-default" data-close="vehicleModal">取消</button>
+        <button class="btn btn-primary" id="saveVehicleBtn">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 批量导入弹窗 -->
+  <div class="modal-overlay" id="importModal">
+    <div class="modal" style="width:640px">
+      <div class="modal-header">
+        <span>批量导入车辆</span>
+        <span class="modal-close" data-close="importModal">&times;</span>
+      </div>
+      <div class="modal-body">
+        <div style="margin-bottom:16px">
+          <button class="btn btn-default" id="downloadTemplateBtn">下载导入模板</button>
+          <span style="font-size:12px;color:rgba(0,0,0,0.45);margin-left:8px">请按模板格式填写后上传</span>
+        </div>
+        <div class="upload-area" id="importUploadArea">
+          <input type="file" id="importFileInput" accept=".csv" style="display:none">
+          <p>点击或拖拽文件到此处上传</p>
+          <div class="hint">仅支持 .csv 格式，单次不超过 500 条</div>
+        </div>
+        <div id="importPreviewWrap" style="display:none">
+          <div style="font-size:14px;font-weight:500;margin-bottom:8px">数据预览（<span id="importCount">0</span> 条）</div>
+          <div class="preview-table">
+            <table>
+              <thead>
+                <tr>
+                  <th>车牌号码</th>
+                  <th>车主姓名</th>
+                  <th>车辆类型</th>
+                  <th>车辆品牌</th>
+                  <th>车牌类型</th>
+                  <th>车牌颜色</th>
+                  <th>车身颜色</th>
+                  <th>备注</th>
+                </tr>
+              </thead>
+              <tbody id="importPreviewBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-default" data-close="importModal">取消</button>
+        <button class="btn btn-primary" id="confirmImportBtn">确定导入</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="message" id="message"></div>
+
+  <script>
+    (function() {
+      const $ = id => document.getElementById(id);
+      const groups = [
+        { id: 1, name: 'T车辆黑名单0604', type: 'black', alertRule: '', remark: '' },
+        { id: 2, name: '测试车辆黑名单2', type: 'black', alertRule: '实时拦截', remark: '测试分组' },
+        { id: 3, name: 'T车辆白名单060401', type: 'white', alertRule: '', remark: '' },
+        { id: 4, name: '测试4', type: 'white', alertRule: '静默跟踪', remark: '' }
+      ];
+      let selectedGroupId = 1;
+      let activeTab = 'black';
+      let editingGroupId = null;
+      let editingVehicleId = null;
+      let importRows = [];
+
+      const vehicles = [
+        { id: 1, groupId: 1, plate: '苏E12345', owner: '张三', brand: '奥迪', type: '小型汽车', plateType: '蓝牌', plateColor: '蓝色', bodyColor: '黑色', remark: '' },
+        { id: 2, groupId: 1, plate: '苏E67890', owner: '李四', brand: '宝马', type: '小型汽车', plateType: '蓝牌', plateColor: '蓝色', bodyColor: '白色', remark: '' },
+        { id: 3, groupId: 3, plate: '苏E11111', owner: '王五', brand: '比亚迪', type: '新能源汽车', plateType: '绿牌', plateColor: '绿色', bodyColor: '灰色', remark: '' }
+      ];
+
+      function showMessage(text, type) {
+        const el = $('message');
+        el.textContent = text;
+        el.className = 'message ' + type + ' show';
+        setTimeout(() => el.classList.remove('show'), 2000);
+      }
+
+      function openModal(id) { $(id).classList.add('show'); }
+      function closeModal(id) { $(id).classList.remove('show'); }
+      document.querySelectorAll('[data-close]').forEach(btn => {
+        btn.addEventListener('click', () => closeModal(btn.dataset.close));
+      });
+      document.querySelectorAll('.modal-overlay').forEach(overlay => {
+        overlay.addEventListener('click', e => { if (e.target === overlay) overlay.classList.remove('show'); });
+      });
+
+      function renderGroups() {
+        const filtered = groups
+          .filter(g => g.type === activeTab)
+          .filter(g => !g._search || g.name.includes(g._search));
+        delete groups.forEach(g => delete g._search);
+        const keyword = $('groupSearchInput').value.trim();
+        const list = groups.filter(g => g.type === activeTab && g.name.includes(keyword));
+        const tbody = $('groupTableBody');
+        tbody.innerHTML = '';
+        list.forEach((g, idx) => {
+          const tr = document.createElement('tr');
+          if (g.id === selectedGroupId) tr.classList.add('selected');
+          tr.innerHTML = `
+            <td>${idx + 1}</td>
+            <td style="cursor:pointer">${g.name}</td>
+            <td>
+              <span class="link" data-edit-group="${g.id}">编辑</span>
+              <span class="link danger" data-del-group="${g.id}">删除</span>
+            </td>
+          `;
+          tr.querySelector('td:nth-child(2)').addEventListener('click', () => {
+            selectedGroupId = g.id;
+            renderGroups();
+            renderVehicles();
+          });
+          tbody.appendChild(tr);
+        });
+        $('groupColName').textContent = activeTab === 'black' ? '黑名单分组' : '白名单分组';
+      }
+
+      function getSelectedGroup() {
+        return groups.find(g => g.id === selectedGroupId) || groups[0];
+      }
+
+      function renderVehicles() {
+        const g = getSelectedGroup();
+        $('rightTitle').textContent = `车辆名单 - ${g.name}`;
+        $('vehicleGroupName').textContent = g.name;
+        const plateKw = $('plateInput').value.trim();
+        const brandKw = $('brandFilter').value;
+        const list = vehicles.filter(v => v.groupId === selectedGroupId)
+          .filter(v => !plateKw || v.plate.includes(plateKw))
+          .filter(v => !brandKw || v.brand === brandKw);
+        $('totalCount').textContent = list.length;
+        const tbody = $('vehicleTableBody');
+        tbody.innerHTML = '';
+        if (list.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="5" class="empty-tip">暂无数据</td></tr>`;
+          return;
+        }
+        list.forEach((v, idx) => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${idx + 1}</td>
+            <td>${v.plate}</td>
+            <td>${v.owner}</td>
+            <td>${v.brand || '--'}</td>
+            <td>
+              <span class="link" data-edit-vehicle="${v.id}">编辑</span>
+              <span class="link danger" data-del-vehicle="${v.id}">删除</span>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
+      }
+
+      document.querySelectorAll('.tabs .tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+          document.querySelectorAll('.tabs .tab').forEach(t => t.classList.remove('active'));
+          tab.classList.add('active');
+          activeTab = tab.dataset.type;
+          const first = groups.find(g => g.type === activeTab);
+          selectedGroupId = first ? first.id : null;
+          renderGroups();
+          renderVehicles();
+        });
+      });
+
+      $('groupSearchBtn').addEventListener('click', renderGroups);
+      $('groupSearchInput').addEventListener('keydown', e => { if (e.key === 'Enter') renderGroups(); });
+
+      function openGroupModal(isEdit) {
+        editingGroupId = isEdit ? selectedGroupId : null;
+        const g = isEdit ? getSelectedGroup() : { type: activeTab, name: '', alertRule: '', remark: '' };
+        const isBlack = (isEdit ? g.type : activeTab) === 'black';
+        $('groupModalTitle').textContent = isEdit ? (isBlack ? '编辑黑名单组' : '编辑白名单组') : (isBlack ? '新增黑名单' : '新增白名单');
+        $('groupNameLabel').textContent = isBlack ? '黑名单组名称' : '白名单组名称';
+        $('groupNameInput').value = g.name;
+        $('groupAlertRule').value = g.alertRule || '';
+        $('groupRemarkInput').value = g.remark || '';
+        openModal('groupModal');
+      }
+
+      $('addGroupBtn').addEventListener('click', () => openGroupModal(false));
+      $('groupTableBody').addEventListener('click', e => {
+        if (e.target.dataset.editGroup) {
+          editingGroupId = +e.target.dataset.editGroup;
+          const g = groups.find(x => x.id === editingGroupId);
+          selectedGroupId = g.id;
+          renderGroups();
+          renderVehicles();
+          openGroupModal(true);
+        }
+        if (e.target.dataset.delGroup) {
+          const id = +e.target.dataset.delGroup;
+          const idx = groups.findIndex(g => g.id === id);
+          if (idx > -1) {
+            groups.splice(idx, 1);
+            if (selectedGroupId === id) {
+              const next = groups.find(g => g.type === activeTab);
+              selectedGroupId = next ? next.id : null;
+            }
+            renderGroups();
+            renderVehicles();
+            showMessage('删除成功', 'success');
+          }
+        }
+      });
+
+      $('saveGroupBtn').addEventListener('click', () => {
+        const name = $('groupNameInput').value.trim();
+        if (!name) { showMessage('请输入名单组名称', 'error'); return; }
+        const alertRule = $('groupAlertRule').value;
+        const remark = $('groupRemarkInput').value.trim();
+        if (editingGroupId) {
+          const g = groups.find(x => x.id === editingGroupId);
+          g.name = name; g.alertRule = alertRule; g.remark = remark;
+          showMessage('保存成功', 'success');
+        } else {
+          const newId = groups.length ? Math.max(...groups.map(g => g.id)) + 1 : 1;
+          groups.push({ id: newId, name, type: activeTab, alertRule, remark });
+          selectedGroupId = newId;
+          showMessage('新增成功', 'success');
+        }
+        closeModal('groupModal');
+        renderGroups();
+        renderVehicles();
+      });
+
+      function openVehicleModal(isEdit, vehicle) {
+        editingVehicleId = isEdit ? vehicle.id : null;
+        $('vehicleModalTitle').textContent = isEdit ? '编辑车辆' : '新增车辆';
+        $('vehicleGroupName').textContent = getSelectedGroup().name;
+        $('vehiclePlateInput').value = isEdit ? vehicle.plate : '';
+        $('vehicleOwnerInput').value = isEdit ? vehicle.owner : '';
+        $('vehicleTypeSelect').value = isEdit ? vehicle.type : '';
+        $('vehicleBrandSelect').value = isEdit ? vehicle.brand : '';
+        $('plateTypeSelect').value = isEdit ? vehicle.plateType : '';
+        $('plateColorSelect').value = isEdit ? vehicle.plateColor : '';
+        $('bodyColorSelect').value = isEdit ? vehicle.bodyColor : '';
+        $('vehicleRemarkInput').value = isEdit ? vehicle.remark : '';
+        openModal('vehicleModal');
+      }
+
+      $('addVehicleBtn').addEventListener('click', () => openVehicleModal(false));
+      $('vehicleTableBody').addEventListener('click', e => {
+        if (e.target.dataset.editVehicle) {
+          const v = vehicles.find(x => x.id === +e.target.dataset.editVehicle);
+          openVehicleModal(true, v);
+        }
+        if (e.target.dataset.delVehicle) {
+          const id = +e.target.dataset.delVehicle;
+          const idx = vehicles.findIndex(v => v.id === id);
+          if (idx > -1) { vehicles.splice(idx, 1); renderVehicles(); showMessage('删除成功', 'success'); }
+        }
+      });
+
+      $('saveVehicleBtn').addEventListener('click', () => {
+        const plate = $('vehiclePlateInput').value.trim();
+        const owner = $('vehicleOwnerInput').value.trim();
+        if (!plate) { showMessage('请输入车牌号', 'error'); return; }
+        if (!owner) { showMessage('请输入车主姓名', 'error'); return; }
+        const payload = {
+          plate,
+          owner,
+          type: $('vehicleTypeSelect').value,
+          brand: $('vehicleBrandSelect').value,
+          plateType: $('plateTypeSelect').value,
+          plateColor: $('plateColorSelect').value,
+          bodyColor: $('bodyColorSelect').value,
+          remark: $('vehicleRemarkInput').value.trim()
+        };
+        if (editingVehicleId) {
+          const v = vehicles.find(x => x.id === editingVehicleId);
+          Object.assign(v, payload);
+          showMessage('保存成功', 'success');
+        } else {
+          const newId = vehicles.length ? Math.max(...vehicles.map(v => v.id)) + 1 : 1;
+          vehicles.push({ id: newId, groupId: selectedGroupId, ...payload });
+          showMessage('新增成功', 'success');
+        }
+        closeModal('vehicleModal');
+        renderVehicles();
+      });
+
+      $('vehicleSearchBtn').addEventListener('click', renderVehicles);
+      $('vehicleResetBtn').addEventListener('click', () => {
+        $('plateInput').value = '';
+        $('brandFilter').value = '';
+        renderVehicles();
+      });
+
+      // 批量导入
+      $('batchImportBtn').addEventListener('click', () => {
+        importRows = [];
+        $('importFileInput').value = '';
+        $('importPreviewWrap').style.display = 'none';
+        openModal('importModal');
+      });
+      $('importUploadArea').addEventListener('click', () => $('importFileInput').click());
+      $('importUploadArea').addEventListener('dragover', e => { e.preventDefault(); $('importUploadArea').style.borderColor = '#1890ff'; });
+      $('importUploadArea').addEventListener('dragleave', () => { $('importUploadArea').style.borderColor = '#d9d9d9'; });
+      $('importUploadArea').addEventListener('drop', e => {
+        e.preventDefault();
+        $('importUploadArea').style.borderColor = '#d9d9d9';
+        const file = e.dataTransfer.files[0];
+        if (file) handleImportFile(file);
+      });
+      $('importFileInput').addEventListener('change', e => {
+        if (e.target.files[0]) handleImportFile(e.target.files[0]);
+      });
+
+      function parseCSV(text) {
+        const lines = text.trim().split(/\r?\n/);
+        const rows = [];
+        for (let i = 1; i < lines.length; i++) {
+          const cols = lines[i].split(',');
+          if (cols.length < 2 || !cols[0].trim()) continue;
+          rows.push({
+            plate: cols[0].trim(),
+            owner: cols[1].trim(),
+            type: cols[2] ? cols[2].trim() : '',
+            brand: cols[3] ? cols[3].trim() : '',
+            plateType: cols[4] ? cols[4].trim() : '',
+            plateColor: cols[5] ? cols[5].trim() : '',
+            bodyColor: cols[6] ? cols[6].trim() : '',
+            remark: cols[7] ? cols[7].trim() : ''
+          });
+        }
+        return rows;
+      }
+
+      function handleImportFile(file) {
+        if (!file.name.endsWith('.csv')) { showMessage('仅支持 .csv 文件', 'error'); return; }
+        const reader = new FileReader();
+        reader.onload = e => {
+          importRows = parseCSV(e.target.result);
+          if (importRows.length === 0) { showMessage('未解析到有效数据', 'error'); return; }
+          $('importCount').textContent = importRows.length;
+          const tbody = $('importPreviewBody');
+          tbody.innerHTML = '';
+          importRows.forEach(r => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+              <td>${r.plate}</td><td>${r.owner}</td><td>${r.type || '--'}</td><td>${r.brand || '--'}</td>
+              <td>${r.plateType || '--'}</td><td>${r.plateColor || '--'}</td><td>${r.bodyColor || '--'}</td><td>${r.remark || '--'}</td>
+            `;
+            tbody.appendChild(tr);
+          });
+          $('importPreviewWrap').style.display = 'block';
+          showMessage(`已读取 ${importRows.length} 条数据`, 'success');
+        };
+        reader.readAsText(file);
+      }
+
+      $('downloadTemplateBtn').addEventListener('click', () => {
+        const header = '车牌号码,车主姓名,车辆类型,车辆品牌,车牌类型,车牌颜色,车身颜色,备注\n';
+        const sample = '苏E00001,张三,小型汽车,奥迪,蓝牌,蓝色,黑色,\n苏E00002,李四,新能源汽车,比亚迪,绿牌,绿色,白色,\n';
+        const blob = new Blob(['\ufeff' + header + sample], { type: 'text/csv;charset=utf-8;' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = '车辆导入模板.csv';
+        a.click();
+        URL.revokeObjectURL(a.href);
+      });
+
+      $('confirmImportBtn').addEventListener('click', () => {
+        if (importRows.length === 0) { showMessage('请先上传文件', 'error'); return; }
+        let maxId = vehicles.length ? Math.max(...vehicles.map(v => v.id)) : 0;
+        importRows.forEach(r => {
+          vehicles.push({ id: ++maxId, groupId: selectedGroupId, ...r });
+        });
+        closeModal('importModal');
+        renderVehicles();
+        showMessage(`成功导入 ${importRows.length} 条车辆`, 'success');
+      });
+
+      renderGroups();
+      renderVehicles();
+    })();
+  </script>
+</body>
+</html>
