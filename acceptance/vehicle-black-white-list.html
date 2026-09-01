@@ -703,29 +703,17 @@
           <span style="font-size:12px;color:rgba(0,0,0,0.45);margin-left:8px">请按模板格式填写后上传</span>
         </div>
         <div class="upload-area" id="importUploadArea">
-          <input type="file" id="importFileInput" accept=".csv" style="display:none">
+          <input type="file" id="importFileInput" accept=".xlsx,.xls" style="display:none">
           <p>点击或拖拽文件到此处上传</p>
-          <div class="hint">仅支持 .csv 格式，单次不超过 500 条</div>
+          <div class="hint">仅支持 .xlsx / .xls 格式，单次不超过 500 条</div>
         </div>
         <div id="importPreviewWrap" style="display:none">
-          <div style="font-size:14px;font-weight:500;margin-bottom:8px">数据预览（<span id="importCount">0</span> 条）</div>
-          <div class="preview-table">
-            <table>
-              <thead>
-                <tr>
-                  <th>车牌号码</th>
-                  <th>车主姓名</th>
-                  <th>车辆类型</th>
-                  <th>车辆品牌</th>
-                  <th>车牌类型</th>
-                  <th>车牌颜色</th>
-                  <th>车身颜色</th>
-                  <th>备注</th>
-                </tr>
-              </thead>
-              <tbody id="importPreviewBody"></tbody>
-            </table>
+          <div style="font-size:14px;font-weight:500;margin-bottom:8px">已选择文件</div>
+          <div style="border:1px solid #f0f0f0;border-radius:2px;padding:16px;margin-bottom:12px">
+            <div id="importFileName" style="font-size:14px;color:rgba(0,0,0,0.85)">—</div>
+            <div id="importFileSize" style="font-size:12px;color:rgba(0,0,0,0.45);margin-top:4px"></div>
           </div>
+          <div class="upload-tip">点击「确定导入」后，系统将解析 Excel 并写入当前名单（原型示意，不实际解析文件内容）。</div>
         </div>
       </div>
       <div class="modal-footer">
@@ -981,6 +969,8 @@
         importRows = [];
         $('importFileInput').value = '';
         $('importPreviewWrap').style.display = 'none';
+        $('importFileName').textContent = '—';
+        $('importFileSize').textContent = '';
         openModal('importModal');
       });
       $('importUploadArea').addEventListener('click', () => $('importFileInput').click());
@@ -996,69 +986,40 @@
         if (e.target.files[0]) handleImportFile(e.target.files[0]);
       });
 
-      function parseCSV(text) {
-        const lines = text.trim().split(/\r?\n/);
-        const rows = [];
-        for (let i = 1; i < lines.length; i++) {
-          const cols = lines[i].split(',');
-          if (cols.length < 2 || !cols[0].trim()) continue;
-          rows.push({
-            plate: cols[0].trim(),
-            owner: cols[1].trim(),
-            type: cols[2] ? cols[2].trim() : '',
-            brand: cols[3] ? cols[3].trim() : '',
-            plateType: cols[4] ? cols[4].trim() : '',
-            plateColor: cols[5] ? cols[5].trim() : '',
-            bodyColor: cols[6] ? cols[6].trim() : '',
-            remark: cols[7] ? cols[7].trim() : ''
-          });
-        }
-        return rows;
-      }
-
       function handleImportFile(file) {
-        if (!file.name.endsWith('.csv')) { showMessage('仅支持 .csv 文件', 'error'); return; }
-        const reader = new FileReader();
-        reader.onload = e => {
-          importRows = parseCSV(e.target.result);
-          if (importRows.length === 0) { showMessage('未解析到有效数据', 'error'); return; }
-          $('importCount').textContent = importRows.length;
-          const tbody = $('importPreviewBody');
-          tbody.innerHTML = '';
-          importRows.forEach(r => {
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-              <td>${r.plate}</td><td>${r.owner}</td><td>${r.type || '--'}</td><td>${r.brand || '--'}</td>
-              <td>${r.plateType || '--'}</td><td>${r.plateColor || '--'}</td><td>${r.bodyColor || '--'}</td><td>${r.remark || '--'}</td>
-            `;
-            tbody.appendChild(tr);
-          });
-          $('importPreviewWrap').style.display = 'block';
-          showMessage(`已读取 ${importRows.length} 条数据`, 'success');
-        };
-        reader.readAsText(file);
+        const lower = file.name.toLowerCase();
+        if (!lower.endsWith('.xlsx') && !lower.endsWith('.xls')) {
+          showMessage('仅支持 .xlsx / .xls 文件', 'error');
+          return;
+        }
+        const sizeKB = (file.size / 1024).toFixed(1);
+        $('importFileName').textContent = file.name;
+        $('importFileSize').textContent = sizeKB + ' KB';
+        $('importPreviewWrap').style.display = 'block';
+        showMessage('文件已选择，可点击确定导入', 'success');
       }
 
       $('downloadTemplateBtn').addEventListener('click', () => {
-        const header = '车牌号码,车主姓名,车辆类型,车辆品牌,车牌类型,车牌颜色,车身颜色,备注\n';
-        const sample = '苏E00001,张三,小型汽车,奥迪,蓝牌,蓝色,黑色,\n苏E00002,李四,新能源汽车,比亚迪,绿牌,绿色,白色,\n';
-        const blob = new Blob(['\ufeff' + header + sample], { type: 'text/csv;charset=utf-8;' });
+        const header = ['车牌号码','车主姓名','车辆类型','车辆品牌','车牌类型','车牌颜色','车身颜色','备注'];
+        const sample = ['苏E00001','张三','小型汽车','奥迪','蓝牌','蓝色','黑色',''];
+        let html = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="utf-8"></head><body><table border="1">';
+        [header, sample].forEach(r => {
+          html += '<tr>' + r.map(c => '<td>' + c + '</td>').join('') + '</tr>';
+        });
+        html += '</table></body></html>';
+        const blob = new Blob(['\ufeff' + html], { type: 'application/vnd.ms-excel' });
         const a = document.createElement('a');
         a.href = URL.createObjectURL(blob);
-        a.download = '车辆导入模板.csv';
+        a.download = '车辆导入模板.xls';
         a.click();
         URL.revokeObjectURL(a.href);
       });
 
       $('confirmImportBtn').addEventListener('click', () => {
-        if (importRows.length === 0) { showMessage('请先上传文件', 'error'); return; }
-        let maxId = vehicles.length ? Math.max(...vehicles.map(v => v.id)) : 0;
-        importRows.forEach(r => {
-          vehicles.push({ id: ++maxId, groupId: selectedGroupId, ...r });
-        });
+        const name = $('importFileName').textContent;
+        if (!name || name === '—') { showMessage('请先上传 Excel 文件', 'error'); return; }
         closeModal('importModal');
-        renderVehicles();
-        showMessage(`成功导入 ${importRows.length} 条车辆`, 'success');
+        showMessage('导入成功（示意）：' + name, 'success');
       });
 
       renderGroups();
