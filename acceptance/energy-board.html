@@ -129,6 +129,11 @@
   .tree-node .nm { flex: 1; }
   .filter-hint { color: #c9cdd4; font-size: 12px; margin-left: -4px; }
 
+  /* 环境监测看板 - 设备树状态点 */
+  .env-dot { width: 6px; height: 6px; border-radius: 50%; margin-right: 6px; display: inline-block; flex-shrink: 0; }
+  .env-dot.online { background: #52c41a; }
+  .env-dot.offline { background: #ff4d4f; }
+
   /* 提示 */
   .demo-tip { position: fixed; right: 16px; bottom: 16px; background: rgba(0,0,0,0.75); color: #fff; padding: 8px 14px; border-radius: 4px; font-size: 12px; z-index: 99; }
 </style>
@@ -206,6 +211,7 @@
       <div class="tab" data-tab="asset" onclick="switchSecondTab('asset')">资产看板</div>
       <div class="tab active" data-tab="meeting" onclick="switchSecondTab('meeting')">会议看板</div>
       <div class="tab" data-tab="energy" onclick="switchSecondTab('energy')">能耗看板</div>
+      <div class="tab" data-tab="env" onclick="switchSecondTab('env')">环境监测看板</div>
     </div>
 
     <!-- 内容区 -->
@@ -367,11 +373,57 @@
         </div>
       </div>
 
+      <!-- 环境监测看板 tab 内容（本次新增，位于能耗看板右侧） -->
+      <div class="tab-pane" id="pane-env">
+
+        <!-- 筛选区 -->
+        <div class="filter-bar" style="background:#fff;padding:16px 20px;border-radius:6px;margin-bottom:16px;">
+          <div class="filter-item">
+            <label>环境设备</label>
+            <div class="treeselect" id="env-device-select">
+              <div class="treeselect-input" onclick="toggleEnvTree()">
+                <span id="env-device-label">PLC-3F-3.200SMART</span>
+                <span class="ts-arrow">▾</span>
+              </div>
+              <div class="treeselect-panel" id="env-tree-panel" style="display:none;"></div>
+              <input type="hidden" id="env-device" value="plc-3f3" />
+            </div>
+          </div>
+          <div class="filter-item">
+            <label>日期范围（按天）</label>
+            <input type="date" id="env-start" />
+            <span class="tilde">~</span>
+            <input type="date" id="env-end" />
+          </div>
+          <button class="btn-primary" onclick="renderEnvCharts()">查询</button>
+        </div>
+
+        <!-- 指标折线图 2×2 -->
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-title">温度<span class="right" id="env-temp-range">近 7 日</span></div>
+            <div id="chart-env-temp" class="chart"></div>
+          </div>
+          <div class="card">
+            <div class="card-title">湿度<span class="right" id="env-humi-range">近 7 日</span></div>
+            <div id="chart-env-humi" class="chart"></div>
+          </div>
+          <div class="card">
+            <div class="card-title">PM2.5<span class="right" id="env-pm25-range">近 7 日</span></div>
+            <div id="chart-env-pm25" class="chart"></div>
+          </div>
+          <div class="card">
+            <div class="card-title">噪声<span class="right" id="env-noise-range">近 7 日</span></div>
+            <div id="chart-env-noise" class="chart"></div>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 </div>
 
-<div class="demo-tip">点击右上二级 tab「会议看板 / 能耗看板」可切换演示</div>
+<div class="demo-tip">点击右上二级 tab「会议看板 / 能耗看板 / 环境监测看板」可切换演示</div>
 
 <script>
   // 二级 tab 切换
@@ -380,6 +432,11 @@
     document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
     document.querySelector('.second-tabs .tab[data-tab="' + name + '"]').classList.add('active');
     document.getElementById('pane-' + name).classList.add('active');
+    // 环境看板：首次进入初始化日期，并渲染图表
+    if (name === 'env') {
+      if (!envInited) { initEnvDates(); envInited = true; }
+      setTimeout(renderEnvCharts, 30);
+    }
     // 重排图表
     setTimeout(resizeAllCharts, 50);
   }
@@ -592,6 +649,167 @@
     });
   }
   renderWaterChart();
+
+  // ===== 环境监测看板 =====
+  let envInited = false;
+
+  // 环境设备树：严格按截图 PLC 设备结构（苏州实验室 / 综合楼 → 综合行政楼 → 楼层 → PLC 设备）
+  const envDeviceTree = [
+    { id: 'suzhou', name: '苏州实验室', children: [
+      { id: 'sz-2f6', name: 'PLC-2F-6.200SMART', status: 'offline' },
+      { id: 'sz-2f4', name: 'PLC-2F-4.200SMART', status: 'online' }
+    ]},
+    { id: 'zonghe', name: '综合楼', children: [
+      { id: 'zha', name: '综合行政楼', children: [
+        { id: 'zha-b1', name: 'B1F' },
+        { id: 'zha-1f', name: '1F', children: [
+          { id: 'plc-1f1', name: 'PLC-1F-1.200SMART', status: 'online' },
+          { id: 'plc-1f2', name: 'PLC-1F-2.200SMART', status: 'online' }
+        ]},
+        { id: 'zha-2f', name: '2F', children: [
+          { id: 'plc-2f2', name: 'PLC-2F-2.200SMART', status: 'online' },
+          { id: 'plc-2f1', name: 'PLC-2F-1.200SMART', status: 'online' }
+        ]},
+        { id: 'zha-3f', name: '3F', children: [
+          { id: 'plc-3f2', name: 'PLC-3F-2.200SMART', status: 'online' },
+          { id: 'plc-3f1', name: 'PLC-3F-1.200SMART', status: 'online' },
+          { id: 'plc-3f3', name: 'PLC-3F-3.200SMART', status: 'online' }
+        ]},
+        { id: 'zha-4f', name: '4F', children: [
+          { id: 'plc-4f2', name: 'PLC-4F-2.200SMART', status: 'online' },
+          { id: 'plc-4f1', name: 'PLC-4F-1.200SMART', status: 'online' }
+        ]},
+        { id: 'zha-5f', name: '5F', children: [
+          { id: 'plc-5f1', name: 'PLC-5F-1.200SMART', status: 'online' },
+          { id: 'plc-5f2', name: 'PLC-5F-2.200SMART', status: 'online' }
+        ]},
+        { id: 'zha-6f', name: '6F', children: [
+          { id: 'plc-6f1', name: 'PLC-6F-1.200SMART', status: 'online' }
+        ]}
+      ]}
+    ]}
+  ];
+  let envTreeExpand = { suzhou: true, zonghe: true, zha: true, 'zha-1f': true, 'zha-2f': true, 'zha-3f': true, 'zha-4f': true, 'zha-5f': true, 'zha-6f': true };
+
+  function renderEnvTree() {
+    const panel = document.getElementById('env-tree-panel');
+    panel.innerHTML = '';
+    const cur = document.getElementById('env-device').value;
+    const renderNodes = (nodes, level) => {
+      nodes.forEach(n => {
+        const has = n.children && n.children.length;
+        const isDevice = !!n.status;
+        const node = document.createElement('div');
+        node.className = 'tree-node' + (n.id === cur ? ' selected' : '');
+        const dot = isDevice ? `<span class="env-dot ${n.status}"></span>` : '';
+        node.innerHTML = `<span class="twist">${has ? (envTreeExpand[n.id] ? '▾' : '▸') : ''}</span>${dot}<span class="nm" style="padding-left:${level * 14}px;">${n.name}</span>`;
+        node.onclick = (e) => {
+          e.stopPropagation();
+          if (has && e.target.classList.contains('twist')) {
+            envTreeExpand[n.id] = !envTreeExpand[n.id];
+            renderEnvTree();
+            return;
+          }
+          if (isDevice) {
+            document.getElementById('env-device').value = n.id;
+            document.getElementById('env-device-label').textContent = n.name;
+            document.querySelectorAll('#env-tree-panel .tree-node').forEach(x => x.classList.remove('selected'));
+            node.classList.add('selected');
+            toggleEnvTree(false);
+            renderEnvCharts();
+          }
+        };
+        panel.appendChild(node);
+        if (has && envTreeExpand[n.id]) renderNodes(n.children, level + 1);
+      });
+    };
+    renderNodes(envDeviceTree, 0);
+  }
+  function toggleEnvTree(force) {
+    const panel = document.getElementById('env-tree-panel');
+    const show = force === undefined ? (panel.style.display === 'none') : force;
+    panel.style.display = show ? 'block' : 'none';
+    if (show) renderEnvTree();
+  }
+  document.addEventListener('click', (e) => {
+    const ts = document.getElementById('env-device-select');
+    if (ts && !ts.contains(e.target)) document.getElementById('env-tree-panel').style.display = 'none';
+  });
+
+  // 日期工具
+  function fmtDate(d) {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return y + '-' + m + '-' + day;
+  }
+  function initEnvDates() {
+    const end = new Date();
+    const start = new Date();
+    start.setDate(start.getDate() - 6); // 近 7 天
+    document.getElementById('env-start').value = fmtDate(start);
+    document.getElementById('env-end').value = fmtDate(end);
+  }
+  function buildDayRange(start, end) {
+    const res = [];
+    const s = new Date(start + 'T00:00:00');
+    const e = new Date(end + 'T00:00:00');
+    while (s <= e) {
+      res.push(fmtDate(s));
+      s.setDate(s.getDate() + 1);
+    }
+    return res;
+  }
+
+  // 环境指标折线图（温度 / 湿度 / PM2.5 / 噪声）
+  function renderEnvCharts() {
+    const device = document.getElementById('env-device').value;
+    const start = document.getElementById('env-start').value;
+    const end = document.getElementById('env-end').value;
+    if (!start || !end) return;
+    const days = buildDayRange(start, end);
+    const labels = days.map(d => d.slice(5).replace('-', '.')); // MM.DD
+    const seedBase = hashId(device);
+    const defs = [
+      { el: 'chart-env-temp',  color: '#ff7a45', unit: '(°C)',     base: 22, amp: 6 },
+      { el: 'chart-env-humi',  color: '#36cfc9', unit: '(%RH)',    base: 55, amp: 20 },
+      { el: 'chart-env-pm25',  color: '#9254de', unit: '(μg/m³)', base: 35, amp: 28 },
+      { el: 'chart-env-noise', color: '#f5222d', unit: '(dB)',     base: 52, amp: 12 }
+    ];
+    defs.forEach(def => {
+      const data = days.map((d, i) => {
+        const seed = (parseInt(d.replace(/-/g, ''), 10) + seedBase + i) % 11;
+        return Math.round(def.base + (seed - 5) * (def.amp / 6));
+      });
+      const el = document.getElementById(def.el);
+      const inst = echarts.getInstanceByDom(el) || echarts.init(el);
+      inst.setOption({
+        grid: { left: 50, right: 20, top: 30, bottom: 30 },
+        tooltip: { trigger: 'axis' },
+        xAxis: {
+          type: 'category', data: labels,
+          axisLabel: { color: '#8c8c8c', fontSize: 11 },
+          axisLine: { lineStyle: { color: '#e5e6eb' } }, axisTick: { show: false }
+        },
+        yAxis: {
+          type: 'value', name: def.unit, nameTextStyle: { color: '#8c8c8c', fontSize: 11 },
+          splitLine: { lineStyle: { color: '#f0f0f0' } }, axisLabel: { color: '#8c8c8c', fontSize: 11 }
+        },
+        series: [{
+          type: 'line', smooth: true, symbol: 'circle', symbolSize: 5,
+          lineStyle: { color: def.color, width: 2 },
+          itemStyle: { color: def.color },
+          areaStyle: { color: { type: 'linear', x: 0, y: 0, x2: 0, y2: 1, colorStops: [{ offset: 0, color: def.color + '40' }, { offset: 1, color: def.color + '00' }] } },
+          data: data
+        }]
+      }, true);
+    });
+    const rangeTxt = start.slice(5).replace('-', '.') + ' ~ ' + end.slice(5).replace('-', '.');
+    ['env-temp-range', 'env-humi-range', 'env-pm25-range', 'env-noise-range'].forEach(id => {
+      const e = document.getElementById(id);
+      if (e) e.textContent = rangeTxt;
+    });
+  }
 
   window.addEventListener('resize', resizeAllCharts);
 </script>
