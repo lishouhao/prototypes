@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>人员安全 - 黑名单 / 白名单（原型）</title>
+<style>
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif; background:#f0f2f5; color:#262626; font-size:14px; height:100vh; overflow:hidden;}
+
+  .app{display:flex; height:100vh;}
+
+  /* 左侧菜单 */
+  .sidebar{width:200px; background:#001529; color:rgba(255,255,255,0.65); flex-shrink:0; overflow:auto;}
+  .sidebar::-webkit-scrollbar{width:6px;}
+  .sidebar::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.1);}
+  .side-logo{padding:16px 20px; color:#fff; font-size:15px; font-weight:600; border-bottom:1px solid #002140;}
+  .side-item{display:flex; align-items:center; padding:10px 20px; cursor:pointer; gap:8px; font-size:14px;}
+  .side-item:hover{color:#fff;}
+  .side-item.active{color:#fff; background:#1890ff;}
+  .side-item .ic{width:16px; text-align:center; opacity:0.85;}
+  .side-sub{padding:8px 20px 8px 44px; cursor:pointer; color:rgba(255,255,255,0.65); font-size:13px;}
+  .side-sub:hover{color:#fff;}
+  .side-sub.active{color:#fff; background:#1890ff;}
+
+  /* 主区 */
+  .main{flex:1; display:flex; flex-direction:column; min-width:0;}
+
+  /* 顶部导航 */
+  .topbar{height:48px; background:#001529; color:rgba(255,255,255,0.85); display:flex; align-items:center; padding:0 16px; gap:8px; font-size:13px; flex-shrink:0;}
+  .topbar .tb-left{display:flex; align-items:center; gap:8px; flex:1;}
+  .topbar .sep{color:rgba(255,255,255,0.3);}
+  .topbar .home{color:rgba(255,255,255,0.65); cursor:pointer;}
+  .topbar .home:hover{color:#fff;}
+  .topbar .tb-right{display:flex; align-items:center; gap:16px; color:rgba(255,255,255,0.65); font-size:13px;}
+  .topbar .tb-right a{color:rgba(255,255,255,0.65); text-decoration:none;}
+  .topbar .tb-right a:hover{color:#fff;}
+  .avatar{width:28px; height:28px; border-radius:50%; background:#1890ff; color:#fff; display:inline-flex; align-items:center; justify-content:center; font-size:12px; cursor:pointer;}
+
+  /* 面包屑 */
+  .crumbbar{background:#fff; border-bottom:1px solid #f0f0f0; padding:0 16px; display:flex; align-items:center; gap:6px; flex-shrink:0; height:38px;}
+  .crumbbar .c-item{padding:0 12px; height:38px; line-height:38px; cursor:pointer; color:#595959; font-size:13px;}
+  .crumbbar .c-item:hover{color:#1890ff;}
+  .crumbbar .c-item.active{background:#1890ff; color:#fff; font-weight:500;}
+  .crumbbar .spacer{flex:1;}
+  .crumbbar .right{display:flex; align-items:center; gap:6px; color:#8c8c8c;}
+
+  /* 内容 */
+  .content{padding:16px; flex:1; overflow:auto; display:flex; gap:16px; align-items:flex-start;}
+  .card{background:#fff; border-radius:4px; box-shadow:0 1px 2px rgba(0,0,0,0.03); padding:16px;}
+  .left-col{width:36%; flex-shrink:0;}
+  .right-col{flex:1; min-width:0;}
+
+  .card-h{font-size:15px; font-weight:500; margin-bottom:14px; color:#262626;}
+
+  /* Tab 切换 */
+  .tabbar{display:flex; background:#f5f5f5; border-radius:4px 4px 0 0; overflow:hidden; margin:-16px -16px 14px;}
+  .tab{padding:10px 20px; cursor:pointer; color:#595959; font-size:14px; flex:1; text-align:center; border-bottom:1px solid transparent;}
+  .tab:hover{color:#1890ff;}
+  .tab.active{background:#fff; color:#262626; font-weight:500; border-bottom:2px solid #1890ff;}
+
+  /* 搜索行 */
+  .search-row{display:flex; gap:8px; margin-bottom:14px; align-items:center;}
+  .input{border:1px solid #d9d9d9; border-radius:4px; padding:6px 10px; font-size:13px; height:32px; background:#fff;}
+  .input:focus{outline:none; border-color:#1890ff;}
+  .input.with-ic{padding-left:30px; background:#fff url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%238c8c8c' stroke-width='2'><circle cx='11' cy='11' r='8'/><path d='M21 21l-4.35-4.35'/></svg>") no-repeat 10px center;}
+
+  /* 按钮 */
+  .btn{display:inline-flex; align-items:center; gap:6px; padding:6px 14px; border-radius:4px; border:1px solid #d9d9d9; background:#fff; color:#595959; cursor:pointer; font-size:13px; line-height:1.5; height:32px; transition:all .15s;}
+  .btn:hover{border-color:#1890ff; color:#1890ff;}
+  .btn-primary{background:#1890ff; color:#fff; border-color:#1890ff;}
+  .btn-primary:hover{background:#40a9ff; color:#fff; border-color:#40a9ff;}
+  .btn-link{background:transparent; border:none; color:#1890ff; padding:4px 8px; height:auto; cursor:pointer; font-size:13px;}
+  .btn-link:hover{color:#40a9ff; background:transparent;}
+  .btn-link.danger{color:#ff4d4f;}
+  .btn-link.danger:hover{color:#ff7875;}
+
+  /* 表格 */
+  .tbl{width:100%; border-collapse:collapse; font-size:13px;}
+  .tbl th, .tbl td{border:1px solid #f0f0f0; padding:10px 12px; text-align:left; vertical-align:middle;}
+  .tbl th{background:#fafafa; color:#595959; font-weight:500;}
+  .tbl tbody tr:hover{background:#fafafa;}
+  .tbl .op{display:flex; gap:8px;}
+
+  .row-avatar{width:32px; height:32px; border-radius:50%; background:#1890ff; color:#fff; display:inline-flex; align-items:center; justify-content:center; font-size:12px;}
+
+  /* 分页 */
+  .pager{display:flex; align-items:center; justify-content:flex-end; gap:8px; margin-top:16px; font-size:13px; color:#595959;}
+  .pager .p-btn{min-width:28px; height:28px; border:1px solid #d9d9d9; background:#fff; border-radius:4px; display:inline-flex; align-items:center; justify-content:center; cursor:pointer; padding:0 6px;}
+  .pager .p-btn:hover{border-color:#1890ff; color:#1890ff;}
+  .pager .p-btn.active{background:#fff; color:#1890ff; border-color:#1890ff;}
+  .pager select{height:28px; border:1px solid #d9d9d9; border-radius:4px; padding:0 8px; background:#fff;}
+
+  /* 弹窗 */
+  .mask{position:fixed; inset:0; background:rgba(0,0,0,0.45); display:none; align-items:center; justify-content:center; z-index:100;}
+  .mask.show{display:flex;}
+  .modal{background:#fff; border-radius:4px; width:540px; max-width:92vw;}
+  .modal-h{padding:16px 20px; font-size:15px; font-weight:500; border-bottom:1px solid #f0f0f0; display:flex; justify-content:space-between; align-items:center;}
+  .modal-h .x{cursor:pointer; color:#8c8c8c; font-size:18px; line-height:1; padding:4px;}
+  .modal-h .x:hover{color:#262626;}
+  .modal-b{padding:20px;}
+  .modal-f{padding:12px 20px; border-top:1px solid #f0f0f0; text-align:right;}
+
+  /* 表单 */
+  .form-row{margin-bottom:16px;}
+  .form-row label{display:block; font-size:13px; color:#262626; margin-bottom:6px;}
+  .form-row label .req{color:#ff4d4f; margin-right:2px;}
+  .ipt{width:100%; border:1px solid #d9d9d9; border-radius:4px; padding:6px 10px; font-size:13px; height:32px; font-family:inherit;}
+  .ipt:focus{outline:none; border-color:#1890ff; box-shadow:0 0 0 2px rgba(24,144,255,0.12);}
+  .ta{width:100%; border:1px solid #d9d9d9; border-radius:4px; padding:6px 10px; font-size:13px; font-family:inherit; min-height:80px; resize:vertical;}
+  .ta:focus{outline:none; border-color:#1890ff; box-shadow:0 0 0 2px rgba(24,144,255,0.12);}
+
+  /* 变更点标注 */
+  .chg-flag{display:inline-block; background:#fff1f0; color:#ff4d4f; border:1px solid #ffa39e; border-radius:3px; padding:0 5px; font-size:11px; margin-left:6px; font-weight:500; vertical-align:middle;}
+
+  .tip{margin:12px 16px 0; padding:10px 14px; background:#fffbe6; border:1px solid #ffe58f; border-radius:4px; color:#ad6800; font-size:12px; line-height:1.8;}
+  .tip b{color:#ad6800;}
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- 左侧菜单 -->
+  <aside class="sidebar">
+    <div class="side-logo">智慧园区</div>
+    <div class="side-item"><span class="ic">⌂</span>首页</div>
+    <div class="side-item" style="color:#fff;"><span class="ic">▣</span>智慧安防<span style="margin-left:auto;font-size:10px;">▾</span></div>
+    <div class="side-item" style="padding-left:36px;">视频监控</div>
+    <div class="side-item" style="padding-left:36px;">安防看板</div>
+    <div class="side-item" style="padding-left:36px;">视频巡更</div>
+    <div class="side-item" style="color:#fff;padding-left:36px;">人员安全<span style="margin-left:auto;font-size:10px;">▾</span></div>
+    <div class="side-sub">人员库</div>
+    <div class="side-sub active">黑名单名单</div>
+    <div class="side-sub">人员布控</div>
+    <div class="side-sub">人员检索</div>
+    <div class="side-item" style="padding-left:36px;">车辆安全</div>
+    <div class="side-item" style="padding-left:36px;">安防设备</div>
+    <div class="side-item" style="padding-left:36px;">设备地图</div>
+    <div class="side-item" style="padding-left:36px;">安防告警</div>
+  </aside>
+
+  <!-- 主区 -->
+  <section class="main">
+
+    <!-- 顶部导航 -->
+    <div class="topbar">
+      <div class="tb-left">
+        <span class="home">☰</span>
+        <span class="home">智慧安防</span>
+        <span class="sep">/</span>
+        <span class="home">人员安全</span>
+        <span class="sep">/</span>
+        <span class="home" style="color:#fff;">黑名单名单</span>
+      </div>
+      <div class="tb-right">
+        <a>意见反馈</a>
+        <a>下载中维插件</a>
+        <span>🔔</span>
+        <span class="avatar">管</span>
+        <span>管理员</span>
+      </div>
+    </div>
+
+    <!-- 面包屑 -->
+    <div class="crumbbar">
+      <div class="c-item">⌂ 首页</div>
+      <div class="c-item active">黑名单名单</div>
+      <div class="c-item">人员布控</div>
+      <div class="spacer"></div>
+      <div class="right"><span>《</span><span style="margin:0 6px;">》</span><span>↻</span><span style="margin-left:6px;">▦</span></div>
+    </div>
+
+    <!-- 变更说明 -->
+    <div class="tip">
+      📌 本期变更点：① 右栏「添加人员」<b>右侧</b>新增 <span class="chg-flag">批量导入</span> 按钮；② 「新建黑名单组」弹窗「名单名称」字段<b>下方</b>新增 <span class="chg-flag">预警处置</span> 多行文本框；③ 右栏「人员名单」操作列新增 <span class="chg-flag">编辑</span> 按钮，弹窗与「新增人员」一致（姓名 / 人脸图片 / 备注）。
+    </div>
+
+    <!-- 内容 -->
+    <div class="content">
+
+      <!-- 左：人员黑白名单 -->
+      <div class="card left-col">
+        <div class="tabbar">
+          <div class="tab active" onclick="switchListType('black')">黑名单组</div>
+          <div class="tab" onclick="switchListType('white')">白名单组</div>
+        </div>
+        <div class="search-row">
+          <input class="input with-ic" placeholder="名单名称">
+          <button class="btn btn-primary" onclick="openMask('maskNewList')">+ 添加</button>
+        </div>
+        <table class="tbl">
+          <thead><tr><th style="width:60px;">序号</th><th>名单名称</th><th style="width:110px;">操作</th></tr></thead>
+          <tbody id="leftRows"></tbody>
+        </table>
+      </div>
+
+      <!-- 右：选中名单下的人员 -->
+      <div class="card right-col">
+        <div class="card-h" id="rightTitle">人员名单 -T 黑名单人员051401</div>
+        <div class="search-row">
+          <input class="input" style="max-width:240px;" placeholder="姓名">
+          <button class="btn btn-primary">搜索</button>
+          <button class="btn">重置</button>
+          <div style="flex:1;"></div>
+          <!-- ① 变更点：批量导入按钮（添加人员右侧） -->
+          <button class="btn btn-primary" onclick="openMask('maskBatchImport')">批量导入</button>
+          <button class="btn btn-primary" onclick="openMask('maskAddPerson')">+ 添加人员</button>
+        </div>
+        <table class="tbl">
+          <thead><tr><th style="width:60px;">序号</th><th style="width:80px;">照片</th><th>姓名</th><th>备注</th><th style="width:80px;">操作</th></tr></thead>
+          <tbody id="rightRows"></tbody>
+        </table>
+        <div class="pager">
+          <span>共 1 条</span>
+          <select><option>10 条/页</option><option>20 条/页</option><option>50 条/页</option></select>
+          <span class="p-btn">‹</span>
+          <span class="p-btn active">1</span>
+          <span class="p-btn">›</span>
+          <span>前往</span>
+          <input class="ipt" style="width:50px;height:28px;text-align:center;" value="1">
+          <span>页</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+</div>
+
+<!-- 弹窗：新建名单组（② 变更点：预警处置字段） -->
+<div class="mask" id="maskNewList">
+  <div class="modal">
+    <div class="modal-h"><span id="newListTitle">新建黑名单组</span><span class="x" onclick="closeMask('maskNewList')">×</span></div>
+    <div class="modal-b">
+      <div class="form-row">
+        <label><span class="req">*</span>名单名称</label>
+        <input class="ipt" placeholder="名单名称">
+      </div>
+      <!-- ② 变更点：预警处置（位于名单名称下方） -->
+      <div class="form-row">
+        <label>预警处置 <span class="chg-flag">本期新增</span></label>
+        <textarea class="ta" placeholder="当名单内人员触发预警时的处置说明（自由输入，如：门禁联动拦截、推送安保值班人、上报属地派出所等）"></textarea>
+      </div>
+      <div class="form-row">
+        <label>描述</label>
+        <textarea class="ta" placeholder="备注"></textarea>
+      </div>
+    </div>
+    <div class="modal-f">
+      <button class="btn" onclick="closeMask('maskNewList')">取消</button>
+      <button class="btn btn-primary" onclick="closeMask('maskNewList')">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- 弹窗：批量导入 -->
+<div class="mask" id="maskBatchImport">
+  <div class="modal">
+    <div class="modal-h"><span>批量导入人员</span><span class="x" onclick="closeMask('maskBatchImport')">×</span></div>
+    <div class="modal-b">
+      <div class="form-row">
+        <label>上传文件</label>
+        <div style="border:1px dashed #d9d9d9;border-radius:4px;padding:24px;text-align:center;color:#8c8c8c;background:#fafafa;">
+          <div style="font-size:28px;color:#1890ff;margin-bottom:6px;">⬆</div>
+          <div>将 Excel / CSV 文件拖拽到此处，或<a style="color:#1890ff;cursor:pointer;">点击选择文件</a></div>
+          <div style="margin-top:8px;font-size:12px;color:#1890ff;cursor:pointer;">下载导入模板</div>
+        </div>
+      </div>
+      <div class="form-row">
+        <label>导入说明</label>
+        <textarea class="ta" placeholder="可填写本次导入的备注（选填）"></textarea>
+      </div>
+    </div>
+    <div class="modal-f">
+      <button class="btn" onclick="closeMask('maskBatchImport')">取消</button>
+      <button class="btn btn-primary" onclick="closeMask('maskBatchImport')">开始导入</button>
+    </div>
+  </div>
+</div>
+
+<!-- 弹窗：新增人员（按截图还原） -->
+<div class="mask" id="maskAddPerson">
+  <div class="modal">
+    <div class="modal-h"><span>新增人员</span><span class="x" onclick="closeMask('maskAddPerson')">×</span></div>
+    <div class="modal-b">
+      <div class="form-row">
+        <label>姓名</label>
+        <input class="ipt" placeholder="请输入姓名">
+      </div>
+      <div class="form-row">
+        <label><span class="req">*</span>人脸图片</label>
+        <div style="border:1px dashed #d9d9d9;border-radius:4px;padding:24px;text-align:center;color:#8c8c8c;background:#fafafa;">
+          <div style="font-size:28px;color:#1890ff;margin-bottom:6px;">⬆</div>
+          <div>点击上传人脸图片</div>
+          <div style="margin-top:8px;font-size:12px;">请上传人脸图片，支持 jpg/png 格式，最大 5M</div>
+        </div>
+      </div>
+      <div class="form-row">
+        <label>备注</label>
+        <textarea class="ta" placeholder="备注"></textarea>
+      </div>
+    </div>
+    <div class="modal-f">
+      <button class="btn" onclick="closeMask('maskAddPerson')">取消</button>
+      <button class="btn btn-primary" onclick="closeMask('maskAddPerson')">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- 弹窗：编辑人员（同新增结构，标题改「编辑人员」，人脸图可选 + 原图占位） -->
+<div class="mask" id="maskEditPerson">
+  <div class="modal">
+    <div class="modal-h"><span>编辑人员</span><span class="x" onclick="closeMask('maskEditPerson')">×</span></div>
+    <div class="modal-b">
+      <div class="form-row">
+        <label>姓名</label>
+        <input class="ipt" id="editName" placeholder="请输入姓名">
+      </div>
+      <div class="form-row">
+        <label>人脸图片 <span style="color:#8c8c8c;font-weight:400;">（编辑时可选，保留原图）</span></label>
+        <div style="border:1px dashed #d9d9d9;border-radius:4px;padding:24px;text-align:center;color:#8c8c8c;background:#fafafa;">
+          <div style="font-size:28px;color:#1890ff;margin-bottom:6px;">⬆</div>
+          <div>点击下方替换人脸图片（可选）</div>
+          <div style="margin-top:8px;font-size:12px;">请上传人脸图片，支持 jpg/png 格式，最大 5M</div>
+        </div>
+      </div>
+      <div class="form-row">
+        <label>备注</label>
+        <textarea class="ta" id="editRemark" placeholder="备注"></textarea>
+      </div>
+    </div>
+    <div class="modal-f">
+      <button class="btn" onclick="closeMask('maskEditPerson')">取消</button>
+      <button class="btn btn-primary" onclick="closeMask('maskEditPerson')">保存</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // 截图数据 + 黑白对称扩展
+  const DATA = {
+    black: {
+      lists: [
+        { name: 'T 黑名单人员051401' },
+        { name: '测试人员黑名单' },
+        { name: 'T 人员黑名单0604' }
+      ],
+      persons: {
+        0: [{ name: '测试', remark: '--' }],
+        1: [],
+        2: []
+      }
+    },
+    white: {
+      lists: [
+        { name: 'T 白名单人员0901' },
+        { name: '长期驻场人员' }
+      ],
+      persons: {
+        0: [{ name: '示例人员A', remark: '--' }],
+        1: []
+      }
+    }
+  };
+
+  let curType = 'black';
+  let curListIdx = 0;
+
+  function switchListType(type) {
+    curType = type;
+    curListIdx = 0;
+    document.querySelectorAll('.tab').forEach((t, i) => t.classList.toggle('active', (type === 'black' ? 0 : 1) === i));
+    renderLeft();
+    renderRight();
+  }
+
+  function renderLeft() {
+    const d = DATA[curType];
+    const rows = d.lists.map((l, i) => `
+      <tr style="${i === curListIdx ? 'background:#e6f7ff;' : ''}cursor:pointer;" onclick="selectList(${i})">
+        <td>${i + 1}</td>
+        <td>${l.name}</td>
+        <td>
+          <button class="btn-link">编辑</button>
+          <button class="btn-link danger">删除</button>
+        </td>
+      </tr>`).join('');
+    document.getElementById('leftRows').innerHTML = rows;
+  }
+
+  function selectList(i) {
+    curListIdx = i;
+    renderLeft();
+    renderRight();
+  }
+
+  function renderRight() {
+    const d = DATA[curType];
+    const cur = d.lists[curListIdx];
+    document.getElementById('rightTitle').textContent = '人员名单 -' + cur.name;
+    const persons = d.persons[curListIdx] || [];
+    if (persons.length === 0) {
+      document.getElementById('rightRows').innerHTML = `<tr><td colspan="5" style="text-align:center;color:#bfbfbf;padding:24px;">暂无数据</td></tr>`;
+    } else {
+      document.getElementById('rightRows').innerHTML = persons.map((p, i) => `
+        <tr>
+          <td>${i + 1}</td>
+          <td><span class="row-avatar">${p.name[0]}</span></td>
+          <td>${p.name}</td>
+          <td>${p.remark || ''}</td>
+          <td>
+            <button class="btn-link" onclick="openEditPerson(${i})">编辑</button>
+            <button class="btn-link danger">删除</button>
+          </td>
+        </tr>`).join('');
+    }
+  }
+
+  function openMask(id) { document.getElementById(id).classList.add('show'); }
+  function closeMask(id) { document.getElementById(id).classList.remove('show'); }
+  function openNewList() {
+    document.getElementById('newListTitle').textContent = (curType === 'black' ? '新建黑名单组' : '新建白名单组');
+    openMask('maskNewList');
+  }
+  function openEditPerson(i) {
+    const p = DATA[curType].persons[curListIdx][i];
+    document.getElementById('editName').value = p.name || '';
+    document.getElementById('editRemark').value = p.remark || '';
+    openMask('maskEditPerson');
+  }
+
+  // 初始化
+  renderLeft();
+  renderRight();
+</script>
+</body>
+</html>
