@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>通行设备-离线告警触发 - 智慧园区</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+      background: #f0f2f5;
+      color: rgba(0, 0, 0, 0.85);
+      font-size: 14px;
+    }
+    .layout { display: flex; min-height: 100vh; }
+    .sidebar {
+      width: 208px; background: #001529; color: rgba(255, 255, 255, 0.65);
+      flex-shrink: 0; overflow-y: auto;
+    }
+    .logo {
+      height: 64px; display: flex; align-items: center; padding-left: 24px;
+      color: #fff; font-size: 18px; font-weight: 600; background: #002140;
+    }
+    .menu-item {
+      padding: 12px 24px 12px 48px; cursor: pointer; transition: all 0.3s;
+      font-size: 14px; position: relative;
+    }
+    .menu-item:hover { color: #fff; }
+    .menu-item.active { color: #fff; background: #1890ff; }
+    .menu-group {
+      padding: 12px 24px 12px 24px; cursor: pointer;
+      font-size: 14px; font-weight: 500;
+    }
+    .menu-group.expanded { color: #fff; }
+    .main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+    .header {
+      height: 56px; background: #fff; border-bottom: 1px solid #f0f0f0;
+      display: flex; align-items: center; padding: 0 24px;
+    }
+    .breadcrumb { color: rgba(0, 0, 0, 0.45); }
+    .breadcrumb .sep { margin: 0 8px; }
+    .header-right { margin-left: auto; display: flex; align-items: center; gap: 16px; }
+    .header-icon { cursor: pointer; color: rgba(0, 0, 0, 0.65); position: relative; }
+    .avatar {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: #1890ff; color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px;
+    }
+    .tab-bar {
+      background: #fff; padding: 8px 24px 0;
+      border-bottom: 1px solid #f0f0f0; display: flex; align-items: center; gap: 4px;
+      overflow-x: auto; white-space: nowrap;
+    }
+    .tab {
+      padding: 8px 16px; cursor: pointer;
+      border: 1px solid transparent; border-bottom: none;
+      border-radius: 4px 4px 0 0; color: rgba(0, 0, 0, 0.65);
+    }
+    .tab.active {
+      color: #1890ff; border-color: #f0f0f0;
+      background: #fff; position: relative; top: 1px;
+    }
+    .tab .icon-home { margin-right: 4px; }
+    .tab-actions { margin-left: auto; padding-bottom: 8px; display: flex; gap: 8px; }
+    .icon-btn {
+      width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;
+      border: 1px solid #d9d9d9; border-radius: 4px; cursor: pointer; background: #fff;
+      color: rgba(0, 0, 0, 0.65);
+    }
+    .icon-btn:hover { color: #1890ff; border-color: #1890ff; }
+
+    .content { padding: 16px 16px; flex: 1; min-height: 0; }
+    .panels { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .panel {
+      background: #fff; border-radius: 4px; padding: 16px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+    }
+    .panel-title {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 15px; font-weight: 600; margin-bottom: 12px;
+    }
+    .panel-title .badge {
+      background: #e6f7ff; color: #1890ff; font-size: 12px;
+      padding: 2px 8px; border-radius: 10px; font-weight: normal;
+    }
+    .panel-title .meta-tip {
+      margin-left: auto; color: rgba(0, 0, 0, 0.45); font-size: 12px; font-weight: normal;
+    }
+    .filter-bar {
+      display: flex; align-items: center; gap: 12px; padding: 12px;
+      background: #fafafa; border-radius: 4px; margin-bottom: 12px; flex-wrap: wrap;
+    }
+    .filter-item { display: flex; align-items: center; gap: 6px; }
+    .filter-item label { color: rgba(0, 0, 0, 0.65); white-space: nowrap; }
+    .filter-item input, .filter-item select {
+      padding: 4px 10px; border: 1px solid #d9d9d9; border-radius: 4px;
+      background: #fff; font-size: 14px; min-width: 140px;
+    }
+    .btn {
+      padding: 4px 14px; border-radius: 4px; cursor: pointer;
+      font-size: 14px; border: 1px solid transparent; display: inline-flex;
+      align-items: center; gap: 4px;
+    }
+    .btn-primary { background: #1890ff; color: #fff; border-color: #1890ff; }
+    .btn-primary:hover { background: #40a9ff; border-color: #40a9ff; }
+    .btn-default { background: #fff; color: rgba(0, 0, 0, 0.85); border-color: #d9d9d9; }
+    .btn-default:hover { color: #1890ff; border-color: #1890ff; }
+    /* .btn-danger removed — use btn-primary for primary action */
+
+    .table-wrap { overflow-x: auto; }
+    table {
+      width: 100%; border-collapse: collapse;
+      font-size: 13px;
+    }
+    table th, table td {
+      padding: 12px 8px; text-align: left;
+      border-bottom: 1px solid #f0f0f0;
+      white-space: nowrap;
+    }
+    table th {
+      background: #fafafa; font-weight: 500; color: rgba(0, 0, 0, 0.85);
+    }
+    table tr:hover td { background: #fafafa; }
+    .status-tag {
+      display: inline-block; padding: 2px 8px; border-radius: 2px;
+      font-size: 12px; line-height: 20px;
+    }
+    .status-online { color: #52c41a; background: #f6ffed; border: 1px solid #b7eb8f; }
+    .status-offline { color: #ff4d4f; background: #fff1f0; border: 1px solid #ffa39e; }
+    .status-alarmed {
+      color: #fa8c16; background: #fff7e6; border: 1px solid #ffd591;
+      display: inline-flex; align-items: center; gap: 4px;
+    }
+    .status-muted { color: rgba(0,0,0,0.45); }
+    .link {
+      color: #1890ff; cursor: pointer; padding: 0 6px;
+      border: none; background: transparent; font-size: 13px;
+    }
+    .link:hover { text-decoration: underline; }
+    .link:focus { outline: none; }
+    .link:disabled, .link.disabled {
+      color: rgba(0,0,0,0.25); cursor: not-allowed; text-decoration: none;
+    }
+    .action-cell { white-space: nowrap; }
+    .action-cell .sep { color: rgba(0,0,0,0.15); }
+    .toolbar {
+      display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;
+    }
+    .toolbar-left { display: flex; gap: 8px; }
+    .toolbar-left .btn-export {
+      display: inline-flex; align-items: center; gap: 4px; color: rgba(0,0,0,0.65);
+      background: #fff; border: 1px solid #d9d9d9;
+    }
+    .pagination {
+      display: flex; align-items: center; justify-content: flex-end;
+      padding: 12px 0; gap: 12px; color: rgba(0,0,0,0.65); font-size: 13px;
+    }
+    .pagination .sizes select {
+      padding: 2px 6px; border: 1px solid #d9d9d9; border-radius: 4px; background: #fff;
+    }
+    .pagination .pager {
+      display: inline-flex; align-items: center; gap: 4px;
+    }
+    .pagination .pager .item {
+      min-width: 28px; height: 28px; padding: 0 6px; border: 1px solid #d9d9d9;
+      background: #fff; display: flex; align-items: center; justify-content: center;
+      cursor: pointer; border-radius: 4px; font-size: 13px;
+    }
+    .pagination .pager .item.active { color: #fff; background: #1890ff; border-color: #1890ff; }
+    .pagination .pager .item.disabled { color: rgba(0,0,0,0.25); cursor: not-allowed; }
+    .jumper { display: inline-flex; align-items: center; gap: 4px; }
+    .jumper input {
+      width: 50px; padding: 2px 6px; border: 1px solid #d9d9d9; border-radius: 4px; text-align: center;
+    }
+
+    /* Modal */
+    .mask {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.45);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 1000;
+    }
+    .modal {
+      background: #fff; border-radius: 4px; width: 520px;
+      box-shadow: 0 6px 16px -8px rgba(0,0,0,0.08), 0 9px 28px 0 rgba(0,0,0,0.05), 0 12px 48px 16px rgba(0,0,0,0.03);
+      animation: modalIn 0.2s ease-out;
+    }
+    @keyframes modalIn { from { transform: translateY(-12px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    .modal-header {
+      padding: 16px 24px; border-bottom: 1px solid #f0f0f0;
+      display: flex; align-items: center;
+      font-size: 16px; font-weight: 500;
+    }
+    .modal-header .icon-warn {
+      width: 22px; height: 22px; border-radius: 50%; background: #fff7e6;
+      color: #fa8c16; display: inline-flex; align-items: center; justify-content: center;
+      margin-right: 10px; font-weight: bold;
+    }
+    .modal-footer {
+      padding: 12px 24px; border-top: 1px solid #f0f0f0;
+      display: flex; justify-content: flex-end; gap: 8px;
+    }
+    .modal-footer .btn { padding: 6px 18px; font-size: 14px; }
+
+    /* Toast */
+    .toast {
+      position: fixed; top: 24px; left: 50%; transform: translateX(-50%);
+      background: #fff; border-radius: 4px; box-shadow: 0 3px 6px -4px rgba(0,0,0,0.12), 0 6px 16px 0 rgba(0,0,0,0.08), 0 9px 28px 8px rgba(0,0,0,0.05);
+      padding: 10px 16px; display: flex; align-items: center; gap: 8px;
+      z-index: 2000; font-size: 14px;
+      animation: toastIn 0.2s ease-out;
+    }
+    @keyframes toastIn { from { transform: translate(-50%, -12px); opacity: 0; } to { transform: translate(-50%, 0); opacity: 1; } }
+    .toast-success { border-left: 3px solid #52c41a; }
+    .toast-success .ic { color: #52c41a; font-weight: bold; }
+
+    /* Highlight 在线/离线/已告警 在 demo 中用状态条 */
+    .demo-legend {
+      background: #fff; border-radius: 4px; padding: 12px 16px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.03); margin-bottom: 16px;
+      display: flex; gap: 24px; align-items: center; flex-wrap: wrap;
+      font-size: 13px; color: rgba(0,0,0,0.65);
+    }
+    .demo-legend strong { color: rgba(0,0,0,0.85); margin-right: 12px; }
+    .demo-legend .lg-item { display: inline-flex; align-items: center; gap: 6px; }
+    .demo-legend .lg-sw {
+      display: inline-block; padding: 2px 8px; border-radius: 2px; font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+<div class="layout">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="logo">智慧园区</div>
+    <div class="menu-item">首页</div>
+    <div class="menu-group">智慧安防</div>
+    <div class="menu-group">智慧消防</div>
+    <div class="menu-group">员工管理</div>
+    <div class="menu-group" style="color:#fff;">人员通行</div>
+    <div class="menu-item">出入口管理</div>
+    <div class="menu-item">通行记录</div>
+    <div class="menu-item">通行设置</div>
+    <div class="menu-item active">通行设备</div>
+    <div class="menu-item">设备地图</div>
+    <div class="menu-item">通行权限</div>
+    <div class="menu-item">我的门禁申请</div>
+    <div class="menu-item">门禁区域管理员配置</div>
+    <div class="menu-item">门禁申请审批</div>
+    <div class="menu-group" style="color:#fff;">车辆通行</div>
+    <div class="menu-item">出入口管理</div>
+    <div class="menu-item">车辆通行记录</div>
+    <div class="menu-item">车位申请</div>
+    <div class="menu-item">通行证信息管理</div>
+    <div class="menu-item">设备地图</div>
+    <div class="menu-item active">通行设备</div>
+    <div class="menu-item">车辆审批-后勤部</div>
+    <div class="menu-item">车辆审批-指导老师</div>
+  </aside>
+
+  <!-- Main -->
+  <section class="main">
+    <div class="header">
+      <div class="breadcrumb"><span class="icon-home">🏠</span> 人员通行 / 通行设备 <span style="margin-left:16px;color:rgba(0,0,0,0.65);">| 车辆通行 / 通行设备</span></div>
+      <div class="header-right">
+        <span class="header-icon">意见反馈</span>
+        <span class="header-icon">下载中心插件</span>
+        <span class="header-icon">🔔</span>
+        <div class="avatar">管</div>
+        <span style="font-size:13px;">管理员</span>
+      </div>
+    </div>
+
+    <div class="tab-bar">
+      <div class="tab active"><span class="icon-home">🏠</span> 首页</div>
+      <div class="tab">黑白名单</div>
+      <div class="tab">人员布控</div>
+      <div class="tab">车俩黑名单</div>
+      <div class="tab">车俩审批-后勤部</div>
+      <div class="tab">通行设备</div>
+      <div class="tab">实时告警</div>
+      <div class="tab">设备资产</div>
+      <div class="tab">设备台账</div>
+      <div class="tab">设备地图</div>
+      <div class="tab">设备地图</div>
+      <div class="tab-actions">
+        <div class="icon-btn">»</div>
+        <div class="icon-btn">⟳</div>
+        <div class="icon-btn">⌘</div>
+      </div>
+    </div>
+
+    <div class="content">
+      <!-- (状态说明区已按老板要求删除——避免过多视觉强调) -->
+
+      <!-- Two Panels -->
+      <div class="panels">
+
+        <!-- LEFT: 人员通行 - 通行设备 -->
+        <div class="panel" id="panel-person">
+          <div class="panel-title">
+            <span>设备信息</span>
+            <span class="badge">人员通行 / 通行设备</span>
+            <span class="meta-tip">门禁类设备 · 离线时可触发告警</span>
+          </div>
+
+          <div class="filter-bar">
+            <div class="filter-item"><label>设备编码</label><input placeholder="请输入"/></div>
+            <div class="filter-item"><label>设备名称</label><input placeholder="请输入"/></div>
+            <div class="filter-item"><label>所属子系统</label>
+              <select><option>请选择</option><option>门禁子系统</option><option>安防子系统</option></select>
+            </div>
+            <button class="btn btn-primary">🔍 搜索</button>
+            <button class="btn btn-default">↺ 重置</button>
+            <span style="margin-left:auto;color:#1890ff;font-size:13px;cursor:pointer;">展开 ▾</span>
+          </div>
+
+          <div class="toolbar">
+            <div class="toolbar-left">
+              <button class="btn btn-export">⬇ 导出</button>
+            </div>
+          </div>
+
+          <div class="table-wrap">
+            <table id="table-person">
+              <thead>
+                <tr>
+                  <th style="width:48px;">序号</th>
+                  <th>设备编码</th>
+                  <th>设备名称</th>
+                  <th>设备类型</th>
+                  <th>规格型号</th>
+                  <th>所在区域</th>
+                  <th>所属子系统</th>
+                  <th>设备状态</th>
+                  <th style="width:150px;">操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr data-row-id="p1">
+                  <td>1</td><td>GDMJ2CED3B8…</td><td>KY2-D2-2-RD-…</td>
+                  <td>门禁</td><td>楼宇133-公共</td><td>苏州实验室</td><td>--</td>
+                  <td><span class="status-tag status-online">在线</span></td>
+                  <td class="action-cell"><button class="link">详情</button></td>
+                </tr>
+                <tr data-row-id="p2">
+                  <td>2</td><td>GDMJ3A3E33BC…</td><td>KY2-D2-3-RD-…</td>
+                  <td>门禁</td><td>楼宇133-公共</td><td>苏州实验室</td><td>--</td>
+                  <td><span class="status-tag status-online">在线</span></td>
+                  <td class="action-cell"><button class="link">详情</button></td>
+                </tr>
+                <tr data-row-id="p3">
+                  <td>3</td><td>GDMJ3DFE3B8…</td><td>KY2-D2-3-RD-…</td>
+                  <td>门禁</td><td>楼宇133-公共</td><td>苏州实验室</td><td>--</td>
+                  <td><span class="status-tag status-offline">离线</span></td>
+                  <td class="action-cell">
+                    <button class="link">详情</button>
+                    <span class="sep">|</span>
+                    <button class="link" onclick="openAlarm('p3', '人员通行-门禁')">告警</button>
+                  </td>
+                </tr>
+                <tr data-row-id="p4">
+                  <td>4</td><td>GDMJ4F13B8…</td><td>KY2-D2-3-RD-…</td>
+                  <td>门禁</td><td>楼宇133-公共</td><td>苏州实验室</td><td>--</td>
+                  <td><span class="status-tag status-offline">离线</span></td>
+                  <td class="action-cell">
+                    <button class="link">详情</button>
+                    <span class="sep">|</span>
+                    <button class="link" onclick="openAlarm('p4', '人员通行-门禁')">告警</button>
+                  </td>
+                </tr>
+                <tr data-row-id="p5">
+                  <td>5</td><td>GDMJ5G18B8…</td><td>KY2-D2-3-RD-…</td>
+                  <td>门禁</td><td>楼宇133-公共</td><td>苏州实验室</td><td>--</td>
+                  <td><span class="status-tag status-offline">离线</span></td>
+                  <td class="action-cell">
+                    <button class="link">详情</button>
+                    <span class="sep">|</span>
+                    <button class="link disabled">告警</button>
+                  </td>
+                </tr>
+                <tr data-row-id="p6">
+                  <td>6</td><td>GDMJ6B743BC…</td><td>KY2-D2-3-RD-…</td>
+                  <td>门禁</td><td>楼宇133-公共</td><td>苏州实验室</td><td>--</td>
+                  <td><span class="status-tag status-online">在线</span></td>
+                  <td class="action-cell"><button class="link">详情</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="pagination">
+            <span>共 2259 条</span>
+            <span class="sizes">10条/页 <select><option>10条/页</option><option>20条/页</option><option>50条/页</option></select></span>
+            <span class="pager">
+              <span class="item disabled">‹</span>
+              <span class="item active">1</span>
+              <span class="item">2</span>
+              <span class="item">3</span>
+              <span class="item">4</span>
+              <span class="item">5</span>
+              <span class="item">6</span>
+              <span class="item">…</span>
+              <span class="item">226</span>
+              <span class="item">›</span>
+            </span>
+            <span class="jumper">前往 <input value="1"/> 页</span>
+          </div>
+        </div>
+
+        <!-- RIGHT: 车辆通行 - 通行设备 -->
+        <div class="panel" id="panel-vehicle">
+          <div class="panel-title">
+            <span>设备信息</span>
+            <span class="badge">车辆通行 / 通行设备</span>
+            <span class="meta-tip">道闸/对讲/主机 · 离线时可触发告警</span>
+          </div>
+
+          <div class="filter-bar">
+            <div class="filter-item"><label>设备编码</label><input placeholder="请输入"/></div>
+            <div class="filter-item"><label>设备名称</label><input placeholder="请输入"/></div>
+            <div class="filter-item"><label>所属子系统</label>
+              <select><option>请选择</option><option>车辆道闸子系统</option><option>安防子系统</option></select>
+            </div>
+            <button class="btn btn-primary">🔍 搜索</button>
+            <button class="btn btn-default">↺ 重置</button>
+            <span style="margin-left:auto;color:#1890ff;font-size:13px;cursor:pointer;">展开 ▾</span>
+          </div>
+
+          <div class="toolbar">
+            <div class="toolbar-left">
+              <button class="btn btn-export">⬇ 导出</button>
+            </div>
+          </div>
+
+          <div class="table-wrap">
+            <table id="table-vehicle">
+              <thead>
+                <tr>
+                  <th style="width:48px;">序号</th>
+                  <th>设备编码</th>
+                  <th>设备名称</th>
+                  <th>设备类型</th>
+                  <th>规格型号</th>
+                  <th>所在区域</th>
+                  <th>所属子系统</th>
+                  <th>设备状态</th>
+                  <th style="width:150px;">操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr data-row-id="v1">
+                  <td>1</td><td>10.3.150.131</td><td>平台对讲</td>
+                  <td>道闸设备</td><td>楼宇133-集水井</td><td>苏州实验室</td><td>--</td>
+                  <td><span class="status-tag status-online">在线</span></td>
+                  <td class="action-cell"><button class="link">详情</button></td>
+                </tr>
+                <tr data-row-id="v2">
+                  <td>2</td><td>10.3.150.132</td><td>平台对讲</td>
+                  <td>道闸设备</td><td>楼宇133-集水井</td><td>苏州实验室</td><td>--</td>
+                  <td><span class="status-tag status-offline">离线</span></td>
+                  <td class="action-cell">
+                    <button class="link">详情</button>
+                    <span class="sep">|</span>
+                    <button class="link" onclick="openAlarm('v2', '车辆通行-道闸')">告警</button>
+                  </td>
+                </tr>
+                <tr data-row-id="v3">
+                  <td>3</td><td>10.3.150.133</td><td>平台对讲</td>
+                  <td>道闸设备</td><td>楼宇133-集水井</td><td>苏州实验室</td><td>--</td>
+                  <td><span class="status-tag status-online">在线</span></td>
+                  <td class="action-cell"><button class="link">详情</button></td>
+                </tr>
+                <tr data-row-id="v4">
+                  <td>4</td><td>10.3.150.134</td><td>平台对讲</td>
+                  <td>道闸设备</td><td>楼宇133-集水井</td><td>苏州实验室</td><td>--</td>
+                  <td><span class="status-tag status-online">在线</span></td>
+                  <td class="action-cell"><button class="link">详情</button></td>
+                </tr>
+                <tr data-row-id="v5">
+                  <td>5</td><td>10.3.150.135</td><td>平台对讲</td>
+                  <td>道闸设备</td><td>楼宇133-集水井</td><td>苏州实验室</td><td>--</td>
+                  <td><span class="status-tag status-offline">离线</span></td>
+                  <td class="action-cell">
+                    <button class="link">详情</button>
+                    <span class="sep">|</span>
+                    <button class="link" onclick="openAlarm('v5', '车辆通行-道闸')">告警</button>
+                  </td>
+                </tr>
+                <tr data-row-id="v6">
+                  <td>6</td><td>10.3.150.86</td><td>主机柜</td>
+                  <td>道闸设备</td><td>楼宇133-集水井</td><td>苏州实验室</td><td>--</td>
+                  <td><span class="status-tag status-offline">离线</span></td>
+                  <td class="action-cell">
+                    <button class="link">详情</button>
+                    <span class="sep">|</span>
+                    <button class="link disabled">告警</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="pagination">
+            <span>共 79 条</span>
+            <span class="sizes">10条/页 <select><option>10条/页</option><option>20条/页</option><option>50条/页</option></select></span>
+            <span class="pager">
+              <span class="item disabled">‹</span>
+              <span class="item active">1</span>
+              <span class="item">2</span>
+              <span class="item">3</span>
+              <span class="item">4</span>
+              <span class="item">5</span>
+              <span class="item">6</span>
+              <span class="item">…</span>
+              <span class="item">8</span>
+              <span class="item">›</span>
+            </span>
+            <span class="jumper">前往 <input value="1"/> 页</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- Modal -->
+<div class="mask" id="modal" style="display:none;">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="icon-warn">!</span>
+      <span>触发离线告警确认</span>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-default" onclick="closeModal()">取消</button>
+      <button class="btn btn-primary" onclick="confirmAlarm()">确认触发</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // 设备 mock 数据，简化版
+  const deviceMock = {
+    p3: { code:'GDMJ3DFE3B8-001', name:'KY2-D2-3-RD-003', sub:'门禁子系统', area:'楼宇133-公共' },
+    p4: { code:'GDMJ4F13B8-001', name:'KY2-D2-3-RD-004', sub:'门禁子系统', area:'楼宇133-公共' },
+    v2: { code:'10.3.150.132',   name:'平台对讲-02',      sub:'车辆道闸子系统', area:'楼宇133-集水井' },
+    v5: { code:'10.3.150.135',   name:'平台对讲-05',      sub:'车辆道闸子系统', area:'楼宇133-集水井' }
+  };
+  let currentRowId = null;
+
+  function openAlarm(rowId, group) {
+    currentRowId = rowId;
+    if (!deviceMock[rowId]) return;
+    document.getElementById('modal').style.display = 'flex';
+  }
+  function closeModal() {
+    document.getElementById('modal').style.display = 'none';
+    currentRowId = null;
+  }
+  function confirmAlarm() {
+    if (!currentRowId) return;
+    // 找到表格行
+    const row = document.querySelector(`tr[data-row-id="${currentRowId}"]`);
+    if (!row) return;
+    // 替换操作列：告警按钮置灰禁用（不再整行标记、不再显示「已告警」文案）
+    const cell = row.querySelector('.action-cell');
+    cell.innerHTML = `
+      <button class="link">详情</button>
+      <span class="sep">|</span>
+      <button class="link disabled">告警</button>`;
+    closeModal();
+    showToast(`已为设备 ${deviceMock[currentRowId].name} 触发离线告警`);
+  }
+  function showToast(msg) {
+    const old = document.querySelector('.toast');
+    if (old) old.remove();
+    const el = document.createElement('div');
+    el.className = 'toast toast-success';
+    el.innerHTML = `<span class="ic">✓</span><span>${msg}</span>`;
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 2600);
+  }
+  // 点击遮罩关闭
+  document.getElementById('modal').addEventListener('click', e => {
+    if (e.target.id === 'modal') closeModal();
+  });
+</script>
+
+</body>
+</html>
