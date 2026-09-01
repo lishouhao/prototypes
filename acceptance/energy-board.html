@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<title>能耗看板 - 园区运行态势</title>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif; color: #1f2329; font-size: 14px; background: #f0f2f5; }
+
+  /* 整体布局 */
+  .app { display: flex; height: 100vh; min-width: 1280px; }
+
+  /* 左侧菜单 */
+  .sidebar { width: 208px; background: #001529; color: rgba(255,255,255,0.85); flex-shrink: 0; overflow-y: auto; }
+  .logo { height: 56px; display: flex; align-items: center; padding: 0 16px; color: #fff; font-weight: 600; border-bottom: 1px solid rgba(255,255,255,0.06); }
+  .logo-icon { width: 28px; height: 28px; border-radius: 4px; background: #4165EC; display: inline-flex; align-items: center; justify-content: center; margin-right: 10px; font-size: 14px; }
+  .menu { list-style: none; padding: 8px 0; }
+  .menu-item { display: flex; align-items: center; padding: 0 24px; height: 40px; color: rgba(255,255,255,0.85); cursor: pointer; font-size: 14px; transition: all .15s; }
+  .menu-item:hover { background: rgba(255,255,255,0.06); }
+  .menu-item .icon { width: 16px; height: 16px; margin-right: 10px; display: inline-flex; align-items: center; justify-content: center; opacity: .9; font-size: 14px; }
+  .menu-item .arrow { margin-left: auto; font-size: 10px; opacity: .6; transition: transform .2s; }
+  .menu-item.open .arrow { transform: rotate(90deg); }
+  .submenu { list-style: none; background: #000c17; }
+  .submenu .menu-item { padding-left: 48px; font-size: 13px; height: 36px; color: rgba(255,255,255,0.7); }
+  .submenu .menu-item.active { color: #fff; background: #4165EC; }
+  .submenu .menu-item.active::before { content: ""; display: inline-block; width: 3px; height: 16px; background: #fff; margin-right: 0; position: absolute; left: 0; }
+
+  /* 主区域 */
+  .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+  /* 顶栏 */
+  .topbar { height: 48px; background: #fff; display: flex; align-items: center; padding: 0 24px; border-bottom: 1px solid #e5e6eb; flex-shrink: 0; }
+  .breadcrumb { color: #1f2329; font-size: 13px; }
+  .breadcrumb .sep { color: #c9cdd4; margin: 0 6px; }
+  .topbar-right { margin-left: auto; display: flex; align-items: center; gap: 16px; font-size: 13px; color: #4e5969; }
+  .topbar-right .link { color: #4165EC; cursor: pointer; }
+  .topbar-right .bell { width: 16px; height: 16px; border-radius: 50%; background: #f0f2f5; display: inline-flex; align-items: center; justify-content: center; font-size: 11px; }
+  .topbar-right .avatar { width: 28px; height: 28px; border-radius: 50%; background: linear-gradient(135deg,#5470c6,#4165EC); color: #fff; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; }
+  .topbar-right .user { display: inline-flex; align-items: center; gap: 6px; }
+
+  /* 一级导航 tab */
+  .nav-tabs { background: #fff; border-bottom: 1px solid #e5e6eb; padding: 0 24px; display: flex; gap: 32px; flex-shrink: 0; }
+  .nav-tabs .tab { padding: 14px 0; color: #1f2329; cursor: pointer; font-size: 14px; position: relative; }
+  .nav-tabs .tab.active { color: #4165EC; font-weight: 500; }
+  .nav-tabs .tab.active::after { content: ""; position: absolute; bottom: -1px; left: 0; right: 0; height: 2px; background: #4165EC; }
+
+  /* 二级 tab 区 */
+  .second-tabs { background: #fff; padding: 0 24px; display: flex; gap: 4px; border-bottom: 1px solid #e5e6eb; flex-shrink: 0; }
+  .second-tabs .tab { padding: 12px 16px; cursor: pointer; color: #4e5969; font-size: 13px; border-radius: 4px 4px 0 0; }
+  .second-tabs .tab:hover { color: #4165EC; }
+  .second-tabs .tab.active { color: #4165EC; font-weight: 500; background: #f0f5ff; position: relative; }
+  .second-tabs .tab.active::after { content: ""; position: absolute; bottom: -1px; left: 12px; right: 12px; height: 2px; background: #4165EC; }
+
+  /* 内容区 */
+  .content { flex: 1; overflow-y: auto; padding: 16px; background: #f0f2f5; }
+  .tab-pane { display: none; }
+  .tab-pane.active { display: block; }
+
+  /* 标题块 */
+  .title-block { background: #fff; padding: 14px 20px; border-radius: 6px; margin-bottom: 16px; font-size: 15px; font-weight: 500; color: #1f2329; display: flex; align-items: center; }
+  .title-block::before { content: ""; display: inline-block; width: 3px; height: 14px; background: #4165EC; margin-right: 10px; border-radius: 2px; }
+
+  /* 卡片网格 */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .grid-meeting-top { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+  .grid-meeting-bottom { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px; }
+
+  /* 卡片 */
+  .card { background: #fff; border-radius: 6px; padding: 20px; box-shadow: 0 1px 2px rgba(0,0,0,0.03); }
+  .card-title { font-size: 14px; font-weight: 500; color: #1f2329; margin-bottom: 16px; display: flex; align-items: center; }
+  .card-title::before { content: ""; display: inline-block; width: 3px; height: 12px; background: #4165EC; margin-right: 8px; border-radius: 2px; }
+  .card-title .right { margin-left: auto; font-size: 12px; color: #8c8c8c; font-weight: normal; cursor: pointer; }
+
+  /* 会议看板 - 会议室概况 */
+  .room-stat { display: flex; align-items: center; }
+  .room-stat .num { font-size: 36px; font-weight: 600; color: #4165EC; margin-right: 8px; }
+  .room-stat .num-cap { font-size: 12px; color: #8c8c8c; }
+  .room-stat .legend { margin-left: 32px; font-size: 13px; color: #4e5969; }
+  .room-stat .legend li { list-style: none; padding: 4px 0; display: flex; align-items: center; }
+  .room-stat .legend .dot { width: 8px; height: 8px; border-radius: 50%; margin-right: 8px; display: inline-block; }
+  .room-stat .legend .num-s { margin-left: auto; padding-left: 16px; font-weight: 500; color: #1f2329; }
+
+  /* 会议看板 - 状态卡片 */
+  .stat-cards { display: flex; flex-direction: column; gap: 12px; }
+  .stat-card { background: #fff; border: 1px solid #e5e6eb; border-radius: 6px; padding: 14px 16px; display: flex; align-items: center; }
+  .stat-card .icon { width: 32px; height: 32px; border-radius: 4px; display: inline-flex; align-items: center; justify-content: center; margin-right: 12px; font-size: 16px; color: #4165EC; background: #f0f5ff; }
+  .stat-card .label { font-size: 12px; color: #8c8c8c; }
+  .stat-card .value { font-size: 20px; font-weight: 600; color: #1f2329; }
+  .stat-card .unit { font-size: 12px; color: #8c8c8c; margin-left: 4px; }
+  .stat-card .right { margin-left: auto; text-align: right; }
+  .stat-card .delta { font-size: 11px; color: #8c8c8c; }
+
+  /* 图表容器 */
+  .chart { width: 100%; height: 280px; }
+  .chart-sm { width: 100%; height: 240px; }
+
+  /* 能耗告警表格 */
+  .alarm-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .alarm-table th, .alarm-table td { padding: 10px 12px; border-bottom: 1px solid #f0f0f0; text-align: left; }
+  .alarm-table th { background: #fafafa; font-weight: 500; color: #4e5969; font-size: 12px; }
+  .alarm-table td { color: #1f2329; }
+  .alarm-table .col-num { color: #8c8c8c; }
+  .table-wrap { max-height: 320px; overflow-y: auto; }
+
+  /* 仪表图占位（数据加载中） */
+  .gauge-empty { width: 100%; height: 280px; display: flex; align-items: center; justify-content: center; color: #c9cdd4; font-size: 13px; }
+
+  /* 用水趋势分析 查询条件 */
+  .filter-bar { display: flex; align-items: center; gap: 20px; margin-bottom: 16px; flex-wrap: wrap; }
+  .filter-item { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #4e5969; }
+  .filter-item label { color: #1f2329; }
+  .filter-item select, .filter-item input { height: 32px; border: 1px solid #d9d9d9; border-radius: 4px; padding: 0 10px; font-size: 13px; color: #1f2329; outline: none; }
+  .filter-item select:focus, .filter-item input:focus { border-color: #4165EC; }
+  .filter-item .tilde { color: #c9cdd4; }
+  .btn-primary { height: 32px; padding: 0 16px; background: #4165EC; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-size: 13px; margin-left: auto; }
+  .btn-primary:hover { background: #3a5bd0; }
+
+  /* 能源空间 树形选择器（组织架构层级） */
+  .treeselect { position: relative; }
+  .treeselect-input { min-width: 220px; height: 32px; border: 1px solid #d9d9d9; border-radius: 4px; padding: 0 10px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; background: #fff; color: #1f2329; }
+  .treeselect-input:hover { border-color: #4165EC; }
+  .ts-arrow { color: #8c8c8c; font-size: 10px; }
+  .treeselect-panel { position: absolute; top: 36px; left: 0; z-index: 50; min-width: 260px; max-height: 280px; overflow: auto; background: #fff; border: 1px solid #e5e6eb; border-radius: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.12); padding: 4px 0; }
+  .tree-node { display: flex; align-items: center; padding: 6px 12px; font-size: 13px; cursor: pointer; color: #1f2329; }
+  .tree-node:hover { background: #f0f5ff; }
+  .tree-node.selected { background: #e6eeff; color: #4165EC; font-weight: 500; }
+  .tree-node .twist { width: 16px; text-align: center; color: #8c8c8c; flex-shrink: 0; }
+  .tree-node .nm { flex: 1; }
+  .filter-hint { color: #c9cdd4; font-size: 12px; margin-left: -4px; }
+
+  /* 提示 */
+  .demo-tip { position: fixed; right: 16px; bottom: 16px; background: rgba(0,0,0,0.75); color: #fff; padding: 8px 14px; border-radius: 4px; font-size: 12px; z-index: 99; }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- 左侧菜单 -->
+  <aside class="sidebar">
+    <div class="logo">
+      <span class="logo-icon">智</span>
+      <span>智慧园区</span>
+    </div>
+    <ul class="menu">
+      <li class="menu-item"><span class="icon">⌂</span>首页</li>
+      <li class="menu-item"><span class="icon">◈</span>智慧安防</li>
+      <li class="menu-item"><span class="icon">⇆</span>智慧通行</li>
+      <li class="menu-item"><span class="icon">⬢</span>智慧办公</li>
+      <li class="menu-item"><span class="icon">⌗</span>物业管理（外协）</li>
+      <li class="menu-item"><span class="icon">▦</span>场地管理</li>
+      <li class="menu-item"><span class="icon">⌬</span>智慧物联</li>
+      <li class="menu-item"><span class="icon">⚙</span>设备管理</li>
+      <li class="menu-item"><span class="icon">⚡</span>智慧能源</li>
+      <li class="menu-item"><span class="icon">⌗</span>设备管理</li>
+      <li class="menu-item"><span class="icon">☷</span>会议室管理</li>
+      <li class="menu-item open" onclick="toggleSubmenu(this)">
+        <span class="icon">▣</span>园区运行态势<span class="arrow">▶</span>
+      </li>
+      <ul class="submenu" id="submenu-runtime">
+        <li class="menu-item">园区态势看板</li>
+        <li class="menu-item">控制设备</li>
+        <li class="menu-item">设备运营</li>
+        <li class="menu-item">场景化管理</li>
+        <li class="menu-item">控制计划</li>
+        <li class="menu-item">场景联动</li>
+        <li class="menu-item active">园区运行态势</li>
+        <li class="menu-item">信息看板</li>
+        <li class="menu-item">规则管理</li>
+        <li class="menu-item">公告管理</li>
+      </ul>
+      <li class="menu-item"><span class="icon">⇄</span>对外数据管控平台</li>
+    </ul>
+  </aside>
+
+  <!-- 主区域 -->
+  <div class="main">
+
+    <!-- 顶栏 -->
+    <header class="topbar">
+      <div class="breadcrumb">预约管理平台<span class="sep">/</span><span>园区运行态势</span></div>
+      <div class="topbar-right">
+        <span class="link">事项反馈</span>
+        <span class="link">下载申报指引</span>
+        <span class="bell">🔔</span>
+        <span class="user"><span class="avatar">管</span><span>管理员</span></span>
+      </div>
+    </header>
+
+    <!-- 一级导航 -->
+    <nav class="nav-tabs">
+      <div class="tab">首页</div>
+      <div class="tab">园区态势看板</div>
+      <div class="tab">控制设备</div>
+      <div class="tab">设备运营</div>
+      <div class="tab">场景化管理</div>
+      <div class="tab">控制计划</div>
+      <div class="tab">场景联动</div>
+      <div class="tab active">园区运行态势</div>
+    </nav>
+
+    <!-- 二级 tab 区（按截图1 还原：安防/设备/资产/会议 + 新增「能耗看板」在会议右侧） -->
+    <div class="second-tabs">
+      <div class="tab" data-tab="security" onclick="switchSecondTab('security')">安防看板</div>
+      <div class="tab" data-tab="device" onclick="switchSecondTab('device')">设备看板</div>
+      <div class="tab" data-tab="asset" onclick="switchSecondTab('asset')">资产看板</div>
+      <div class="tab active" data-tab="meeting" onclick="switchSecondTab('meeting')">会议看板</div>
+      <div class="tab" data-tab="energy" onclick="switchSecondTab('energy')">能耗看板</div>
+    </div>
+
+    <!-- 内容区 -->
+    <div class="content">
+
+      <!-- 会议看板 tab 内容（默认显示，与截图1 对照） -->
+      <div class="tab-pane active" id="pane-meeting">
+        <div class="grid-meeting-top">
+          <!-- 会议室概况 -->
+          <div class="card">
+            <div class="card-title">会议室概况</div>
+            <div class="room-stat">
+              <div>
+                <div class="num">31</div>
+                <div class="num-cap">会议室总</div>
+              </div>
+              <ul class="legend">
+                <li><span class="dot" style="background:#4165EC"></span>已开放<span class="num-s">24</span></li>
+                <li><span class="dot" style="background:#c9cdd4"></span>未开放<span class="num-s">5</span></li>
+              </ul>
+              <div id="chart-room-stat" style="flex:1;min-width:140px;height:160px;"></div>
+            </div>
+          </div>
+
+          <!-- 会议室类型概况 -->
+          <div class="card">
+            <div class="card-title">会议室类型概况</div>
+            <div id="chart-room-type" class="chart-sm"></div>
+          </div>
+
+          <!-- 右侧 4 个状态卡片 -->
+          <div class="stat-cards">
+            <div class="stat-card">
+              <span class="icon">📅</span>
+              <div>
+                <div class="label">今日预约会议数</div>
+                <div><span class="value">0</span><span class="unit">个</span></div>
+              </div>
+              <div class="right"><div class="delta">昨日 0</div></div>
+            </div>
+            <div class="stat-card">
+              <span class="icon">⏱</span>
+              <div>
+                <div class="label">今日会议时长</div>
+                <div><span class="value">0</span><span class="unit">小时</span></div>
+              </div>
+              <div class="right"><div class="delta">昨日 0</div></div>
+            </div>
+            <div class="stat-card">
+              <span class="icon">¥</span>
+              <div>
+                <div class="label">今日会议成本</div>
+                <div><span class="value">0</span><span class="unit">元</span></div>
+              </div>
+              <div class="right"><div class="delta">昨日 0</div></div>
+            </div>
+            <div class="stat-card">
+              <span class="icon">📄</span>
+              <div>
+                <div class="label">今日合同成本</div>
+                <div><span class="value">0</span><span class="unit">元</span></div>
+              </div>
+              <div class="right"><div class="delta">昨日 0</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid-meeting-bottom">
+          <div class="card">
+            <div class="card-title">会议领用数据<span class="right">近 7 日</span></div>
+            <div id="chart-meeting-book" class="chart"></div>
+          </div>
+          <div class="card">
+            <div class="card-title">会议时长数据<span class="right">近 7 日</span></div>
+            <div id="chart-meeting-time" class="chart"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 能耗看板 tab 内容（本次新增，点击切换后展示） -->
+      <div class="tab-pane" id="pane-energy">
+        <div class="title-block">用电概览</div>
+
+        <div class="grid-2">
+          <!-- 用电类型 -->
+          <div class="card">
+            <div class="card-title">用电类型</div>
+            <div class="gauge-empty">暂无数据</div>
+          </div>
+
+          <!-- 空调类型统计 -->
+          <div class="card">
+            <div class="card-title">空调类型统计
+              <span class="right">📅 2026-09</span>
+            </div>
+            <div class="gauge-empty">暂无数据</div>
+          </div>
+        </div>
+
+        <div class="grid-2" style="margin-top:16px;">
+          <!-- 今年用电量趋势 -->
+          <div class="card">
+            <div class="card-title">今年用电量趋势</div>
+            <div id="chart-electric-trend" class="chart"></div>
+          </div>
+
+          <!-- 能耗告警 -->
+          <div class="card">
+            <div class="card-title">能耗告警</div>
+            <div class="table-wrap">
+              <table class="alarm-table">
+                <thead>
+                  <tr>
+                    <th>序号</th>
+                    <th>能耗空间</th>
+                    <th>能耗分项</th>
+                    <th>统计类型</th>
+                    <th>实时参数</th>
+                    <th>告警时间</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td class="col-num">1</td><td>4F</td><td>厨房及食堂用电</td><td>日用量</td><td>1641</td><td>2026/08/20 03:00:00</td></tr>
+                  <tr><td class="col-num">2</td><td>4F</td><td>厨房及食堂用电</td><td>日用量</td><td>1646</td><td>2026/08/19 03:00:00</td></tr>
+                  <tr><td class="col-num">3</td><td>4F</td><td>厨房及食堂用电</td><td>日用量</td><td>1433</td><td>2026/08/18 03:00:00</td></tr>
+                  <tr><td class="col-num">4</td><td>4F</td><td>厨房及食堂用电</td><td>日用量</td><td>1396</td><td>2026/08/17 03:00:00</td></tr>
+                  <tr><td class="col-num">5</td><td>4F</td><td>厨房及食堂用电</td><td>日用量</td><td>1667</td><td>2026/08/16 03:00:00</td></tr>
+                  <tr><td class="col-num">6</td><td>4F</td><td>厨房及食堂用电</td><td>日用量</td><td>1687</td><td>2026/08/15 03:00:00</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- 用水趋势分析（本次新增，看板底部） -->
+        <div class="card" style="margin-top:16px;">
+          <div class="card-title">用水趋势分析</div>
+          <div class="filter-bar">
+            <div class="filter-item">
+              <label>能源空间</label>
+              <div class="treeselect" id="water-space-select">
+                <div class="treeselect-input" onclick="toggleTree()">
+                  <span id="water-space-label">全部空间</span>
+                  <span class="ts-arrow">▾</span>
+                </div>
+                <div class="treeselect-panel" id="water-tree-panel" style="display:none;"></div>
+                <input type="hidden" id="water-space" value="all" />
+              </div>
+            </div>
+            <div class="filter-item">
+              <label>日期范围（按月）</label>
+              <input type="month" id="water-start" value="2026-01" />
+              <span class="tilde">~</span>
+              <input type="month" id="water-end" value="2026-08" />
+            </div>
+            <button class="btn-primary" onclick="renderWaterChart()">查询</button>
+          </div>
+          <div id="chart-water-trend" class="chart" style="height:320px;"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="demo-tip">点击右上二级 tab「会议看板 / 能耗看板」可切换演示</div>
+
+<script>
+  // 二级 tab 切换
+  function switchSecondTab(name) {
+    document.querySelectorAll('.second-tabs .tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+    document.querySelector('.second-tabs .tab[data-tab="' + name + '"]').classList.add('active');
+    document.getElementById('pane-' + name).classList.add('active');
+    // 重排图表
+    setTimeout(resizeAllCharts, 50);
+  }
+
+  function toggleSubmenu(el) {
+    el.classList.toggle('open');
+    const sub = document.getElementById('submenu-runtime');
+    sub.style.display = el.classList.contains('open') ? 'block' : 'none';
+  }
+
+  function resizeAllCharts() {
+    document.querySelectorAll('.chart, .chart-sm, [id^="chart-"]').forEach(el => {
+      const inst = echarts.getInstanceByDom(el);
+      if (inst) inst.resize();
+    });
+  }
+
+  // ===== ECharts 渲染 =====
+
+  // 会议室概况环形图
+  echarts.init(document.getElementById('chart-room-stat')).setOption({
+    color: ['#4165EC', '#e5e6eb'],
+    series: [{
+      type: 'pie', radius: ['70%', '85%'], avoidLabelOverlap: false,
+      label: { show: false }, labelLine: { show: false },
+      data: [
+        { value: 24, name: '已开放' },
+        { value: 5, name: '未开放' }
+      ]
+    }]
+  });
+
+  // 会议室类型概况饼图
+  echarts.init(document.getElementById('chart-room-type')).setOption({
+    color: ['#5470c6', '#91cc75', '#fac858', '#ee6666'],
+    tooltip: { trigger: 'item' },
+    legend: { orient: 'vertical', right: 10, top: 'center', textStyle: { fontSize: 12 } },
+    series: [{
+      type: 'pie', radius: ['45%', '70%'], center: ['38%', '50%'],
+      label: { show: false }, labelLine: { show: false },
+      data: [
+        { value: 51.4, name: '圆桌' },
+        { value: 22.6, name: '自由研讨' },
+        { value: 16.1, name: '多功能厅' },
+        { value: 9.9,  name: '其他' }
+      ]
+    }]
+  });
+
+  // 会议领用数据
+  echarts.init(document.getElementById('chart-meeting-book')).setOption({
+    grid: { left: 40, right: 20, top: 20, bottom: 30 },
+    tooltip: { trigger: 'axis' },
+    xAxis: { type: 'category', boundaryGap: false, data: ['08.26','08.27','08.28','08.29','08.30','08.31','09.01'], axisLine: { lineStyle: { color: '#e5e6eb' } }, axisLabel: { color: '#8c8c8c', fontSize: 11 } },
+    yAxis: { type: 'value', splitLine: { lineStyle: { color: '#f0f0f0' } }, axisLabel: { color: '#8c8c8c', fontSize: 11 } },
+    series: [{
+      type: 'line', smooth: true, symbol: 'none',
+      lineStyle: { color: '#4165EC', width: 2 },
+      areaStyle: { color: { type: 'linear', x: 0, y: 0, x2: 0, y2: 1, colorStops: [{offset:0,color:'rgba(65,101,236,0.25)'},{offset:1,color:'rgba(65,101,236,0)'}] } },
+      data: [4, 10, 8, 3, 1, 1, 1]
+    }]
+  });
+
+  // 会议时长数据
+  echarts.init(document.getElementById('chart-meeting-time')).setOption({
+    grid: { left: 40, right: 20, top: 20, bottom: 30 },
+    tooltip: { trigger: 'axis' },
+    xAxis: { type: 'category', boundaryGap: false, data: ['08.26','08.27','08.28','08.29','08.30','08.31','09.01'], axisLine: { lineStyle: { color: '#e5e6eb' } }, axisLabel: { color: '#8c8c8c', fontSize: 11 } },
+    yAxis: { type: 'value', splitLine: { lineStyle: { color: '#f0f0f0' } }, axisLabel: { color: '#8c8c8c', fontSize: 11 } },
+    series: [{
+      type: 'line', smooth: true, symbol: 'none',
+      lineStyle: { color: '#4165EC', width: 2 },
+      areaStyle: { color: { type: 'linear', x: 0, y: 0, x2: 0, y2: 1, colorStops: [{offset:0,color:'rgba(65,101,236,0.25)'},{offset:1,color:'rgba(65,101,236,0)'}] } },
+      data: [5, 12, 7, 2, 1, 1, 1]
+    }]
+  });
+
+  // 今年用电量趋势（KWH，3-8 月）
+  echarts.init(document.getElementById('chart-electric-trend')).setOption({
+    grid: { left: 60, right: 20, top: 30, bottom: 40 },
+    tooltip: { trigger: 'axis' },
+    xAxis: {
+      type: 'category',
+      data: ['3月','4月','5月','6月','7月','8月'],
+      axisLabel: { color: '#8c8c8c', fontSize: 11 },
+      axisLine: { lineStyle: { color: '#e5e6eb' } },
+      axisTick: { show: false }
+    },
+    yAxis: {
+      type: 'value',
+      name: '(KWH)',
+      nameTextStyle: { color: '#8c8c8c', fontSize: 11 },
+      max: 210000,
+      interval: 30000,
+      axisLabel: { color: '#8c8c8c', fontSize: 11, formatter: v => v >= 1000 ? (v/1000) + ',000' : v },
+      splitLine: { lineStyle: { color: '#f0f0f0' } }
+    },
+    series: [{
+      type: 'line', smooth: true, symbol: 'circle', symbolSize: 5,
+      lineStyle: { color: '#4165EC', width: 2 },
+      itemStyle: { color: '#4165EC' },
+      areaStyle: { color: { type: 'linear', x: 0, y: 0, x2: 0, y2: 1, colorStops: [{offset:0,color:'rgba(65,101,236,0.25)'},{offset:1,color:'rgba(65,101,236,0)'}] } },
+      data: [185000, 130000, 95000, 70000, 55000, 42000]
+    }]
+  });
+
+  // 能源空间：组织架构树（数据来源于【用水空间管理】维护的用水架构，原型用示意层级）
+  const waterSpaceTree = [
+    { id: 'all', name: '全部空间', children: [
+      { id: '133', name: '133综合楼', children: [
+        { id: '133-1', name: '1F' }, { id: '133-2', name: '2F' }, { id: '133-3', name: '3F' }, { id: '133-4', name: '4F' }
+      ]},
+      { id: '499', name: '499学生公寓', children: [
+        { id: '499-1', name: '1F' }, { id: '499-2', name: '2F' }, { id: '499-3', name: '3F' }
+      ]},
+      { id: 'east', name: '东区' },
+      { id: '415', name: '415观微院' },
+      { id: '518', name: '518探理院' },
+      { id: '517', name: '517能源中心' },
+      { id: '047', name: '047地库' }
+    ]}
+  ];
+  let treeExpandState = { all: true };
+  function renderWaterTree() {
+    const panel = document.getElementById('water-tree-panel');
+    panel.innerHTML = '';
+    const cur = document.getElementById('water-space').value;
+    const renderNodes = (nodes, level) => {
+      nodes.forEach(n => {
+        const has = n.children && n.children.length;
+        const node = document.createElement('div');
+        node.className = 'tree-node' + (n.id === cur ? ' selected' : '');
+        node.innerHTML = `<span class="twist">${has ? (treeExpandState[n.id] ? '▾' : '▸') : ''}</span><span class="nm" style="padding-left:${level * 14}px;">${n.name}</span>`;
+        node.onclick = (e) => {
+          e.stopPropagation();
+          if (has && e.target.classList.contains('twist')) {
+            treeExpandState[n.id] = !treeExpandState[n.id];
+            renderWaterTree();
+            return;
+          }
+          document.getElementById('water-space').value = n.id;
+          document.getElementById('water-space-label').textContent = n.name;
+          document.querySelectorAll('.tree-node').forEach(x => x.classList.remove('selected'));
+          node.classList.add('selected');
+          toggleTree(false);
+          renderWaterChart();
+        };
+        panel.appendChild(node);
+        if (has && treeExpandState[n.id]) renderNodes(n.children, level + 1);
+      });
+    };
+    renderNodes(waterSpaceTree, 0);
+  }
+  function toggleTree(force) {
+    const panel = document.getElementById('water-tree-panel');
+    const show = force === undefined ? (panel.style.display === 'none') : force;
+    panel.style.display = show ? 'block' : 'none';
+    if (show) renderWaterTree();
+  }
+  document.addEventListener('click', (e) => {
+    const ts = document.getElementById('water-space-select');
+    if (ts && !ts.contains(e.target)) document.getElementById('water-tree-panel').style.display = 'none';
+  });
+  function hashId(s) { let h = 0; for (let i = 0; i < s.length; i++) { h = (h * 31 + s.charCodeAt(i)) >>> 0; } return h; }
+
+  // 用水趋势分析：按月范围生成月份列表
+  function buildMonthRange(start, end) {
+    const res = [];
+    let [sy, sm] = start.split('-').map(Number);
+    let [ey, em] = end.split('-').map(Number);
+    while (sy < ey || (sy === ey && sm <= em)) {
+      res.push(sy + '-' + String(sm).padStart(2, '0'));
+      sm++;
+      if (sm > 12) { sm = 1; sy++; }
+    }
+    return res;
+  }
+
+  // 用水趋势分析：柱状图按能源空间 + 月份范围展示每月用水量（示意数据）
+  function renderWaterChart() {
+    const space = document.getElementById('water-space').value;
+    const start = document.getElementById('water-start').value;
+    const end = document.getElementById('water-end').value;
+    if (!start || !end) return;
+    const months = buildMonthRange(start, end);
+    const base = 80 + (hashId(space) % 12) * 70;  // 示意基准用水量（吨），真实数据取自用水架构接口
+    const data = months.map((m, i) => {
+      const seed = (parseInt(m.replace('-', ''), 10) * 7 + i * 3) % 5;
+      return Math.round(base * (0.8 + seed * 0.1));
+    });
+    const el = document.getElementById('chart-water-trend');
+    const inst = echarts.getInstanceByDom(el) || echarts.init(el);
+    inst.setOption({
+      grid: { left: 60, right: 20, top: 30, bottom: 40 },
+      tooltip: { trigger: 'axis' },
+      xAxis: {
+        type: 'category', data: months,
+        axisLabel: { color: '#8c8c8c', fontSize: 11 },
+        axisLine: { lineStyle: { color: '#e5e6eb' } }, axisTick: { show: false }
+      },
+      yAxis: {
+        type: 'value', name: '(吨)', nameTextStyle: { color: '#8c8c8c', fontSize: 11 },
+        splitLine: { lineStyle: { color: '#f0f0f0' } }, axisLabel: { color: '#8c8c8c', fontSize: 11 }
+      },
+      series: [{
+        type: 'bar', barWidth: '50%',
+        itemStyle: { color: '#4165EC', borderRadius: [3, 3, 0, 0] },
+        data: data
+      }]
+    });
+  }
+  renderWaterChart();
+
+  window.addEventListener('resize', resizeAllCharts);
+</script>
+</body>
+</html>
