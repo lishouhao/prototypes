@@ -240,6 +240,96 @@
     .empty-option {
       color: rgba(0, 0, 0, 0.25);
     }
+    .ms {
+      position: relative;
+      display: inline-block;
+      min-width: 260px;
+      vertical-align: middle;
+    }
+    .ms-control {
+      min-height: 34px;
+      border: 1px solid #d9d9d9;
+      border-radius: 2px;
+      padding: 3px 26px 3px 8px;
+      background: #fff;
+      cursor: pointer;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      align-items: center;
+      position: relative;
+      transition: all 0.3s;
+    }
+    .ms-control:hover {
+      border-color: #40a9ff;
+    }
+    .ms-arrow {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: rgba(0, 0, 0, 0.25);
+      pointer-events: none;
+      font-size: 12px;
+    }
+    .ms-placeholder {
+      color: rgba(0, 0, 0, 0.25);
+      font-size: 14px;
+    }
+    .ms-tag {
+      display: inline-flex;
+      align-items: center;
+      background: #f0f0f0;
+      border: 1px solid #d9d9d9;
+      border-radius: 2px;
+      padding: 0 4px 0 8px;
+      font-size: 12px;
+      line-height: 20px;
+      color: rgba(0, 0, 0, 0.65);
+    }
+    .ms-tag .x {
+      margin-left: 4px;
+      cursor: pointer;
+      color: rgba(0, 0, 0, 0.45);
+      font-size: 12px;
+    }
+    .ms-tag .x:hover {
+      color: #000;
+    }
+    .ms-panel {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      z-index: 20;
+      margin-top: 4px;
+      min-width: 100%;
+      background: #fff;
+      border: 1px solid #d9d9d9;
+      border-radius: 2px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+      padding: 4px 0;
+      max-height: 240px;
+      overflow: auto;
+    }
+    .ms-panel.open {
+      display: block;
+    }
+    .ms-option {
+      padding: 8px 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .ms-option:hover {
+      background: #f5f5f5;
+    }
+    .ms-option input {
+      cursor: pointer;
+    }
     .status-saved {
       color: #52c41a;
       font-size: 12px;
@@ -321,6 +411,7 @@
               <tr>
                 <th style="width: 140px;">告警类型</th>
                 <th style="width: 120px;">告警等级</th>
+                <th style="width: 200px;">配置区域</th>
                 <th>关联审批流</th>
               </tr>
             </thead>
@@ -357,15 +448,26 @@
       { id: 'flow_005', name: '设备故障维修审批流' }
     ];
 
+    const regions = [
+      { key: 'zhonghe', name: '综合楼' },
+      { key: 'tanli', name: '探理院' },
+      { key: 'guanwei', name: '观微院' },
+      { key: 'jizhi', name: '集智院' },
+      { key: 'gongyu', name: '学生公寓' },
+      { key: 'nengyuan', name: '能源中心' }
+    ];
+
+    const allRegions = regions.map(r => r.key);
+
     let configData = [
-      { type: 'security', level: 'normal', flowId: 'flow_004' },
-      { type: 'security', level: 'minor', flowId: 'flow_004' },
-      { type: 'security', level: 'major', flowId: 'flow_001' },
-      { type: 'security', level: 'urgent', flowId: 'flow_003' },
-      { type: 'fire', level: 'normal', flowId: 'flow_004' },
-      { type: 'fire', level: 'minor', flowId: 'flow_002' },
-      { type: 'fire', level: 'major', flowId: 'flow_002' },
-      { type: 'fire', level: 'urgent', flowId: 'flow_003' }
+      { type: 'security', level: 'normal', region: [...allRegions], flowId: 'flow_004' },
+      { type: 'security', level: 'minor', region: [...allRegions], flowId: 'flow_004' },
+      { type: 'security', level: 'major', region: [...allRegions], flowId: 'flow_001' },
+      { type: 'security', level: 'urgent', region: [...allRegions], flowId: 'flow_003' },
+      { type: 'fire', level: 'normal', region: [...allRegions], flowId: 'flow_004' },
+      { type: 'fire', level: 'minor', region: [...allRegions], flowId: 'flow_002' },
+      { type: 'fire', level: 'major', region: [...allRegions], flowId: 'flow_002' },
+      { type: 'fire', level: 'urgent', region: [...allRegions], flowId: 'flow_003' }
     ];
 
     const initialData = JSON.stringify(configData);
@@ -387,6 +489,63 @@
       }).join('');
     }
 
+    function getRegionName(key) {
+      return regions.find(r => r.key === key)?.name || key;
+    }
+
+    function getRegionTags(regionArr, index) {
+      if (!regionArr || regionArr.length === 0) {
+        return '<span class="ms-placeholder">请选择区域</span>';
+      }
+      return regionArr.map(k =>
+        `<span class="ms-tag">${getRegionName(k)}<span class="x" onclick="event.stopPropagation(); removeRegion(${index}, '${k}')">×</span></span>`
+      ).join('');
+    }
+
+    function getRegionOptions(index, regionArr) {
+      return regions.map(r => {
+        const checked = (regionArr || []).includes(r.key) ? 'checked' : '';
+        return `<label class="ms-option"><input type="checkbox" ${checked} onchange="onRegionToggle(${index}, '${r.key}', this.checked)"> ${r.name}</label>`;
+      }).join('');
+    }
+
+    let openMsIndex = -1;
+
+    function toggleMs(index, event) {
+      event.stopPropagation();
+      openMsIndex = (openMsIndex === index) ? -1 : index;
+      renderTable();
+    }
+
+    function onRegionToggle(index, key, checked) {
+      const arr = configData[index].region || [];
+      if (checked) {
+        if (!arr.includes(key)) arr.push(key);
+      } else {
+        const i = arr.indexOf(key);
+        if (i > -1) arr.splice(i, 1);
+      }
+      configData[index].region = arr;
+      changedRows.add(index);
+      renderTable();
+    }
+
+    function removeRegion(index, key) {
+      const arr = configData[index].region || [];
+      const i = arr.indexOf(key);
+      if (i > -1) arr.splice(i, 1);
+      configData[index].region = arr;
+      changedRows.add(index);
+      renderTable();
+    }
+
+    document.addEventListener('click', function () {
+      if (openMsIndex !== -1) {
+        openMsIndex = -1;
+        renderTable();
+      }
+    });
+
     function renderTable() {
       const tbody = document.getElementById('configBody');
       tbody.innerHTML = configData.map((row, index) => {
@@ -396,6 +555,17 @@
           <tr data-index="${index}">
             <td>${getTypeName(row.type)}</td>
             <td><span class="tag ${level.tagClass}">${level.name}</span></td>
+            <td>
+              <div class="ms">
+                <div class="ms-control" onclick="toggleMs(${index}, event)">
+                  ${getRegionTags(row.region, index)}
+                  <span class="ms-arrow">▾</span>
+                </div>
+                <div class="ms-panel ${openMsIndex === index ? 'open' : ''}" onclick="event.stopPropagation()">
+                  ${getRegionOptions(index, row.region)}
+                </div>
+              </div>
+            </td>
             <td>
               <select onchange="onFlowChange(${index}, this.value)">
                 ${getFlowOptions(row.flowId)}
