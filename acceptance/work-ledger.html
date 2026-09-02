@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<title>工作台账 - 排班管理</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif; color: #1f2329; font-size: 14px; background: #f5f7fa; }
+  .app { display: flex; height: 100vh; min-width: 1280px; }
+
+  /* 左侧菜单 */
+  .sidebar { width: 208px; background: #001529; color: rgba(255,255,255,0.85); flex-shrink: 0; overflow-y: auto; }
+  .logo { height: 48px; display: flex; align-items: center; padding: 0 16px; color: #fff; font-weight: 500; border-bottom: 1px solid rgba(255,255,255,0.06); font-size: 15px; }
+  .logo-icon { width: 24px; height: 24px; border-radius: 4px; background: #4165EC; display: inline-flex; align-items: center; justify-content: center; margin-right: 10px; font-size: 12px; }
+  .menu-wrap { padding: 8px 0; }
+  .group { margin-bottom: 4px; }
+  .group-title { display: flex; align-items: center; padding: 0 16px; height: 40px; color: rgba(255,255,255,0.65); cursor: pointer; font-size: 13px; transition: all .15s; }
+  .group-title:hover { color: #fff; }
+  .group-title .arrow { margin-left: auto; font-size: 10px; opacity: .6; transition: transform .2s; }
+  .group.open .group-title .arrow { transform: rotate(90deg); }
+  .group-title .icon { width: 16px; height: 16px; margin-right: 10px; display: inline-flex; align-items: center; justify-content: center; }
+  .submenu { list-style: none; }
+  .submenu .item { display: flex; align-items: center; padding: 0 16px 0 42px; height: 36px; color: rgba(255,255,255,0.7); cursor: pointer; font-size: 13px; transition: all .15s; position: relative; }
+  .submenu .item:hover { color: #fff; }
+  .submenu .item.active { color: #fff; background: #4165EC; }
+  .submenu .item.active::before { content: ""; display: inline-block; width: 3px; height: 16px; background: #fff; position: absolute; left: 0; }
+  .submenu .has-child { padding-left: 30px; }
+  .submenu .has-child .arrow { margin-left: auto; font-size: 10px; opacity: .6; transition: transform .2s; }
+  .submenu .has-child.open .arrow { transform: rotate(90deg); }
+  .thirdmenu { list-style: none; background: rgba(0,0,0,0.15); }
+  .thirdmenu .item { padding-left: 58px; font-size: 13px; height: 34px; }
+  .thirdmenu .item.active { background: #4165EC; color: #fff; }
+
+  /* 主区域 */
+  .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+  .topbar { height: 48px; background: #fff; display: flex; align-items: center; padding: 0 16px; border-bottom: 1px solid #e5e6eb; flex-shrink: 0; }
+  .topbar-left { display: flex; align-items: center; gap: 12px; }
+  .topbar-left .hamburger { width: 24px; height: 24px; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; color: #4e5969; }
+  .breadcrumb { color: #1f2329; font-size: 13px; }
+  .breadcrumb .sep { color: #c9cdd4; margin: 0 6px; }
+  .topbar-right { margin-left: auto; display: flex; align-items: center; gap: 16px; font-size: 13px; color: #4e5969; }
+  .topbar-right a { color: #4165EC; text-decoration: none; font-size: 12px; }
+  .topbar-right .avatar { width: 28px; height: 28px; border-radius: 50%; background: #4165EC; color: #fff; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; }
+  .topbar-right .user { display: inline-flex; align-items: center; gap: 6px; }
+
+  /* Tab 栏 */
+  .tabs { height: 40px; background: #fff; border-bottom: 1px solid #e5e6eb; display: flex; align-items: center; padding: 0 12px; gap: 4px; flex-shrink: 0; overflow-x: auto; }
+  .tab { padding: 0 14px; height: 28px; line-height: 28px; border-radius: 4px; font-size: 13px; color: #4e5969; cursor: pointer; white-space: nowrap; }
+  .tab:hover { color: #4165EC; background: #f5f7fa; }
+  .tab.active { color: #fff; background: #4165EC; }
+
+  /* 页面主体：左树 + 右表 */
+  .page-body { flex: 1; display: flex; overflow: hidden; }
+  .tree-panel { width: 260px; background: #fff; border-right: 1px solid #e5e6eb; display: flex; flex-direction: column; flex-shrink: 0; }
+  .tree-search { padding: 12px; border-bottom: 1px solid #f0f0f0; }
+  .tree-search input { width: 100%; height: 32px; border: 1px solid #d9d9d9; border-radius: 4px; padding: 0 10px; font-size: 13px; outline: none; }
+  .tree-search input:focus { border-color: #4165EC; }
+  .tree-body { flex: 1; overflow-y: auto; padding: 8px 0; }
+  .tree-node { display: flex; align-items: center; padding: 6px 12px 6px 12px; cursor: pointer; font-size: 13px; color: #1f2329; user-select: none; }
+  .tree-node:hover { background: #f5f7fa; }
+  .tree-node.active { background: #e6f0ff; color: #4165EC; }
+  .tree-node .arrow { width: 14px; height: 14px; display: inline-flex; align-items: center; justify-content: center; margin-right: 4px; font-size: 10px; color: #8c8c8c; transition: transform .2s; }
+  .tree-node .arrow.empty { visibility: hidden; }
+  .tree-node.open > .arrow { transform: rotate(90deg); }
+  .tree-node.lv-1 { padding-left: 28px; }
+  .tree-node.lv-2 { padding-left: 44px; }
+  .tree-node.lv-3 { padding-left: 60px; }
+
+  .right-area { flex: 1; overflow: hidden; display: flex; flex-direction: column; padding: 12px; }
+  .card { background: #fff; border-radius: 6px; box-shadow: 0 1px 2px rgba(0,0,0,0.03); flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+  /* 筛选栏 */
+  .filter-bar { padding: 16px; border-bottom: 1px solid #f0f0f0; }
+  .filter-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  .filter-cell { display: flex; flex-direction: column; gap: 6px; }
+  .filter-cell .lab { font-size: 12px; color: #4e5969; }
+  .filter-cell input { height: 32px; border: 1px solid #d9d9d9; border-radius: 4px; padding: 0 10px; font-size: 13px; outline: none; color: #1f2329; background: #fff; }
+  .filter-cell input:focus { border-color: #4165EC; }
+  .filter-cell .range { display: flex; align-items: center; gap: 6px; }
+  .filter-cell .range input { flex: 1; padding: 0 8px; min-width: 0; }
+  .filter-actions { display: flex; align-items: flex-end; gap: 8px; margin-top: 12px; }
+  .btn { height: 32px; padding: 0 16px; border-radius: 4px; cursor: pointer; font-size: 13px; display: inline-flex; align-items: center; gap: 4px; }
+  .btn-primary { background: #4165EC; color: #fff; border: none; }
+  .btn-primary:hover { background: #3a5bd0; }
+  .btn-default { background: #fff; color: #1f2329; border: 1px solid #d9d9d9; }
+  .btn-default:hover { border-color: #4165EC; color: #4165EC; }
+
+  /* 表格 */
+  .table-wrap { flex: 1; overflow: auto; padding: 0 16px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th, td { border: 1px solid #f0f0f0; padding: 10px 12px; text-align: left; }
+  th { background: #fafafa; color: #1f2329; font-weight: 500; white-space: nowrap; }
+  tbody tr:hover { background: #f5f8ff; }
+  td.t-right, th.t-right { text-align: right; }
+  td.t-center, th.t-center { text-align: center; }
+  .tag { display: inline-block; font-size: 12px; padding: 1px 8px; border-radius: 4px; line-height: 18px; }
+  .tag-green { color: #389e0d; background: #f6ffed; border: 1px solid #b7eb8f; }
+  .tag-orange { color: #d46b08; background: #fff7e6; border: 1px solid #ffd591; }
+  .tag-red { color: #cf1322; background: #fff1f0; border: 1px solid #ffa39e; }
+  .tag-blue { color: #4165EC; background: #f0f5ff; border: 1px solid #adc6ff; }
+  .tag-gray { color: #4e5969; background: #f2f3f5; border: 1px solid #e5e6eb; }
+  .tag-red { color: #cf1322; background: #fff1f0; border: 1px solid #ffa39e; }
+  .op a { color: #4165EC; text-decoration: none; margin-right: 8px; cursor: pointer; }
+  .op a:hover { text-decoration: underline; }
+
+  /* 分页 */
+  .pager { display: flex; align-items: center; justify-content: flex-end; gap: 8px; padding: 12px 16px; border-top: 1px solid #f0f0f0; font-size: 13px; color: #4e5969; flex-shrink: 0; }
+  .pager .pg { min-width: 28px; height: 28px; border: 1px solid #d9d9d9; border-radius: 4px; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; padding: 0 8px; }
+  .pager .pg.active { background: #4165EC; color: #fff; border-color: #4165EC; }
+  .pager .pg:hover:not(.active) { border-color: #4165EC; color: #4165EC; }
+  .pager .txt { margin: 0 4px; }
+  .pager select { height: 28px; border: 1px solid #d9d9d9; border-radius: 4px; padding: 0 6px; font-size: 13px; }
+  .pager .goto { display: inline-flex; align-items: center; gap: 4px; }
+  .pager .goto input { width: 40px; height: 28px; border: 1px solid #d9d9d9; border-radius: 4px; text-align: center; font-size: 13px; }
+
+  /* 抽屉 */
+  .mask { position: fixed; inset: 0; background: rgba(0,0,0,0.45); display: none; z-index: 50; }
+  .mask.show { display: block; }
+  .drawer { position: fixed; top: 0; right: 0; height: 100%; width: 720px; max-width: 92vw; background: #f5f7fa; z-index: 51; transform: translateX(100%); transition: transform .25s; display: flex; flex-direction: column; }
+  .drawer.show { transform: translateX(0); }
+  .drawer-head { height: 56px; background: #fff; border-bottom: 1px solid #e5e6eb; display: flex; align-items: center; padding: 0 20px 0 24px; flex-shrink: 0; }
+  .drawer-head .t { font-size: 16px; font-weight: 600; }
+  .drawer-head .close { margin-left: auto; cursor: pointer; font-size: 18px; color: #8c8c8c; }
+  .drawer-body { flex: 1; overflow-y: auto; padding: 16px; }
+  .sec-card { background: #fff; border-radius: 6px; padding: 16px 20px 20px; margin-bottom: 16px; box-shadow: 0 1px 2px rgba(0,0,0,0.03); }
+  .sec-title { font-size: 14px; font-weight: 500; color: #1f2329; margin-bottom: 12px; display: flex; align-items: center; }
+  .sec-title::before { content: ""; display: inline-block; width: 3px; height: 12px; background: #4165EC; margin-right: 8px; border-radius: 2px; }
+  .sec-title .right { margin-left: auto; font-size: 12px; color: #8c8c8c; font-weight: normal; }
+  .info-row { display: flex; gap: 28px; flex-wrap: wrap; }
+  .info-row .it { font-size: 13px; }
+  .info-row .it .k { color: #8c8c8c; margin-right: 6px; }
+  .info-row .it .v { color: #1f2329; font-weight: 500; }
+  .collapse-hd { display: flex; align-items: center; cursor: pointer; user-select: none; }
+  .collapse-hd .arrow { margin-left: auto; font-size: 11px; color: #8c8c8c; transition: transform .2s; }
+  .collapse-hd.open .arrow { transform: rotate(90deg); }
+  .collapse-bd { display: none; margin-top: 12px; }
+  .collapse-bd.show { display: block; }
+</style>
+</head>
+<body>
+<div class="app">
+  <!-- 左侧菜单 -->
+  <aside class="sidebar">
+    <div class="logo"><span class="logo-icon">智</span>智慧园区</div>
+    <div class="menu-wrap">
+      <div class="group">
+        <div class="group-title"><span class="icon">🚗</span>车辆通行<span class="arrow">▶</span></div>
+      </div>
+      <div class="group">
+        <div class="group-title"><span class="icon">⚙️</span>设备管理<span class="arrow">▶</span></div>
+      </div>
+      <div class="group">
+        <div class="group-title"><span class="icon">🛠️</span>一键报修<span class="arrow">▶</span></div>
+      </div>
+      <div class="group">
+        <div class="group-title"><span class="icon">📋</span>工单管理<span class="arrow">▶</span></div>
+      </div>
+      <div class="group open">
+        <div class="group-title"><span class="icon">🏢</span>物业管理<span class="arrow">▶</span></div>
+        <ul class="submenu">
+          <li class="item">告警中心</li>
+          <li class="item open has-child"><span>人员组织</span><span class="arrow">▶</span></li>
+          <ul class="thirdmenu">
+            <li class="item">人员管理</li>
+            <li class="item">部门管理</li>
+            <li class="item">岗位管理</li>
+            <li class="item open has-child"><span>排班管理</span><span class="arrow">▶</span></li>
+            <ul class="thirdmenu" style="background:rgba(0,0,0,0.12);">
+              <li class="item">排班日历</li>
+              <li class="item active">工作台账</li>
+            </ul>
+          </ul>
+          <li class="item">品牌库管理</li>
+          <li class="item">巡检管理</li>
+          <li class="item">维保管理</li>
+          <li class="item">仓储管理</li>
+          <li class="item">物业合同</li>
+        </ul>
+      </div>
+    </div>
+  </aside>
+
+  <!-- 主区域 -->
+  <section class="main">
+    <div class="topbar">
+      <div class="topbar-left">
+        <span class="hamburger">☰</span>
+        <div class="breadcrumb">物业管理<span class="sep">/</span>人员组织<span class="sep">/</span>排班管理<span class="sep">/</span>工作台账</div>
+      </div>
+      <div class="topbar-right">
+        <a href="#">金山文档</a>
+        <a href="#">下载中心插件</a>
+        <span class="bell">🔔</span>
+        <span class="user"><span class="avatar">ad</span>admin</span>
+      </div>
+    </div>
+
+    <div class="tabs">
+      <span class="tab">远程记录</span>
+      <span class="tab">告警提醒</span>
+      <span class="tab">环境监控</span>
+      <span class="tab">规则制度</span>
+      <span class="tab">公告管理</span>
+      <span class="tab">通知公告</span>
+      <span class="tab">园区运行监控</span>
+      <span class="tab">安防看板</span>
+      <span class="tab">一键报修</span>
+      <span class="tab">发起工单</span>
+      <span class="tab">所有工单</span>
+      <span class="tab">人员管理</span>
+      <span class="tab">用户管理</span>
+      <span class="tab">部门管理</span>
+      <span class="tab">岗位管理</span>
+      <span class="tab">排班管理</span>
+      <span class="tab active">工作台账</span>
+    </div>
+
+    <div class="page-body">
+      <!-- 左侧组织树 -->
+      <aside class="tree-panel">
+        <div class="tree-search"><input type="text" placeholder="请输入部门名称" /></div>
+        <div class="tree-body" id="treeBody"></div>
+      </aside>
+
+      <!-- 右侧内容 -->
+      <div class="right-area">
+        <div class="card">
+          <!-- 筛选栏 -->
+          <div class="filter-bar">
+            <div class="filter-grid">
+              <div class="filter-cell"><span class="lab">用户名称</span><input id="f-name" type="text" placeholder="请输入用户名称" /></div>
+              <div class="filter-cell"><span class="lab">用户昵称</span><input id="f-nick" type="text" placeholder="请输入用户昵称" /></div>
+              <div class="filter-cell"><span class="lab">用户工号</span><input id="f-code" type="text" placeholder="请输入用户工号" /></div>
+              <div class="filter-cell"><span class="lab">日期范围</span>
+                <div class="range">
+                  <input id="f-start" type="date" value="2026-08-01" />
+                  <span>~</span>
+                  <input id="f-end" type="date" value="2026-08-31" />
+                </div>
+              </div>
+            </div>
+            <div class="filter-actions">
+              <button class="btn btn-primary" onclick="applyFilter()">🔍 搜索</button>
+              <button class="btn btn-default" onclick="resetFilter()">重置</button>
+            </div>
+          </div>
+
+          <!-- 表格 -->
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th class="t-center" style="width:48px;">用户编号</th>
+                  <th>用户名称</th>
+                  <th>用户昵称</th>
+                  <th>部门</th>
+                  <th>岗位</th>
+                  <th>工号</th>
+                  <th class="t-center">工作内容(条)</th>
+                  <th>台账状态</th>
+                  <th style="width:120px;">操作</th>
+                </tr>
+              </thead>
+              <tbody id="ledgerBody"></tbody>
+            </table>
+          </div>
+
+          <!-- 分页 -->
+          <div class="pager" id="pager"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- 抽屉 -->
+<div class="mask" id="mask" onclick="closeDrawer()"></div>
+<div class="drawer" id="drawer">
+  <div class="drawer-head">
+    <div class="t" id="drawerTitle">员工工作台账详情</div>
+    <span class="close" onclick="closeDrawer()">✕</span>
+  </div>
+  <div class="drawer-body" id="drawerBody"></div>
+</div>
+
+<script>
+// ===== 组织树 =====
+const TREE = [
+  { id: "root", name: "苏州国家实验室", open: true, lv: 0, children: [
+    { id: "wy", name: "卓越物业", open: true, lv: 1, children: [
+      { id: "wx", name: "维修部", lv: 2 },
+      { id: "sd", name: "水电部", lv: 2 },
+      { id: "bj", name: "保洁部", lv: 2 },
+      { id: "ab", name: "安保部", lv: 2 }
+    ]},
+    { id: "ky", name: "科研支撑部", lv: 1 },
+    { id: "zh", name: "综合管理部", lv: 1 }
+  ]}
+];
+
+function renderTree(nodes, parent) {
+  nodes.forEach(n => {
+    const hasChild = n.children && n.children.length;
+    const div = document.createElement("div");
+    div.className = `tree-node lv-${n.lv} ${n.open ? "open" : ""}`;
+    div.dataset.id = n.id;
+    div.innerHTML = `<span class="arrow ${hasChild ? "" : "empty"}">▶</span><span>${n.name}</span>`;
+    div.onclick = (e) => { e.stopPropagation(); selectNode(n.id); };
+    parent.appendChild(div);
+    if (hasChild && n.open) {
+      const wrap = document.createElement("div");
+      parent.appendChild(wrap);
+      renderTree(n.children, wrap);
+    }
+  });
+}
+function selectNode(id) {
+  document.querySelectorAll(".tree-node").forEach(el => el.classList.remove("active"));
+  document.querySelector(`.tree-node[data-id="${id}"]`).classList.add("active");
+  applyFilter();
+}
+
+// ===== 模拟数据 =====
+const DEPT_MAP = { wx: "维修部", sd: "水电部", bj: "保洁部", ab: "安保部", ky: "科研支撑部", zh: "综合管理部" };
+const EMPLOYEES = [
+  { id: 7162, name: "尹俊旭", nick: "yinjunxu", dept: "ab", role: "保安", code: "T00062" },
+  { id: 7163, name: "韩寒",   nick: "hanhan",   dept: "ab", role: "保安", code: "T00063" },
+  { id: 7164, name: "何旭阳", nick: "hexuyang", dept: "wx", role: "维修工", code: "T00064" },
+  { id: 7165, name: "吕瑞丰", nick: "luruifeng",dept: "wx", role: "维修工", code: "T00065" },
+  { id: 7166, name: "廖梓浩", nick: "liaozihao",dept: "sd", role: "水工", code: "T00066" },
+  { id: 7167, name: "刘鹏辉", nick: "liupenghui",dept:"sd", role: "电工", code: "T00067" },
+  { id: 7168, name: "李继明", nick: "lijiming", dept: "bj", role: "保洁", code: "T00068" },
+  { id: 7169, name: "韩文敏", nick: "hanwenmin",dept: "bj", role: "保洁", code: "T00069" },
+  { id: 7170, name: "张典猛", nick: "zhangdianmeng",dept:"ab", role: "保安", code: "T00070" },
+  { id: 7171, name: "邢卓越", nick: "xingzy02", dept: "ky", role: "维修工", code: "T00071" },
+  { id: 7172, name: "王建国", nick: "wangjianguo",dept:"zh", role: "电工", code: "T00072" },
+  { id: 7173, name: "陈秀英", nick: "chenxiuying",dept:"bj", role: "保洁", code: "T00073" }
+];
+const WORK_ITEMS = ["公共区域维修", "设施设备巡检", "水泵房值守", "配电室巡检", "楼层保洁", "门岗执勤", "园区巡逻", "绿化浇灌协助", "报修工单处理", "能耗抄表"];
+const OUTPUTS = ["完成2项维修", "巡检无异常", "设备运行正常", "区域清洁完成", "交接班记录完整", "工单闭环"];
+
+function rng(seed) { let s = seed % 2147483647; if (s <= 0) s += 2147483646; return () => (s = s * 16807 % 2147483647) / 2147483647; }
+function pick(arr, r) { return arr[Math.floor(r() * arr.length)]; }
+function fmt(min) { const h = Math.floor(min / 60), m = min % 60; return `${String(h).padStart(2,"0")}:${String(m).padStart(2,"0")}`; }
+function hashStr(s) { let h = 0; for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) % 2147483647; return h; }
+
+// 规定时间：上班 08:30，下班 17:30
+function parseDate(s) { const [y, m, d] = s.split("-").map(Number); return new Date(y, m - 1, d); }
+function eachDate(startStr, endStr) {
+  const res = []; let cur = parseDate(startStr); const end = parseDate(endStr);
+  if (cur > end) return res;
+  while (cur <= end) {
+    const y = cur.getFullYear(), m = cur.getMonth() + 1, d = cur.getDate();
+    res.push(`${y}-${String(m).padStart(2,"0")}-${String(d).padStart(2,"0")}`);
+    cur.setDate(cur.getDate() + 1);
+  }
+  return res;
+}
+
+// 按日统计上下班打卡，无考勤周期
+function genRange(emp, startStr, endStr) {
+  const r = rng(emp.id * 100003 + hashStr(startStr + "|" + endStr));
+  const dates = eachDate(startStr, endStr);
+  const attend = []; const works = [];
+  let normal = 0, late = 0, early = 0, leave = 0, absent = 0, onSum = 0, offSum = 0, onCount = 0, offCount = 0;
+  dates.forEach(date => {
+    const roll = r();
+    if (roll < 0.035) { leave++; attend.push({ date, on: "--", off: "--", hours: 0, status: "请假" }); return; }
+    if (roll < 0.05) { absent++; attend.push({ date, on: "--", off: "--", hours: 0, status: "缺勤" }); return; }
+    // 上班：约 70% 在 08:00-09:00（正常），30% 在 09:00-09:45（迟到）
+    let onMin = r() < 0.7 ? 8 * 60 + Math.floor(r() * 60) : 9 * 60 + Math.floor(r() * 45);
+    let lateFlag = onMin > 9 * 60;                      // 上班晚于 09:00 → 迟到
+    // 下班：80% 在 17:30-18:30（正常），20% 在 17:00-17:30（早退）
+    let offMin = r() < 0.8 ? 17 * 60 + 30 + Math.floor(r() * 60) : 17 * 60 + Math.floor(r() * 30);
+    let earlyFlag = offMin < 17 * 60 + 30;              // 下班早于 17:30 → 早退
+    let hrs = Math.max(0, (offMin - onMin) / 60 - 1); hrs = Math.round(hrs * 10) / 10;
+    onSum += onMin; offSum += offMin; onCount++; offCount++;
+    const st = lateFlag ? "迟到" : (earlyFlag ? "早退" : "正常");
+    if (st === "正常") normal++; else if (st === "迟到") late++; else early++;
+    attend.push({ date, on: fmt(onMin), off: fmt(offMin), hours: hrs, status: st });
+    const n = 1 + (r() < 0.6 ? 1 : 0);
+    for (let i = 0; i < n; i++) works.push({ date, item: pick(WORK_ITEMS, r), hours: Math.round((hrs / n) * 10) / 10, output: pick(OUTPUTS, r) });
+  });
+  const totalDays = dates.length;
+  const avgOn = onCount ? fmt(Math.round(onSum / onCount)) : "--";
+  const avgOff = offCount ? fmt(Math.round(offSum / offCount)) : "--";
+  // 台账状态：正常 / 迟到 / 早退 / 请假 / 缺勤（迟到、早退二选一互斥；请假优先于缺勤）
+  let status = "正常", statusTag = "tag-green";
+  if (leave > 0) { status = "请假"; statusTag = "tag-gray"; }
+  else if (absent > 0) { status = "缺勤"; statusTag = "tag-red"; }
+  else if (late > 0) { status = "迟到"; statusTag = "tag-orange"; }
+  else if (early > 0) { status = "早退"; statusTag = "tag-orange"; }
+  else { status = "正常"; statusTag = "tag-green"; }
+  return { emp, range: `${startStr} ~ ${endStr}`, attend, works,
+    summary: { totalDays, normal, late, early, leave, absent, avgOn, avgOff, workCount: works.length, status, statusTag } };
+}
+
+function statusTagOf(st) {
+  if (st === "正常") return "tag-green";
+  if (st === "请假") return "tag-gray";
+  if (st === "缺勤") return "tag-red";
+  return "tag-orange"; // 迟到 / 早退
+}
+
+// 生成「今天」的考勤 + 工作内容（抽屉明细只展示今天）
+function genToday(emp) {
+  const now = new Date();
+  const y = now.getFullYear(), m = now.getMonth() + 1, d = now.getDate();
+  const today = `${y}-${String(m).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
+  const r = rng(emp.id * 7919 + hashStr(today));
+  const attend = []; const works = [];
+  const roll = r();
+  // 演示锚点：固定 2 名员工今日分别请假 / 缺勤，确保评审可见全状态标签
+  if (emp.id === 7163) {
+    attend.push({ date: today, on: "--", off: "--", hours: 0, status: "请假" });
+  }
+  else if (emp.id === 7166) {
+    attend.push({ date: today, on: "--", off: "--", hours: 0, status: "缺勤" });
+  }
+  else if (roll < 0.18) {
+    // 无打卡：依员工确定性分流 请假 / 缺勤（单日样本少，提高比例以覆盖全状态便于演示）
+    const stt = (emp.id % 2 === 0) ? "请假" : "缺勤";
+    attend.push({ date: today, on: "--", off: "--", hours: 0, status: stt });
+  }
+  else {
+    let onMin = r() < 0.7 ? 8 * 60 + Math.floor(r() * 60) : 9 * 60 + Math.floor(r() * 45);
+    let lateFlag = onMin > 9 * 60;
+    let offMin = r() < 0.8 ? 17 * 60 + 30 + Math.floor(r() * 60) : 17 * 60 + Math.floor(r() * 30);
+    let earlyFlag = offMin < 17 * 60 + 30;
+    let hrs = Math.max(0, (offMin - onMin) / 60 - 1); hrs = Math.round(hrs * 10) / 10;
+    const st = lateFlag ? "迟到" : (earlyFlag ? "早退" : "正常");
+    attend.push({ date: today, on: fmt(onMin), off: fmt(offMin), hours: hrs, status: st });
+  }
+  const n = (attend[0].status === "请假" || attend[0].status === "缺勤") ? 0 : (1 + (r() < 0.6 ? 1 : 0));
+  for (let i = 0; i < n; i++) works.push({ date: today, item: pick(WORK_ITEMS, r), hours: n ? Math.round((attend[0].hours / n) * 10) / 10 : 0, output: pick(OUTPUTS, r) });
+  return { attend, works, date: today };
+}
+
+// ===== 状态 =====
+let RANGE = { start: "2026-08-01", end: "2026-08-31" };
+let DATA = [], FILTERED = [];
+let page = 1, PAGE_SIZE = 10;
+
+function buildData() {
+  DATA = EMPLOYEES.map(e => genRange(e, RANGE.start, RANGE.end));
+}
+
+function applyFilter() {
+  const name = document.getElementById("f-name").value.trim();
+  const nick = document.getElementById("f-nick").value.trim();
+  const code = document.getElementById("f-code").value.trim();
+  const start = document.getElementById("f-start").value;
+  const end = document.getElementById("f-end").value;
+  RANGE = { start: start || "2026-08-01", end: end || "2026-08-31" };
+  const activeNode = document.querySelector(".tree-node.active");
+  const deptId = activeNode ? activeNode.dataset.id : "root";
+  buildData();
+  let list = DATA;
+  if (deptId !== "root") {
+    const allowed = new Set([deptId]);
+    function collect(nodes) { nodes.forEach(n => { allowed.add(n.id); if (n.children) collect(n.children); }); }
+    const node = findNode(TREE, deptId);
+    if (node && node.children) collect(node.children);
+    list = list.filter(x => allowed.has(x.emp.dept));
+  }
+  if (name) list = list.filter(x => x.emp.name.includes(name));
+  if (nick) list = list.filter(x => x.emp.nick.includes(nick));
+  if (code) list = list.filter(x => x.emp.code.toLowerCase().includes(code.toLowerCase()));
+  FILTERED = list;
+  page = 1;
+  renderList();
+}
+
+function findNode(nodes, id) { for (const n of nodes) { if (n.id === id) return n; if (n.children) { const f = findNode(n.children, id); if (f) return f; } } return null; }
+
+function resetFilter() {
+  ["f-name","f-nick","f-code"].forEach(id => document.getElementById(id).value = "");
+  document.getElementById("f-start").value = "2026-08-01";
+  document.getElementById("f-end").value = "2026-08-31";
+  document.querySelectorAll(".tree-node").forEach(el => el.classList.remove("active"));
+  applyFilter();
+}
+
+function renderList() {
+  const total = FILTERED.length;
+  const pages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  if (page > pages) page = pages;
+  const start = (page - 1) * PAGE_SIZE;
+  const slice = FILTERED.slice(start, start + PAGE_SIZE);
+  const body = document.getElementById("ledgerBody");
+  if (!slice.length) { body.innerHTML = `<tr><td colspan="9" style="text-align:center;color:#8c8c8c;padding:28px;">暂无数据</td></tr>`; }
+  else {
+    body.innerHTML = slice.map((x) => {
+      const e = x.emp, s = x.summary;
+      return `<tr>
+        <td class="t-center">${e.id}</td>
+        <td>${e.name}</td>
+        <td>${e.nick}</td>
+        <td>${DEPT_MAP[e.dept]}</td>
+        <td>${e.role}</td>
+        <td>${e.code}</td>
+        <td class="t-center">${s.workCount}</td>
+        <td><span class="tag ${s.statusTag}">${s.status}</span></td>
+        <td class="op"><a onclick="openDrawer(${e.id})">查看台账</a></td>
+      </tr>`;
+    }).join("");
+  }
+  let pg = "";
+  for (let p = 1; p <= pages; p++) pg += `<span class="pg ${p === page ? "active" : ""}" onclick="gotoPage(${p})">${p}</span>`;
+  document.getElementById("pager").innerHTML = `
+    <span class="txt">共 ${total} 条</span>
+    <select><option>10条/页</option><option>20条/页</option><option>50条/页</option></select>
+    ${pg}
+    <span class="goto">前往 <input type="text" value="${page}" /> 页</span>
+  `;
+}
+
+function gotoPage(p) { page = p; renderList(); }
+
+// ===== 抽屉 =====
+function openDrawer(id) {
+  const x = FILTERED.find(d => d.emp.id === id) || DATA.find(d => d.emp.id === id);
+  if (!x) return;
+  const e = x.emp, s = x.summary;
+  const today = genToday(e);
+  document.getElementById("drawerTitle").textContent = `${e.name} 工作台账 · 今日`;
+  const attendRows = today.attend.map(a => {
+    const stTag = statusTagOf(a.status);
+    return `<tr><td>${a.date}</td><td class="t-center">${a.on}</td><td class="t-center">${a.off}</td><td class="t-right">${a.hours}</td><td class="t-center"><span class="tag ${stTag}">${a.status}</span></td></tr>`;
+  }).join("");
+  const workRows = today.works.map(w => `<tr><td>${w.date}</td><td>${w.item}</td><td class="t-right">${w.hours}</td><td>${w.output}</td></tr>`).join("");
+  document.getElementById("drawerBody").innerHTML = `
+    <div class="sec-card">
+      <div class="sec-title">员工信息</div>
+      <div class="info-row">
+        <div class="it"><span class="k">用户名称</span><span class="v">${e.name}</span></div>
+        <div class="it"><span class="k">用户昵称</span><span class="v">${e.nick}</span></div>
+        <div class="it"><span class="k">工号</span><span class="v">${e.code}</span></div>
+        <div class="it"><span class="k">部门</span><span class="v">${DEPT_MAP[e.dept]}</span></div>
+        <div class="it"><span class="k">岗位</span><span class="v">${e.role}</span></div>
+        <div class="it"><span class="k">记录日期</span><span class="v">${today.date}</span></div>
+        <div class="it"><span class="k">台账状态</span><span class="v"><span class="tag ${s.statusTag}">${s.status}</span></span></div>
+      </div>
+    </div>
+
+    <div class="sec-card">
+      <div class="collapse-hd open" onclick="toggleCollapse(this)"><div class="sec-title" style="margin:0;">今日考勤（上班 / 下班打卡）<span class="right" style="font-weight:normal;">${today.attend.length} 条</span></div><span class="arrow">▶</span></div>
+      <div class="collapse-bd show">
+        <table>
+          <thead><tr><th>日期</th><th class="t-center">上班打卡</th><th class="t-center">下班打卡</th><th class="t-right">工时(h)</th><th class="t-center">状态</th></tr></thead>
+          <tbody>${attendRows}</tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="sec-card">
+      <div class="collapse-hd open" onclick="toggleCollapse(this)"><div class="sec-title" style="margin:0;">今日工作内容<span class="right" style="font-weight:normal;">${today.works.length} 条</span></div><span class="arrow">▶</span></div>
+      <div class="collapse-bd show">
+        <table>
+          <thead><tr><th>日期</th><th>工作事项</th><th class="t-right">工时(h)</th><th>产出</th></tr></thead>
+          <tbody>${workRows}</tbody>
+        </table>
+      </div>
+    </div>
+  `;
+  document.getElementById("mask").classList.add("show");
+  document.getElementById("drawer").classList.add("show");
+}
+
+function toggleCollapse(hd) { hd.classList.toggle("open"); hd.nextElementSibling.classList.toggle("show"); }
+function closeDrawer() { document.getElementById("mask").classList.remove("show"); document.getElementById("drawer").classList.remove("show"); }
+
+// ===== 初始化 =====
+(function init() {
+  const treeBody = document.getElementById("treeBody");
+  renderTree(TREE, treeBody);
+  document.querySelector('.tree-node[data-id="root"]').classList.add("active");
+  applyFilter();
+})();
+</script>
+</body>
+</html>
