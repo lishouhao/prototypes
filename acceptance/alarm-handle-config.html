@@ -330,16 +330,6 @@
     .ms-option input {
       cursor: pointer;
     }
-    .status-saved {
-      color: #52c41a;
-      font-size: 12px;
-      margin-left: 8px;
-    }
-    .status-unsaved {
-      color: #faad14;
-      font-size: 12px;
-      margin-left: 8px;
-    }
   </style>
 </head>
 <body>
@@ -550,7 +540,6 @@
       const tbody = document.getElementById('configBody');
       tbody.innerHTML = configData.map((row, index) => {
         const level = getLevel(row.level);
-        const changed = changedRows.has(index) ? '<span class="status-unsaved">（待保存）</span>' : '<span class="status-saved">（已保存）</span>';
         return `
           <tr data-index="${index}">
             <td>${getTypeName(row.type)}</td>
@@ -570,7 +559,6 @@
               <select onchange="onFlowChange(${index}, this.value)">
                 ${getFlowOptions(row.flowId)}
               </select>
-              ${changed}
             </td>
           </tr>
         `;
