@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>园区人流密度日趋势（模拟数据）</title>
+<style>
+  :root{
+    --primary:#1677ff;
+    --primary-bg:#e6f4ff;
+    --text:#1f2329;
+    --sub:#646a73;
+    --border:#e5e6eb;
+    --bg:#f5f7fa;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;}
+  body{background:var(--bg);color:var(--text);padding:24px;}
+  .card{background:#fff;border-radius:8px;box-shadow:0 1px 4px rgba(0,0,0,.06);padding:20px;max-width:980px;margin:0 auto;}
+  h2{font-size:18px;font-weight:600;margin-bottom:4px;}
+  .desc{color:var(--sub);font-size:13px;margin-bottom:16px;line-height:1.6;}
+  .tabs{display:flex;gap:8px;margin-bottom:16px;}
+  .tab{padding:6px 16px;border:1px solid var(--border);border-radius:6px;cursor:pointer;font-size:14px;background:#fff;color:var(--sub);user-select:none;}
+  .tab:hover{border-color:var(--primary);color:var(--primary);}
+  .tab.active{background:var(--primary);color:#fff;border-color:var(--primary);}
+  .stats{display:flex;gap:16px;margin:16px 0;}
+  .stat{flex:1;background:var(--bg);border-radius:8px;padding:12px 16px;}
+  .stat .label{font-size:12px;color:var(--sub);}
+  .stat .value{font-size:20px;font-weight:600;margin-top:4px;}
+  .stat .value small{font-size:12px;font-weight:400;color:var(--sub);}
+  svg{width:100%;height:auto;display:block;}
+  .note{margin-top:16px;font-size:12px;color:var(--sub);line-height:1.7;border-top:1px dashed var(--border);padding-top:12px;}
+  .tablewrap{margin-top:14px;max-height:160px;overflow:auto;}
+  table{width:100%;border-collapse:collapse;font-size:12px;}
+  th,td{border:1px solid var(--border);padding:4px 6px;text-align:center;}
+  th{background:var(--bg);font-weight:600;position:sticky;top:0;}
+</style>
+</head>
+<body>
+<div class="card">
+  <h2>园区人流密度 · 日趋势（模拟数据）</h2>
+  <div class="desc">单位：人/㎡（园区公共区域整体综合估计）。园区作息：上班高峰 8–9 时，下班 18 时，周末与法定节假日双休。</div>
+  <div class="tabs">
+    <div class="tab active" data-mode="workday">工作日</div>
+    <div class="tab" data-mode="weekend">周末（双休）</div>
+    <div class="tab" data-mode="holiday">节假日</div>
+  </div>
+  <div class="stats">
+    <div class="stat"><div class="label">峰值时段</div><div class="value" id="peakHour">—</div></div>
+    <div class="stat"><div class="label">峰值密度</div><div class="value" id="peakVal">— <small>人/㎡</small></div></div>
+    <div class="stat"><div class="label">日均密度</div><div class="value" id="avgVal">— <small>人/㎡</small></div></div>
+  </div>
+  <svg id="chart" viewBox="0 0 900 420" xmlns="http://www.w3.org/2000/svg"></svg>
+  <div class="tablewrap">
+    <table id="dataTable"></table>
+  </div>
+  <div class="note">
+    数据为模拟生成，量级参考门厅/餐厅/通道典型密度区间（正常 0.5–1.0 人/㎡，夜间近 0）。
+    工作日呈双峰（早 8–9、晚 17–18）+ 午休小峰；周末无通勤峰、全天低平；节假日较周末更低。
+    正式上线需以「真实在场人数 ÷ 核定容量」或「ROI 米标定面积」替换本模拟值。
+  </div>
+</div>
+<script>
+  const data = {
+    workday: [0.05,0.04,0.04,0.03,0.03,0.05,0.12,0.28,0.65,0.92,0.55,0.60,0.72,0.50,0.45,0.46,0.50,0.68,0.88,0.40,0.25,0.18,0.12,0.08],
+    weekend: [0.03,0.03,0.02,0.02,0.02,0.03,0.05,0.08,0.10,0.12,0.15,0.18,0.20,0.17,0.15,0.14,0.13,0.12,0.13,0.16,0.14,0.10,0.07,0.05],
+    holiday: [0.02,0.02,0.02,0.01,0.01,0.02,0.03,0.05,0.06,0.07,0.08,0.09,0.10,0.08,0.07,0.06,0.06,0.05,0.06,0.07,0.06,0.05,0.04,0.03]
+  };
+  const peaks = { workday:[[8,9],[17,18]], weekend:[], holiday:[] };
+  const W=900,H=420, mL=52,mR=20,mT=34,mB=42;
+  const pw=W-mL-mR, ph=H-mT-mB, maxY=1.0;
+  const svg=document.getElementById('chart');
+  function render(mode){
+    const arr=data[mode];
+    let s='';
+    for(let i=0;i<=5;i++){
+      const y=mT+ph-(ph*i/5);
+      const v=(maxY*i/5).toFixed(2);
+      s+=`<line x1="${mL}" y1="${y}" x2="${W-mR}" y2="${y}" stroke="#eee" stroke-width="1"/>`;
+      s+=`<text x="${mL-8}" y="${y+4}" font-size="11" fill="#646a73" text-anchor="end">${v}</text>`;
+    }
+    const gap=pw/24, bw=gap*0.62, pk=peaks[mode];
+    arr.forEach((v,i)=>{
+      const x=mL+gap*i+(gap-bw)/2;
+      const bh=ph*(v/maxY);
+      const y=mT+ph-bh;
+      const isPeak = pk.some(([a,b])=>i>=a&&i<=b);
+      const fill=isPeak?'#1677ff':'#91caff';
+      s+=`<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${bw.toFixed(1)}" height="${bh.toFixed(1)}" rx="2" fill="${fill}"><title>${i}时：${v} 人/㎡</title></rect>`;
+      if(i%3===0||i===23){
+        s+=`<text x="${(mL+gap*i+gap/2).toFixed(1)}" y="${H-mB+18}" font-size="10" fill="#646a73" text-anchor="middle">${i}</text>`;
+      }
+    });
+    s+=`<text x="${W/2}" y="${H-6}" font-size="11" fill="#646a73" text-anchor="middle">小时（0–23 时）</text>`;
+    s+=`<text x="${mL-38}" y="${mT-14}" font-size="11" fill="#646a73" text-anchor="start">人/㎡</text>`;
+    pk.forEach(([a,b])=>{
+      const txt=a===8?'早高峰':(a===17?'晚高峰':'');
+      if(txt) s+=`<text x="${(mL+gap*a+gap/2).toFixed(1)}" y="${mT-2}" font-size="11" fill="#1677ff" text-anchor="middle" font-weight="600">${txt}</text>`;
+    });
+    svg.innerHTML=s;
+    let peak=Math.max(...arr), pi=arr.indexOf(peak), sum=arr.reduce((a,b)=>a+b,0);
+    document.getElementById('peakHour').textContent=pi+' 时';
+    document.getElementById('peakVal').innerHTML=peak.toFixed(2)+' <small>人/㎡</small>';
+    document.getElementById('avgVal').innerHTML=(sum/24).toFixed(2)+' <small>人/㎡</small>';
+    let th='<tr><th>时段</th>', td='<tr><td>密度</td>';
+    arr.forEach((v,i)=>{ th+=`<th>${i}</th>`; td+=`<td>${v.toFixed(2)}</td>`; });
+    document.getElementById('dataTable').innerHTML=th+'</tr>'+td+'</tr>';
+  }
+  document.querySelectorAll('.tab').forEach(t=>{
+    t.onclick=()=>{
+      document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+      t.classList.add('active');
+      render(t.dataset.mode);
+    };
+  });
+  render('workday');
+</script>
+</body>
+</html>
