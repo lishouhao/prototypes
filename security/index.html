@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>安防看板</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;}
+  body{background:#f0f2f5;color:#1f2329;overflow:hidden;}
+  .app{display:flex;flex-direction:column;height:100vh;}
+  /* topbar */
+  .topbar{height:48px;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.08);display:flex;align-items:center;justify-content:space-between;padding:0 16px;z-index:10;}
+  .topbar-left{display:flex;align-items:center;gap:12px;}
+  .topbar-left .menu-btn{font-size:18px;cursor:pointer;color:#646a73;}
+  .topbar-left .brand{font-size:16px;font-weight:600;color:#1677ff;display:flex;align-items:center;gap:6px;}
+  .topbar-left .brand::before{content:"";display:inline-block;width:8px;height:8px;background:#1677ff;border-radius:50%;}
+  .topbar-center{flex:1;overflow-x:auto;white-space:nowrap;margin:0 16px;}
+  .topbar-center::-webkit-scrollbar{display:none;}
+  .topbar-center .nav-tab{display:inline-block;padding:0 12px;height:48px;line-height:48px;font-size:13px;color:#646a73;cursor:pointer;border-bottom:2px solid transparent;}
+  .topbar-center .nav-tab.active{color:#1677ff;border-bottom-color:#1677ff;background:#e6f4ff;}
+  .topbar-right{display:flex;align-items:center;gap:12px;color:#646a73;font-size:13px;}
+  .topbar-right .badge-new{background:#ff4d4f;color:#fff;font-size:10px;padding:1px 4px;border-radius:8px;margin-left:2px;}
+  .user{display:flex;align-items:center;gap:6px;}
+  .user img{width:24px;height:24px;border-radius:50%;}
+
+  /* main */
+  .main{flex:1;display:flex;overflow:hidden;}
+  .sidebar{width:180px;background:#001529;color:rgba(255,255,255,.65);font-size:13px;overflow-y:auto;}
+  .sidebar::-webkit-scrollbar{width:4px;}
+  .sidebar::-webkit-scrollbar-thumb{background:rgba(255,255,255,.2);}
+  .side-item{padding:10px 16px;cursor:pointer;display:flex;align-items:center;gap:8px;transition:.2s;}
+  .side-item:hover,.side-item.active{color:#fff;background:#1677ff;}
+  .side-item .arrow{margin-left:auto;font-size:10px;}
+  .side-group>.group-title{padding:8px 16px 8px 28px;font-size:12px;color:rgba(255,255,255,.45);}
+  .side-sub{padding:8px 16px 8px 44px;cursor:pointer;font-size:12px;transition:.2s;}
+  .side-sub:hover,.side-sub.active{color:#fff;background:rgba(22,119,255,.25);}
+  .side-sub.active{border-right:3px solid #1677ff;}
+
+  /* content */
+  .content{flex:1;overflow-y:auto;padding:16px;}
+  .page-title{font-size:18px;font-weight:600;margin-bottom:12px;}
+  .grid-row{display:flex;gap:12px;margin-bottom:12px;}
+  .col{flex:1;min-width:0;display:flex;flex-direction:column;gap:12px;}
+  .col.wide{flex:2;}
+  .card{background:#fff;border-radius:6px;padding:14px;box-shadow:0 1px 2px rgba(0,0,0,.04);}
+  .card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+  .card-title{font-size:14px;font-weight:600;color:#1f2329;}
+  .card-sub{font-size:12px;color:#8a8f99;font-weight:400;}
+  .now-text{font-size:10px;fill:#0050b3;font-weight:600;}
+  .card-tabs{display:flex;gap:4px;}
+  .card-tab{padding:3px 10px;font-size:12px;color:#646a73;background:#f5f7fa;border-radius:4px;cursor:pointer;}
+  .card-tab.active{background:#1677ff;color:#fff;}
+  .card-date{display:flex;align-items:center;gap:4px;font-size:12px;color:#646a73;}
+  .card-date input{border:1px solid #d9d9d9;border-radius:4px;padding:2px 6px;font-size:12px;}
+
+  /* stat card */
+  .stat-card{display:flex;align-items:center;gap:12px;}
+  .stat-icon{width:48px;height:48px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:22px;}
+  .stat-icon.purple{background:#f0f5ff;color:#1677ff;}
+  .stat-icon.blue{background:#e6f4ff;color:#1677ff;}
+  .stat-icon.orange{background:#fff7e6;color:#fa8c16;}
+  .stat-label{font-size:13px;color:#646a73;}
+  .stat-value{font-size:24px;font-weight:700;color:#1f2329;margin-top:2px;}
+  .stat-value small{font-size:13px;font-weight:400;margin-left:2px;}
+
+  /* chart */
+  svg{width:100%;height:220px;display:block;}
+  .axis-line{stroke:#e5e6eb;stroke-width:1;}
+  .axis-text{font-size:11px;fill:#8f959e;}
+  .grid-line{stroke:#f0f0f0;stroke-width:1;}
+  .bar{rx:2;}
+  .line{fill:none;stroke-width:2;stroke-linejoin:round;stroke-linecap:round;}
+  .area{fill-opacity:.15;}
+  .dot{stroke:#fff;stroke-width:2;}
+  .legend{display:flex;gap:16px;justify-content:flex-end;font-size:12px;color:#646a73;margin-top:4px;}
+  .legend-item{display:flex;align-items:center;gap:4px;}
+  .legend-dot{width:8px;height:8px;border-radius:2px;}
+
+  /* alert stats */
+  .alert-row{display:flex;gap:12px;}
+  .alert-row .col{flex:1;}
+  .big-number{font-size:32px;font-weight:700;color:#1f2329;}
+  .sub-legend{display:flex;gap:12px;margin-top:8px;flex-wrap:wrap;}
+  .sub-legend span{display:flex;align-items:center;gap:4px;font-size:12px;color:#646a73;}
+  .sub-legend i{width:8px;height:8px;border-radius:2px;display:inline-block;}
+
+  /* ring */
+  .ring-wrap{position:relative;width:120px;height:120px;margin:0 auto;}
+  .ring-text{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+  .ring-text .num{font-size:24px;font-weight:700;color:#1f2329;}
+  .ring-text .lab{font-size:12px;color:#646a73;}
+
+  /* density tabs */
+
+  .mt8{margin-top:8px;}
+  .note{font-size:12px;color:#8f959e;margin-top:6px;}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="topbar">
+    <div class="topbar-left">
+      <span class="menu-btn">☰</span>
+      <div class="brand">智慧园区</div>
+    </div>
+    <div class="topbar-center">
+      <span class="nav-tab">菜单管理</span>
+      <span class="nav-tab">用水能耗报表</span>
+      <span class="nav-tab">用电概览</span>
+      <span class="nav-tab">能耗设备监测</span>
+      <span class="nav-tab">能源设备</span>
+      <span class="nav-tab">用电质量</span>
+      <span class="nav-tab">分项配置</span>
+      <span class="nav-tab">环境监测</span>
+      <span class="nav-tab">巡更巡检</span>
+      <span class="nav-tab">告警管理</span>
+      <span class="nav-tab">环境告警</span>
+      <span class="nav-tab">规则预测</span>
+      <span class="nav-tab">公告管理</span>
+      <span class="nav-tab">通知公告</span>
+      <span class="nav-tab">园区运行监控</span>
+      <span class="nav-tab active">安防看板</span>
+      <span class="nav-tab">一键报修</span>
+    </div>
+    <div class="topbar-right">
+      <span>更多功能</span>
+      <span>下载中心插件</span>
+      <span class="user"><img src="https://api.dicebear.com/7.x/avataaars/svg?seed=admin" alt=""> admin</span>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="sidebar">
+      <div class="side-item">首页</div>
+      <div class="side-item active">智慧安防 <span class="arrow">▼</span></div>
+      <div class="side-group">
+        <div class="side-sub active">安防看板</div>
+        <div class="side-sub">视频监控</div>
+        <div class="side-sub">视频巡更</div>
+      </div>
+      <div class="side-item">人员安全 <span class="arrow">▶</span></div>
+      <div class="side-item">车辆安全 <span class="arrow">▶</span></div>
+      <div class="side-item">安防设备 <span class="arrow">▶</span></div>
+      <div class="side-item">智慧消防 <span class="arrow">▶</span></div>
+      <div class="side-item">园区人员 <span class="arrow">▶</span></div>
+      <div class="side-item">人员通行</div>
+      <div class="side-item">车辆通行</div>
+      <div class="side-item">设施管理 <span class="arrow">▶</span></div>
+      <div class="side-item">一键报修</div>
+    </div>
+
+    <div class="content">
+      <div class="page-title">安防看板</div>
+
+      <!-- Row 1: stats + trends -->
+      <div class="grid-row">
+        <div class="col" style="flex:0 0 200px;">
+          <div class="card stat-card">
+            <div class="stat-icon purple">👤</div>
+            <div>
+              <div class="stat-label">当前园区人次</div>
+              <div class="stat-value">906<small>人</small></div>
+            </div>
+          </div>
+          <div class="card stat-card">
+            <div class="stat-icon blue">👥</div>
+            <div>
+              <div class="stat-label">今日累计入园人次</div>
+              <div class="stat-value">1794<small>人</small></div>
+            </div>
+          </div>
+        </div>
+        <div class="col wide">
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">入园人次趋势</span>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <div class="card-tabs"><span class="card-tab active">今日</span><span class="card-tab">昨日</span><span class="card-tab">上周</span><span class="card-tab">上月</span></div>
+                <div class="card-date"><input type="date" value="2026-09-01"> ~ <input type="date" value="2026-09-01"></div>
+              </div>
+            </div>
+            <svg id="enterTrend"></svg>
+          </div>
+        </div>
+        <div class="col" style="flex:0 0 200px;">
+          <div class="card stat-card">
+            <div class="stat-icon blue">🚗</div>
+            <div>
+              <div class="stat-label">当前园区车辆</div>
+              <div class="stat-value">322<small>个</small></div>
+            </div>
+          </div>
+          <div class="card stat-card">
+            <div class="stat-icon orange">🅿️</div>
+            <div>
+              <div class="stat-label">当前剩余车位数</div>
+              <div class="stat-value">1092<small>个</small></div>
+            </div>
+          </div>
+        </div>
+        <div class="col wide">
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">园区车辆趋势</span>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <div class="card-tabs"><span class="card-tab active">今日</span><span class="card-tab">昨日</span><span class="card-tab">上周</span><span class="card-tab">上月</span></div>
+                <div class="card-date"><input type="date" value="2026-09-01"> ~ <input type="date" value="2026-09-01"></div>
+              </div>
+            </div>
+            <svg id="vehicleTrend"></svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Row 2: 人流密度（新增，放在车位统计上方） -->
+      <div class="grid-row">
+        <div class="col">
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">人流密度</span>
+              <span class="card-sub" id="densityNow"></span>
+            </div>
+            <svg id="densityChart"></svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Row 3: 车位统计 -->
+      <div class="grid-row">
+        <div class="col">
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">车位总数与空闲车位数统计</span>
+            </div>
+            <svg id="parkingChart"></svg>
+            <div class="legend">
+              <div class="legend-item"><span class="legend-dot" style="background:#1677ff;"></span>车位总数</div>
+              <div class="legend-item"><span class="legend-dot" style="background:#52c41a;"></span>空闲车位数</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Row 4: bottom stats -->
+      <div class="grid-row alert-row">
+        <div class="col">
+          <div class="card" style="text-align:center;">
+            <div class="card-title" style="text-align:left;">今日巡更巡检统计</div>
+            <div class="ring-wrap">
+              <svg viewBox="0 0 120 120" style="width:100%;height:100%;">
+                <circle cx="60" cy="60" r="50" fill="none" stroke="#f0f0f0" stroke-width="10"/>
+                <circle cx="60" cy="60" r="50" fill="none" stroke="#1677ff" stroke-width="10" stroke-dasharray="251.2" stroke-dashoffset="37.68" transform="rotate(-90 60 60)"/>
+              </svg>
+              <div class="ring-text">
+                <div class="num">85%</div>
+                <div class="lab">完成率</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col">
+          <div class="card">
+            <div class="card-title">未关闭告警统计</div>
+            <div class="big-number" style="color:#1677ff;margin-top:10px;">157499</div>
+            <div class="sub-legend">
+              <span><i style="background:#f5222d;"></i>紧急</span>
+              <span><i style="background:#fa8c16;"></i>重要</span>
+              <span><i style="background:#faad14;"></i>次要</span>
+              <span><i style="background:#52c41a;"></i>普通</span>
+            </div>
+          </div>
+        </div>
+        <div class="col wide">
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">告警工单数据趋势</span>
+              <div class="legend" style="margin:0;">
+                <div class="legend-item"><span class="legend-dot" style="background:#1677ff;"></span>告警总数</div>
+                <div class="legend-item"><span class="legend-dot" style="background:#52c41a;"></span>工单总数</div>
+              </div>
+            </div>
+            <svg id="alertTrend"></svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // helper: SVG namespace
+  const ns = "http://www.w3.org/2000/svg";
+  function createSVG(id){ return document.getElementById(id); }
+  function clear(el){ while(el.firstChild) el.removeChild(el.firstChild); }
+  function svgEl(tag,attrs){
+    const el=document.createElementNS(ns,tag);
+    for(let k in attrs) el.setAttribute(k,attrs[k]);
+    return el;
+  }
+
+  function drawLineChart(svgId,data,opts={max:600,yTicks:6}){
+    const svg=createSVG(svgId); clear(svg);
+    const W=svg.clientWidth||960, H=220, mL=40,mR=20,mT=20,mB=30;
+    const pw=W-mL-mR, ph=H-mT-mB;
+    const max=opts.max;
+    // grid + y labels
+    for(let i=0;i<opts.yTicks;i++){
+      const y=mT+ph-(ph*i/(opts.yTicks-1));
+      const v=Math.round(max*i/(opts.yTicks-1));
+      svg.appendChild(svgEl('line',{x1:mL,y1:y,x2:W-mR,y2:y,class:'grid-line'}));
+      svg.appendChild(svgEl('text',{x:mL-6,y:y+4,class:'axis-text','text-anchor':'end'})).textContent=v;
+    }
+    // x labels
+    const n=data.length;
+    data.forEach((v,i)=>{
+      if(i%2===0 || i===n-1){
+        const x=mL+(pw*i/(n-1));
+        svg.appendChild(svgEl('text',{x:x,y:H-6,class:'axis-text','text-anchor':'middle'})).textContent=i+'时';
+      }
+    });
+    // area path
+    let d=`M ${mL} ${mT+ph}`;
+    data.forEach((v,i)=>{
+      const x=mL+(pw*i/(n-1));
+      const y=mT+ph-(ph*v/max);
+      d+=` L ${x} ${y}`;
+    });
+    d+=` L ${mL+pw} ${mT+ph} Z`;
+    svg.appendChild(svgEl('path',{d:d,fill:'#1677ff',class:'area'}));
+    // line path
+    let dl='';
+    data.forEach((v,i)=>{
+      const x=mL+(pw*i/(n-1));
+      const y=mT+ph-(ph*v/max);
+      dl+=(i===0?'M':'L')+` ${x} ${y}`;
+    });
+    svg.appendChild(svgEl('path',{d:dl,class:'line',stroke:'#1677ff'}));
+    // dots
+    data.forEach((v,i)=>{
+      if(i%2===0){
+        const x=mL+(pw*i/(n-1));
+        const y=mT+ph-(ph*v/max);
+        svg.appendChild(svgEl('circle',{cx:x,cy:y,r:3,fill:'#1677ff',class:'dot'}));
+      }
+    });
+  }
+
+  function drawBarChart(svgId,data,opts={max:300,yTicks:6,color:'#1677ff'}){
+    const svg=createSVG(svgId); clear(svg);
+    const W=svg.clientWidth||960, H=220, mL=40,mR=20,mT=20,mB=30;
+    const pw=W-mL-mR, ph=H-mT-mB;
+    const max=opts.max;
+    for(let i=0;i<opts.yTicks;i++){
+      const y=mT+ph-(ph*i/(opts.yTicks-1));
+      const v=Math.round(max*i/(opts.yTicks-1));
+      svg.appendChild(svgEl('line',{x1:mL,y1:y,x2:W-mR,y2:y,class:'grid-line'}));
+      svg.appendChild(svgEl('text',{x:mL-6,y:y+4,class:'axis-text','text-anchor':'end'})).textContent=v;
+    }
+    const n=data.length, bw=(pw/n)*0.55, gap=(pw/n);
+    data.forEach((v,i)=>{
+      const x=mL+gap*i+(gap-bw)/2;
+      const h=ph*v/max;
+      const y=mT+ph-h;
+      svg.appendChild(svgEl('rect',{x:x,y:y,width:bw,height:h,fill:opts.color,class:'bar'}));
+      if(i%2===0 || i===n-1){
+        svg.appendChild(svgEl('text',{x:mL+gap*i+gap/2,y:H-6,class:'axis-text','text-anchor':'middle'})).textContent=i+'时';
+      }
+    });
+  }
+
+  function drawGroupedBarChart(svgId,series,labels,opts={max:800,yTicks:5}){
+    const svg=createSVG(svgId); clear(svg);
+    const W=svg.clientWidth||960, H=220, mL=50,mR=20,mT=20,mB=50;
+    const pw=W-mL-mR, ph=H-mT-mB;
+    const max=opts.max;
+    for(let i=0;i<opts.yTicks;i++){
+      const y=mT+ph-(ph*i/(opts.yTicks-1));
+      const v=Math.round(max*i/(opts.yTicks-1));
+      svg.appendChild(svgEl('line',{x1:mL,y1:y,x2:W-mR,y2:y,class:'grid-line'}));
+      svg.appendChild(svgEl('text',{x:mL-6,y:y+4,class:'axis-text','text-anchor':'end'})).textContent=v;
+    }
+    const n=labels.length, groupW=pw/n, barW=groupW*0.28, gap=groupW*0.12;
+    const colors=['#1677ff','#52c41a'];
+    labels.forEach((lab,i)=>{
+      const gx=mL+groupW*i;
+      series.forEach((s,si)=>{
+        const v=s[i];
+        const h=ph*v/max;
+        const x=gx+gap+si*(barW+4);
+        const y=mT+ph-h;
+        svg.appendChild(svgEl('rect',{x:x,y:y,width:barW,height:h,fill:colors[si],class:'bar'}));
+      });
+      // x label rotated
+      const tx=gx+groupW/2, ty=H-12;
+      const text=svgEl('text',{x:tx,y:ty,class:'axis-text','text-anchor':'end',transform:`rotate(-25 ${tx} ${ty})`});
+      text.textContent=lab;
+      svg.appendChild(text);
+    });
+  }
+
+  function drawDensityChart(svgId,data,opts={}){
+    opts=Object.assign({max:1.0,yTicks:5,nowHour:new Date().getHours()},opts);
+    const svg=createSVG(svgId); clear(svg);
+    const W=svg.clientWidth||960, H=220, mL=40,mR=20,mT=20,mB=30;
+    const pw=W-mL-mR, ph=H-mT-mB;
+    const max=opts.max;
+    for(let i=0;i<opts.yTicks;i++){
+      const y=mT+ph-(ph*i/(opts.yTicks-1));
+      const v=(max*i/(opts.yTicks-1)).toFixed(2);
+      svg.appendChild(svgEl('line',{x1:mL,y1:y,x2:W-mR,y2:y,class:'grid-line'}));
+      svg.appendChild(svgEl('text',{x:mL-6,y:y+4,class:'axis-text','text-anchor':'end'})).textContent=v;
+    }
+    const n=data.length;
+    const xAt=i=> n===1 ? mL+pw/2 : mL+(pw*i/(n-1));
+    const yAt=v=> mT+ph-(ph*Math.min(v,max)/max);
+    let dl='';
+    data.forEach((v,i)=>{ dl+=(i===0?'M':'L')+` ${xAt(i)} ${yAt(v)}`; });
+    svg.appendChild(svgEl('path',{d:dl,fill:'none',stroke:'#1677ff','stroke-width':2,'stroke-linejoin':'round'}));
+    data.forEach((v,i)=>{
+      const x=xAt(i), y=yAt(v);
+      const isNow=(i===opts.nowHour);
+      svg.appendChild(svgEl('circle',{cx:x,cy:y,r:isNow?4.5:2.5,fill:isNow?'#0050b3':'#1677ff'}));
+      svg.appendChild(svgEl('text',{x:x,y:H-6,class:'axis-text','text-anchor':'middle'})).textContent=i+'时';
+      if(isNow){
+        svg.appendChild(svgEl('text',{x:x,y:y-10,class:'now-text','text-anchor':'middle'})).textContent='当前';
+      }
+    });
+  }
+
+  // data
+  const enterData=[20,15,10,8,10,25,60,150,350,550,420,300,250,220,240,260,300,380,280,150,80,50,30,25];
+  const vehicleData=[10,8,5,5,8,20,50,120,200,280,220,150,120,100,110,130,160,200,140,80,40,30,20,15];
+  const parkingLabels=['综合楼地面区','综合楼西楼区','招商楼地面区','能源中心地面区','东区地面区','能源中心地面区'];
+  const parkingTotal=[50,300,80,260,60,750];
+  const parkingFree=[30,180,60,20,40,720];
+  const alertData1=[12,18,15,22,28,35,30,25,20,18,22,26];
+  const alertData2=[8,12,10,15,18,22,20,16,14,12,15,18];
+  const density={
+    workday:[0.05,0.04,0.04,0.03,0.03,0.05,0.12,0.28,0.65,0.92,0.55,0.60,0.72,0.50,0.45,0.46,0.50,0.68,0.88,0.40,0.25,0.18,0.12,0.08],
+    weekend:[0.03,0.03,0.02,0.02,0.02,0.03,0.05,0.08,0.10,0.12,0.15,0.18,0.20,0.17,0.15,0.14,0.13,0.12,0.13,0.16,0.14,0.10,0.07,0.05],
+    holiday:[0.02,0.02,0.02,0.01,0.01,0.02,0.03,0.05,0.06,0.07,0.08,0.09,0.10,0.08,0.07,0.06,0.06,0.05,0.06,0.07,0.06,0.05,0.04,0.03]
+  };
+  const nowHour=new Date().getHours();
+  document.getElementById('densityNow').textContent='数据截至 '+String(nowHour).padStart(2,'0')+':00';
+
+  // draw initial
+  drawLineChart('enterTrend',enterData,{max:600,yTicks:7});
+  drawBarChart('vehicleTrend',vehicleData,{max:300,yTicks:7,color:'#1677ff'});
+  drawGroupedBarChart('parkingChart',[parkingTotal,parkingFree],parkingLabels,{max:800,yTicks:5});
+  drawBarChart('alertTrend',alertData1,{max:40,yTicks:5,color:'#1677ff'});
+  // overlay alert total line
+  (function(){
+    const svg=createSVG('alertTrend');
+    const W=svg.clientWidth||960, H=220, mL=40,mR=20,mT=20,mB=30;
+    const pw=W-mL-mR, ph=H-mT-mB;
+    const max=40, n=alertData2.length;
+    let dl='';
+    alertData2.forEach((v,i)=>{
+      const x=mL+(pw*i/(n-1));
+      const y=mT+ph-(ph*v/max);
+      dl+=(i===0?'M':'L')+` ${x} ${y}`;
+    });
+    svg.appendChild(svgEl('path',{d:dl,class:'line',stroke:'#52c41a'}));
+  })();
+  drawDensityChart('densityChart',density.workday.slice(0,nowHour+1),{nowHour});
+
+  // card tabs (visual only)
+  document.querySelectorAll('.card-tabs').forEach(tabs=>{
+    tabs.querySelectorAll('.card-tab').forEach(tab=>{
+      tab.onclick=()=>{
+        tabs.querySelectorAll('.card-tab').forEach(x=>x.classList.remove('active'));
+        tab.classList.add('active');
+      };
+    });
+  });
+
+  // redraw on resize
+  window.addEventListener('resize',()=>{
+    drawLineChart('enterTrend',enterData,{max:600,yTicks:7});
+    drawBarChart('vehicleTrend',vehicleData,{max:300,yTicks:7,color:'#1677ff'});
+    drawGroupedBarChart('parkingChart',[parkingTotal,parkingFree],parkingLabels,{max:800,yTicks:5});
+    drawDensityChart('densityChart',density.workday.slice(0,nowHour+1),{nowHour});
+    drawBarChart('alertTrend',alertData1,{max:40,yTicks:5,color:'#1677ff'});
+    (function(){
+      const svg=createSVG('alertTrend');
+      const W=svg.clientWidth||960, H=220, mL=40,mR=20,mT=20,mB=30;
+      const pw=W-mL-mR, ph=H-mT-mB;
+      const max=40, n=alertData2.length;
+      let dl='';
+      alertData2.forEach((v,i)=>{
+        const x=mL+(pw*i/(n-1));
+        const y=mT+ph-(ph*v/max);
+        dl+=(i===0?'M':'L')+` ${x} ${y}`;
+      });
+      svg.appendChild(svgEl('path',{d:dl,class:'line',stroke:'#52c41a'}));
+    })();
+  });
+</script>
+</body>
+</html>
