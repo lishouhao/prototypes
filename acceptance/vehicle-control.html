@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>车辆布控 - 智慧园区</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+      background: #f0f2f5;
+      color: rgba(0, 0, 0, 0.85);
+    }
+    .layout { display: flex; min-height: 100vh; }
+    .sidebar {
+      width: 208px;
+      background: #001529;
+      color: rgba(255, 255, 255, 0.65);
+      flex-shrink: 0;
+      overflow-y: auto;
+    }
+    .logo {
+      height: 64px;
+      display: flex;
+      align-items: center;
+      padding-left: 24px;
+      color: #fff;
+      font-size: 18px;
+      font-weight: 600;
+      background: #002140;
+    }
+    .menu-section { padding: 12px 0; }
+    .menu-title {
+      padding: 8px 24px;
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.45);
+      text-transform: uppercase;
+    }
+    .menu-item {
+      position: relative;
+      padding: 12px 24px 12px 48px;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-size: 14px;
+    }
+    .menu-item:hover { color: #fff; background: #1890ff; }
+    .menu-item.active { color: #fff; background: #1890ff; }
+    .menu-item.has-children::after {
+      content: '›';
+      position: absolute;
+      right: 24px;
+      top: 12px;
+      font-size: 16px;
+    }
+    .submenu { background: #000c17; }
+    .submenu .menu-item { padding-left: 64px; font-size: 13px; }
+    .submenu .menu-item.active { background: #1890ff; }
+    .main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+    .header {
+      height: 64px;
+      background: #fff;
+      border-bottom: 1px solid #f0f0f0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+    }
+    .breadcrumb {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      color: rgba(0, 0, 0, 0.45);
+    }
+    .breadcrumb a { color: rgba(0, 0, 0, 0.45); text-decoration: none; }
+    .breadcrumb a:hover { color: #1890ff; }
+    .breadcrumb .current { color: rgba(0, 0, 0, 0.85); font-weight: 500; }
+    .user-area {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      color: rgba(0, 0, 0, 0.65);
+      font-size: 14px;
+    }
+    .avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: #1890ff;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 500;
+    }
+    .page-tabs {
+      display: flex;
+      gap: 8px;
+      padding: 16px 24px 0;
+    }
+    .page-tab {
+      padding: 8px 16px;
+      border: 1px solid #d9d9d9;
+      background: #fff;
+      color: rgba(0, 0, 0, 0.65);
+      border-radius: 2px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .page-tab.active { background: #1890ff; color: #fff; border-color: #1890ff; }
+    .content { flex: 1; padding: 16px 24px 24px; overflow: auto; }
+    .card {
+      background: #fff;
+      border-radius: 2px;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+    }
+    .card-body { padding: 16px 24px 24px; }
+    .card-header {
+      padding: 16px 24px;
+      border-bottom: 1px solid #f0f0f0;
+      font-size: 16px;
+      font-weight: 500;
+      color: rgba(0, 0, 0, 0.85);
+    }
+    .filters {
+      display: flex;
+      gap: 12px;
+      align-items: flex-end;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+    .filter-item { display: flex; flex-direction: column; gap: 6px; }
+    .filter-item label { font-size: 14px; color: rgba(0, 0, 0, 0.65); }
+    .query-bar { display: flex; gap: 12px; align-items: center; margin-bottom: 16px; flex-wrap: wrap; }
+    .query-bar label { font-size: 14px; color: rgba(0, 0, 0, 0.65); }
+    .input, .select {
+      height: 32px;
+      padding: 0 12px;
+      border: 1px solid #d9d9d9;
+      border-radius: 2px;
+      font-size: 14px;
+      color: rgba(0, 0, 0, 0.65);
+      background: #fff;
+      outline: none;
+      min-width: 140px;
+      transition: all 0.3s;
+    }
+    .input:focus, .select:focus { border-color: #40a9ff; box-shadow: 0 0 0 2px rgba(24,144,255,0.2); }
+    .input::placeholder { color: rgba(0, 0, 0, 0.25); }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 16px;
+      height: 32px;
+      border-radius: 2px;
+      font-size: 14px;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: all 0.3s;
+      line-height: 1.5;
+      white-space: nowrap;
+    }
+    .btn-primary { background: #1890ff; color: #fff; border-color: #1890ff; }
+    .btn-primary:hover { background: #40a9ff; border-color: #40a9ff; }
+    .btn-default { background: #fff; color: rgba(0, 0, 0, 0.65); border-color: #d9d9d9; }
+    .btn-default:hover { color: #1890ff; border-color: #1890ff; }
+    .btn + .btn { margin-left: 8px; }
+    .btn-icon { padding: 0 8px; }
+    .toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    th, td {
+      padding: 12px 16px;
+      text-align: left;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    th { background: #fafafa; color: rgba(0, 0, 0, 0.85); font-weight: 500; }
+    tbody tr:hover { background: #fafafa; }
+    .link { color: #1890ff; cursor: pointer; margin-right: 12px; }
+    .link:hover { color: #40a9ff; }
+    .link.danger { color: #ff4d4f; }
+    .link.danger:hover { color: #ff7875; }
+    .tag {
+      display: inline-block;
+      padding: 1px 8px;
+      border-radius: 2px;
+      font-size: 12px;
+      line-height: 20px;
+    }
+    .tag-level-high { background: #fff1f0; color: #cf1322; border: 1px solid #ffa39e; }
+    .tag-level-mid { background: #fff7e6; color: #d46b08; border: 1px solid #ffd591; }
+    .tag-level-low { background: #f6ffed; color: #389e0d; border: 1px solid #b7eb8f; }
+    .device-list { max-width: 220px; }
+    .device-name { display: inline-block; background: #f0f5ff; color: #2f54eb; border-radius: 2px; padding: 0 6px; margin: 0 4px 4px 0; font-size: 12px; line-height: 20px; }
+    .pagination {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 8px;
+      margin-top: 16px;
+      font-size: 14px;
+      color: rgba(0, 0, 0, 0.65);
+    }
+    .pagination .page-input { width: 48px; text-align: center; }
+    /* 开关 */
+    .switch { position: relative; display: inline-block; width: 44px; height: 22px; }
+    .switch input { display: none; }
+    .switch .slider {
+      position: absolute; cursor: pointer; inset: 0;
+      background: #ccc; transition: .3s; border-radius: 22px;
+    }
+    .switch .slider:before {
+      content: ""; position: absolute; height: 18px; width: 18px;
+      left: 2px; bottom: 2px; background: #fff; transition: .3s; border-radius: 50%;
+    }
+    .switch input:checked + .slider { background: #1890ff; }
+    .switch input:checked + .slider:before { transform: translateX(22px); }
+    /* 弹窗 */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.45);
+      display: none; align-items: center; justify-content: center; z-index: 1000;
+    }
+    .modal-overlay.show { display: flex; }
+    .modal {
+      background: #fff; border-radius: 2px; width: 600px; max-height: 90vh;
+      overflow-y: auto; box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    .modal-header {
+      padding: 16px 24px; border-bottom: 1px solid #f0f0f0;
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 16px; font-weight: 500;
+    }
+    .modal-close { font-size: 20px; color: rgba(0,0,0,0.45); cursor: pointer; }
+    .modal-close:hover { color: rgba(0,0,0,0.85); }
+    .modal-body { padding: 24px; }
+    .modal-footer { padding: 10px 24px 24px; display: flex; justify-content: flex-end; }
+    .form-item { display: flex; align-items: flex-start; margin-bottom: 16px; }
+    .form-label {
+      width: 100px; padding-top: 5px; text-align: right; margin-right: 16px;
+      font-size: 14px; color: rgba(0, 0, 0, 0.85); flex-shrink: 0;
+    }
+    .form-label .required { color: #ff4d4f; margin-right: 4px; }
+    .form-control { flex: 1; min-width: 0; }
+    .form-control .input, .form-control .select { width: 100%; }
+    .form-control textarea {
+      width: 100%; min-height: 80px; padding: 8px 12px;
+      border: 1px solid #d9d9d9; border-radius: 2px; font-size: 14px;
+      resize: vertical; outline: none; font-family: inherit;
+    }
+    .form-control textarea:focus { border-color: #40a9ff; box-shadow: 0 0 0 2px rgba(24,144,255,0.2); }
+    .form-control .hint { font-size: 12px; color: rgba(0,0,0,0.45); margin-top: 4px; }
+    .switch-row { display: flex; align-items: center; gap: 10px; padding-top: 5px; }
+    .switch-row .switch-text { font-size: 14px; color: rgba(0,0,0,0.85); }
+    .empty-tip { text-align: center; color: rgba(0,0,0,0.45); font-size: 14px; padding: 40px 0; }
+    .message {
+      position: fixed; top: 24px; left: 50%; transform: translateX(-50%);
+      background: #fff; padding: 10px 16px; border-radius: 2px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15); font-size: 14px; z-index: 2000; display: none;
+    }
+    .message.show { display: block; }
+    .message.success { border-left: 4px solid #52c41a; }
+    .message.error { border-left: 4px solid #ff4d4f; }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="logo">智慧园区</div>
+      <div class="menu-section">
+        <div class="menu-item"><span style="margin-right:8px">🏠</span>首页</div>
+        <div class="menu-title">智慧安防</div>
+        <div class="menu-item has-children">视频监控</div>
+        <div class="menu-item has-children">安防看板</div>
+        <div class="menu-item has-children">视频巡更</div>
+        <div class="menu-item has-children">人员安全</div>
+        <div class="menu-item has-children active">车辆安全</div>
+        <div class="submenu">
+          <div class="menu-item">车辆黑名单</div>
+          <div class="menu-item active">车辆布控</div>
+          <div class="menu-item">车辆检索</div>
+          <div class="menu-item">车辆轨迹</div>
+        </div>
+        <div class="menu-item has-children">安防设备</div>
+        <div class="menu-item">设备地图</div>
+        <div class="menu-item has-children">安防告警</div>
+      </div>
+    </aside>
+    <div class="main">
+      <header class="header">
+        <div class="breadcrumb">
+          <span>智慧安防</span>
+          <span>/</span>
+          <span>车辆安全</span>
+          <span>/</span>
+          <span class="current">车辆布控</span>
+        </div>
+        <div class="user-area">
+          <span style="color:#1890ff;cursor:pointer">意见反馈</span>
+          <span>下载中继插件</span>
+          <span style="font-size:18px">🔔</span>
+          <div class="avatar">管</div>
+          <span>管理员</span>
+        </div>
+      </header>
+      <div class="page-tabs">
+        <div class="page-tab">首页</div>
+        <div class="page-tab active">车辆布控</div>
+        <div class="page-tab">车辆布控详情</div>
+      </div>
+      <div class="content">
+        <div class="card">
+          <div class="card-body">
+            <div class="filters">
+              <div class="filter-item">
+                <label>任务名称</label>
+                <input class="input" id="nameInput" placeholder="请输入">
+              </div>
+              <div class="filter-item">
+                <label>任务类型</label>
+                <select class="select" id="typeFilter">
+                  <option value="">全部</option>
+                  <option>黑名单布控</option>
+                  <option>白名单布控</option>
+                  <option>重点车辆布控</option>
+                </select>
+              </div>
+              <div class="filter-item">
+                <label>车牌号</label>
+                <input class="input" id="plateInput" placeholder="如 苏E12345">
+              </div>
+              <div class="filter-item">
+                <label>告警等级</label>
+                <select class="select" id="levelFilter">
+                  <option value="">全部</option>
+                  <option>高</option>
+                  <option>中</option>
+                  <option>低</option>
+                </select>
+              </div>
+              <div class="filter-item">
+                <label>任务状态</label>
+                <select class="select" id="statusFilter">
+                  <option value="">全部</option>
+                  <option value="1">启用</option>
+                  <option value="0">停用</option>
+                </select>
+              </div>
+              <div class="filter-item">
+                <label>布控区域</label>
+                <input class="input" id="areaInput" placeholder="如 综合楼周边">
+              </div>
+              <div class="filter-item">
+                <label>布控时段</label>
+                <div style="display:flex;gap:8px;align-items:center">
+                  <input class="input" id="periodFrom" type="date" style="min-width:140px">
+                  <span>至</span>
+                  <input class="input" id="periodTo" type="date" style="min-width:140px">
+                </div>
+              </div>
+              <div class="filter-item">
+                <label>&nbsp;</label>
+                <div style="display:flex;gap:8px">
+                  <button class="btn btn-primary" id="searchBtn">搜索</button>
+                  <button class="btn btn-default" id="resetBtn">重置</button>
+                </div>
+              </div>
+            </div>
+            <div class="query-bar">
+              <label>常用模板</label>
+              <select class="select" id="templateSelect" style="min-width:160px">
+                <option value="">— 请选择 —</option>
+              </select>
+              <button class="btn btn-default" id="saveTemplateBtn">保存为模板</button>
+              <button class="btn btn-default" id="delTemplateBtn">删除模板</button>
+            </div>
+            <div class="toolbar">
+              <div></div>
+              <button class="btn btn-primary" id="addBtn">+ 新建布控</button>
+            </div>
+            <table>
+              <thead>
+                <tr>
+                  <th style="width:60px">序号</th>
+                  <th>任务名称</th>
+                  <th style="width:120px">任务类型</th>
+                  <th style="width:90px">布控车辆数</th>
+                  <th>关联设备</th>
+                  <th style="width:140px">布控区域</th>
+                  <th style="width:200px">布控时段</th>
+                  <th style="width:90px">告警等级</th>
+                  <th style="width:140px">创建时间</th>
+                  <th style="width:90px">任务状态</th>
+                  <th style="width:120px">操作</th>
+                </tr>
+              </thead>
+              <tbody id="tableBody"></tbody>
+            </table>
+            <div class="pagination">
+              <span>共 <span id="totalCount">0</span> 条</span>
+              <select class="select" style="width:auto;min-width:auto">
+                <option>10条/页</option>
+                <option>20条/页</option>
+                <option>50条/页</option>
+              </select>
+              <button class="btn btn-default btn-icon">&lt;</button>
+              <button class="btn btn-primary btn-icon">1</button>
+              <button class="btn btn-default btn-icon">&gt;</button>
+              <span>前往</span>
+              <input class="input page-input" value="1">
+              <span>页</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 新建/编辑布控弹窗 -->
+  <div class="modal-overlay" id="modal">
+    <div class="modal">
+      <div class="modal-header">
+        <span id="modalTitle">新建布控</span>
+        <span class="modal-close" data-close="modal">&times;</span>
+      </div>
+      <div class="modal-body">
+        <div class="form-item">
+          <div class="form-label"><span class="required">*</span>任务名称</div>
+          <div class="form-control">
+            <input class="input" id="f_name" placeholder="请输入布控任务名称">
+          </div>
+        </div>
+        <div class="form-item">
+          <div class="form-label"><span class="required">*</span>任务类型</div>
+          <div class="form-control">
+            <select class="select" id="f_type">
+              <option value="">请选择</option>
+              <option>黑名单布控</option>
+              <option>白名单布控</option>
+              <option>重点车辆布控</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-item">
+          <div class="form-label">布控车辆</div>
+          <div class="form-control">
+            <textarea id="f_vehicles" placeholder="每行一个车牌号，如：&#10;苏E12345&#10;苏E67890"></textarea>
+            <div class="hint">每行一个车牌号，系统自动统计「布控车辆数」</div>
+          </div>
+        </div>
+        <div class="form-item">
+          <div class="form-label">关联设备</div>
+          <div class="form-control">
+            <textarea id="f_devices" placeholder="每行一个设备名称，如：&#10;入口相机A&#10;入口相机B"></textarea>
+            <div class="hint">每行一个设备名称，支持多个</div>
+          </div>
+        </div>
+        <div class="form-item">
+          <div class="form-label">布控区域</div>
+          <div class="form-control">
+            <input class="input" id="f_area" placeholder="如：综合楼周边、地库B区">
+          </div>
+        </div>
+        <div class="form-item">
+          <div class="form-label">布控时段</div>
+          <div class="form-control" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+            <input class="input" id="f_start" type="datetime-local" style="min-width:180px">
+            <span>至</span>
+            <input class="input" id="f_end" type="datetime-local" style="min-width:180px">
+          </div>
+        </div>
+        <div class="form-item">
+          <div class="form-label">告警等级</div>
+          <div class="form-control">
+            <select class="select" id="f_level">
+              <option value="">请选择</option>
+              <option>高</option>
+              <option>中</option>
+              <option>低</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-item">
+          <div class="form-label">任务状态</div>
+          <div class="form-control">
+            <div class="switch-row">
+              <label class="switch"><input type="checkbox" id="f_status" checked><span class="slider"></span></label>
+              <span class="switch-text" id="f_status_text">启用</span>
+            </div>
+          </div>
+        </div>
+        <div class="form-item">
+          <div class="form-label">布控说明</div>
+          <div class="form-control">
+            <textarea id="f_remark" placeholder="请输入布控说明（选填）"></textarea>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-default" data-close="modal">取消</button>
+        <button class="btn btn-primary" id="saveBtn">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="message" id="message"></div>
+
+  <script>
+    (function () {
+      const $ = id => document.getElementById(id);
+
+      const tasks = [
+        {
+          id: 1, name: '重点车辆布控0604', type: '重点车辆布控',
+          vehicles: ['苏E12345', '苏E67890', '苏E11111'],
+          devices: ['入口相机A', '入口相机B'],
+          area: '综合楼周边、地库B区',
+          start: '2026-06-04 00:00', end: '2026-12-31 23:59',
+          level: '高', createTime: '2026-06-04 10:32', status: true
+        },
+        {
+          id: 2, name: '黑名单车辆布控_测试', type: '黑名单布控',
+          vehicles: ['苏E00001', '苏E00002'],
+          devices: ['东门卡口相机'],
+          area: '东门出入口',
+          start: '2026-08-01 08:00', end: '2026-08-31 20:00',
+          level: '中', createTime: '2026-08-01 09:15', status: true
+        },
+        {
+          id: 3, name: '访客白名单布控', type: '白名单布控',
+          vehicles: ['苏E88888'],
+          devices: ['南门相机', '地库相机A', '地库相机B'],
+          area: '南门、地库A区',
+          start: '2026-09-01 00:00', end: '2026-09-30 23:59',
+          level: '低', createTime: '2026-09-01 14:20', status: false
+        }
+      ];
+
+      let editingId = null;
+
+      function showMessage(text, type) {
+        const el = $('message');
+        el.textContent = text;
+        el.className = 'message ' + type + ' show';
+        setTimeout(() => el.classList.remove('show'), 2000);
+      }
+      function openModal() { $('modal').classList.add('show'); }
+      function closeModal() { $('modal').classList.remove('show'); }
+
+      function levelTag(level) {
+        const map = { '高': 'tag-level-high', '中': 'tag-level-mid', '低': 'tag-level-low' };
+        const cls = map[level] || 'tag-level-low';
+        return `<span class="tag ${cls}">${level}</span>`;
+      }
+      function deviceHtml(devices) {
+        if (!devices || !devices.length) return '--';
+        return '<div class="device-list">' + devices.map(d => `<span class="device-name">${d}</span>`).join('') + '</div>';
+      }
+
+      function toDate(s) { return new Date(s.replace(' ', 'T')); }
+
+      function render() {
+        const nameKw = $('nameInput').value.trim();
+        const typeKw = $('typeFilter').value;
+        const plateKw = $('plateInput').value.trim();
+        const levelKw = $('levelFilter').value;
+        const statusKw = $('statusFilter').value;
+        const areaKw = $('areaInput').value.trim();
+        const from = $('periodFrom').value;
+        const to = $('periodTo').value;
+        const list = tasks.filter(t => {
+          if (nameKw && !t.name.includes(nameKw)) return false;
+          if (typeKw && t.type !== typeKw) return false;
+          if (plateKw && !(t.vehicles || []).some(v => v.includes(plateKw))) return false;
+          if (levelKw && t.level !== levelKw) return false;
+          if (statusKw !== '' && (statusKw === '1' ? !t.status : t.status)) return false;
+          if (areaKw && !(t.area || '').includes(areaKw)) return false;
+          if (from && toDate(t.end) < toDate(from + 'T00:00:00')) return false;
+          if (to && toDate(t.start) > toDate(to + 'T23:59:59')) return false;
+          return true;
+        });
+        $('totalCount').textContent = list.length;
+        const tbody = $('tableBody');
+        tbody.innerHTML = '';
+        if (list.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="11" class="empty-tip">暂无数据</td></tr>`;
+          return;
+        }
+        list.forEach((t, idx) => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${idx + 1}</td>
+            <td>${t.name}</td>
+            <td>${t.type}</td>
+            <td>${(t.vehicles || []).length}</td>
+            <td>${deviceHtml(t.devices)}</td>
+            <td>${t.area || '--'}</td>
+            <td>${t.start} ~ ${t.end}</td>
+            <td>${levelTag(t.level)}</td>
+            <td>${t.createTime}</td>
+            <td>
+              <label class="switch">
+                <input type="checkbox" data-toggle="${t.id}" ${t.status ? 'checked' : ''}>
+                <span class="slider"></span>
+              </label>
+            </td>
+            <td>
+              <span class="link" data-edit="${t.id}">编辑</span>
+              <span class="link danger" data-del="${t.id}">删除</span>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
+      }
+
+      // 状态开关
+      $('tableBody').addEventListener('change', e => {
+        if (e.target.dataset.toggle) {
+          const id = +e.target.dataset.toggle;
+          const t = tasks.find(x => x.id === id);
+          if (t) { t.status = e.target.checked; showMessage(t.status ? '已启用' : '已停用', 'success'); }
+        }
+      });
+
+      // 编辑/删除
+      $('tableBody').addEventListener('click', e => {
+        if (e.target.dataset.edit) {
+          const id = +e.target.dataset.edit;
+          const t = tasks.find(x => x.id === id);
+          editingId = id;
+          $('modalTitle').textContent = '编辑布控';
+          $('f_name').value = t.name;
+          $('f_type').value = t.type;
+          $('f_vehicles').value = (t.vehicles || []).join('\n');
+          $('f_devices').value = (t.devices || []).join('\n');
+          $('f_area').value = t.area || '';
+          $('f_start').value = t.start.replace(' ', 'T');
+          $('f_end').value = t.end.replace(' ', 'T');
+          $('f_level').value = t.level;
+          $('f_status').checked = t.status;
+          $('f_status_text').textContent = t.status ? '启用' : '停用';
+          $('f_remark').value = t.remark || '';
+          openModal();
+        }
+        if (e.target.dataset.del) {
+          const id = +e.target.dataset.del;
+          const idx = tasks.findIndex(x => x.id === id);
+          if (idx > -1) { tasks.splice(idx, 1); render(); showMessage('删除成功', 'success'); }
+        }
+      });
+
+      // 新建
+      $('addBtn').addEventListener('click', () => {
+        editingId = null;
+        $('modalTitle').textContent = '新建布控';
+        $('f_name').value = '';
+        $('f_type').value = '';
+        $('f_vehicles').value = '';
+        $('f_devices').value = '';
+        $('f_area').value = '';
+        $('f_start').value = '';
+        $('f_end').value = '';
+        $('f_level').value = '';
+        $('f_status').checked = true;
+        $('f_status_text').textContent = '启用';
+        $('f_remark').value = '';
+        openModal();
+      });
+
+      $('f_status').addEventListener('change', e => {
+        $('f_status_text').textContent = e.target.checked ? '启用' : '停用';
+      });
+
+      $('saveBtn').addEventListener('click', () => {
+        const name = $('f_name').value.trim();
+        const type = $('f_type').value;
+        if (!name) { showMessage('请输入任务名称', 'error'); return; }
+        if (!type) { showMessage('请选择任务类型', 'error'); return; }
+        const vehicles = $('f_vehicles').value.split('\n').map(s => s.trim()).filter(Boolean);
+        const devices = $('f_devices').value.split('\n').map(s => s.trim()).filter(Boolean);
+        const area = $('f_area').value.trim();
+        const start = $('f_start').value.replace('T', ' ');
+        const end = $('f_end').value.replace('T', ' ');
+        const level = $('f_level').value;
+        const status = $('f_status').checked;
+        const remark = $('f_remark').value.trim();
+        if (editingId) {
+          const t = tasks.find(x => x.id === editingId);
+          Object.assign(t, { name, type, vehicles, devices, area, start, end, level, status, remark });
+          showMessage('保存成功', 'success');
+        } else {
+          const newId = tasks.length ? Math.max(...tasks.map(t => t.id)) + 1 : 1;
+          tasks.push({
+            id: newId, name, type, vehicles, devices, area,
+            start: start || '—', end: end || '—',
+            level: level || '低', createTime: '2026-09-03 10:43', status, remark
+          });
+          showMessage('新建成功', 'success');
+        }
+        closeModal();
+        render();
+      });
+
+      $('searchBtn').addEventListener('click', render);
+      $('resetBtn').addEventListener('click', () => {
+        $('nameInput').value = '';
+        $('typeFilter').value = '';
+        $('plateInput').value = '';
+        $('levelFilter').value = '';
+        $('statusFilter').value = '';
+        $('areaInput').value = '';
+        $('periodFrom').value = '';
+        $('periodTo').value = '';
+        $('templateSelect').value = '';
+        render();
+      });
+
+      // —— 高级查询：常用筛选模板 ——
+      const templates = [];
+      function getFilterState() {
+        return {
+          name: $('nameInput').value,
+          type: $('typeFilter').value,
+          plate: $('plateInput').value,
+          level: $('levelFilter').value,
+          status: $('statusFilter').value,
+          area: $('areaInput').value,
+          from: $('periodFrom').value,
+          to: $('periodTo').value
+        };
+      }
+      function applyFilterState(s) {
+        $('nameInput').value = s.name || '';
+        $('typeFilter').value = s.type || '';
+        $('plateInput').value = s.plate || '';
+        $('levelFilter').value = s.level || '';
+        $('statusFilter').value = (s.status === undefined ? '' : s.status);
+        $('areaInput').value = s.area || '';
+        $('periodFrom').value = s.from || '';
+        $('periodTo').value = s.to || '';
+        render();
+      }
+      function refreshTemplates() {
+        const sel = $('templateSelect');
+        sel.innerHTML = '<option value="">— 请选择 —</option>';
+        templates.forEach((t, i) => {
+          const opt = document.createElement('option');
+          opt.value = String(i);
+          opt.textContent = t.name;
+          sel.appendChild(opt);
+        });
+      }
+      $('saveTemplateBtn').addEventListener('click', () => {
+        const name = window.prompt('请输入筛选模板名称', '常用筛选-' + (templates.length + 1));
+        if (!name) return;
+        templates.push({ name, filters: getFilterState() });
+        refreshTemplates();
+        $('templateSelect').value = String(templates.length - 1);
+        showMessage('模板「' + name + '」已保存', 'success');
+      });
+      $('templateSelect').addEventListener('change', e => {
+        const idx = e.target.value;
+        if (idx === '') return;
+        applyFilterState(templates[+idx].filters);
+        showMessage('已应用模板「' + templates[+idx].name + '」', 'success');
+      });
+      $('delTemplateBtn').addEventListener('click', () => {
+        const idx = $('templateSelect').value;
+        if (idx === '') { showMessage('请先选择要删除的模板', 'error'); return; }
+        const removed = templates.splice(+idx, 1)[0];
+        refreshTemplates();
+        $('templateSelect').value = '';
+        showMessage('模板「' + removed.name + '」已删除', 'success');
+      });
+
+      document.querySelectorAll('[data-close]').forEach(btn =>
+        btn.addEventListener('click', closeModal));
+      $('modal').addEventListener('click', e => { if (e.target === $('modal')) closeModal(); });
+
+      render();
+    })();
+  </script>
+</body>
+</html>
