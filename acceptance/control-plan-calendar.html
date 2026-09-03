@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>控制计划 - 智慧园区</title>
+  <title>计划日历 - 智慧园区</title>
   <style>
     * { box-sizing: border-box; }
     body {
@@ -92,147 +92,7 @@
     }
     .page-title { font-size: 20px; font-weight: 600; margin: 0; }
 
-    /* 视图切换 Tab */
-    .view-tabs {
-      display: inline-flex;
-      background: #f0f0f0;
-      border-radius: 4px;
-      padding: 2px;
-      margin-bottom: 16px;
-    }
-    .view-tab {
-      padding: 6px 20px;
-      cursor: pointer;
-      font-size: 14px;
-      border-radius: 3px;
-      transition: all 0.2s;
-      color: rgba(0,0,0,0.65);
-      user-select: none;
-    }
-    .view-tab:hover { color: #1890ff; }
-    .view-tab.active {
-      background: #fff;
-      color: #1890ff;
-      font-weight: 500;
-      box-shadow: 0 1px 2px rgba(0,0,0,0.06);
-    }
-
-    /* 搜索栏 */
-    .search-bar {
-      display: flex;
-      gap: 12px;
-      margin-bottom: 16px;
-      align-items: center;
-    }
-    .search-input {
-      width: 300px;
-      height: 32px;
-      border: 1px solid #d9d9d9;
-      border-radius: 4px;
-      padding: 0 11px;
-      font-size: 14px;
-      outline: none;
-      transition: all 0.3s;
-    }
-    .search-input:focus { border-color: #1890ff; box-shadow: 0 0 0 2px rgba(24,144,255,0.1); }
-    .btn {
-      height: 32px;
-      padding: 0 15px;
-      border-radius: 4px;
-      font-size: 14px;
-      cursor: pointer;
-      border: 1px solid #d9d9d9;
-      background: #fff;
-      transition: all 0.3s;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .btn-primary {
-      background: #1890ff;
-      border-color: #1890ff;
-      color: #fff;
-    }
-    .btn-primary:hover { background: #40a9ff; border-color: #40a9ff; }
-
-    /* ====== 列表视图 ====== */
-    .list-view { display: block; }
-    .list-view.hidden { display: none; }
-
-    .table-wrap {
-      background: #fff;
-      border-radius: 4px;
-      box-shadow: 0 1px 2px rgba(0,0,0,0.03);
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 14px;
-    }
-    thead th {
-      background: #fafafa;
-      border-bottom: 1px solid #e8e8e8;
-      padding: 12px 16px;
-      font-weight: 500;
-      color: rgba(0,0,0,0.85);
-      text-align: left;
-      white-space: nowrap;
-    }
-    tbody td {
-      padding: 12px 16px;
-      border-bottom: 1px solid #f0f0f0;
-      color: rgba(0,0,0,0.65);
-    }
-    tbody tr:hover { background: #e6f7ff; }
-    .tag {
-      display: inline-block;
-      padding: 2px 8px;
-      border-radius: 4px;
-      font-size: 12px;
-      line-height: 20px;
-    }
-    .tag-blue { background: #e6f7ff; color: #1890ff; border: 1px solid #91d5ff; }
-    .link-action {
-      color: #1890ff;
-      cursor: pointer;
-      margin-right: 12px;
-      font-size: 13px;
-    }
-    .link-action:hover { color: #40a9ff; }
-    .link-danger { color: #ff4d4f; }
-    .link-danger:hover { color: #ff7875; }
-
-    /* 分页 */
-    .pagination {
-      display: flex;
-      justify-content: flex-end;
-      align-items: center;
-      padding: 16px;
-      gap: 8px;
-      font-size: 14px;
-      color: rgba(0,0,0,0.65);
-    }
-    .page-btn {
-      min-width: 32px;
-      height: 32px;
-      border: 1px solid #d9d9d9;
-      border-radius: 4px;
-      background: #fff;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 14px;
-      transition: all 0.2s;
-    }
-    .page-btn:hover { color: #1890ff; border-color: #1890ff; }
-    .page-btn.active { background: #1890ff; border-color: #1890ff; color: #fff; }
-    .page-btn.disabled { color: rgba(0,0,0,0.25); border-color: #d9d9d9; cursor: not-allowed; }
-
     /* ====== 日历视图 ====== */
-    .calendar-view { display: none; }
-    .calendar-view.show { display: block; }
-
     .calendar-card {
       background: #fff;
       border-radius: 4px;
@@ -340,14 +200,14 @@
       text-overflow: ellipsis;
       border-left: 3px solid;
       transition: all 0.2s;
+      background: #e6f7ff;
+      border-color: #1890ff;
+      color: #0050b3;
     }
     .cal-event:hover {
       transform: scale(1.02);
       box-shadow: 0 1px 4px rgba(0,0,0,0.12);
       white-space: normal;
-    }
-    .cal-event.blue, .cal-event.green, .cal-event.orange, .cal-event.purple {
-      background: #e6f7ff; border-color: #1890ff; color: #0050b3;
     }
     .event-time { opacity: 0.65; font-size: 11px; }
 
@@ -833,7 +693,8 @@
         <div class="menu-item">设备看板</div>
         <div class="menu-item">设备验核</div>
         <div class="menu-item">场景校验</div>
-        <div class="menu-item" style="background:#1890ff;color:#fff;">&#x1F4CB; 控制计划</div>
+        <div class="menu-item">&#x1F4CB; 控制计划</div>
+        <div class="menu-item active" style="background:#1890ff;color:#fff;">&#x1F4C5; 计划日历</div>
         <div class="menu-item">设备分组</div>
         <div class="menu-item">一键标签</div>
       </div>
@@ -856,7 +717,8 @@
       <div class="top-tab">巡检任务</div>
       <div class="top-tab">巡检计划</div>
       <div class="top-tab">场景数据</div>
-      <div class="top-tab active">控制计划</div>
+      <div class="top-tab">控制计划</div>
+      <div class="top-tab active">计划日历</div>
       <div class="top-tab">设备分组</div>
       <div class="top-tab">异常管理</div>
       <div class="top-tab">告警管理</div>
@@ -865,142 +727,22 @@
     <!-- 内容 -->
     <div class="content">
       <div class="page-header">
-        <h1 class="page-title">控制计划</h1>
-      </div>
-
-      <!-- 视图切换 Tab -->
-      <div class="view-tabs">
-        <div class="view-tab active" onclick="switchView('list')">&#x1F4CB; 列表</div>
-        <div class="view-tab" onclick="switchView('calendar')">&#x1F4C5; 日历</div>
-      </div>
-
-      <!-- 搜索栏 -->
-      <div class="search-bar">
-        <input class="search-input" placeholder="计划名称" />
-        <button class="btn btn-primary">&#x1F50D; 搜索</button>
-        <button class="btn">&#x21BB; 重置</button>
-        <div style="flex:1"></div>
-        <button class="btn btn-primary">+ 新建计划</button>
-      </div>
-
-      <!-- ========== 列表视图 ========== -->
-      <div class="list-view" id="listView">
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>计划名称</th>
-                <th>类联场景</th>
-                <th>执行时间</th>
-                <th>重复规则</th>
-                <th>计划状态</th>
-                <th>操作</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>测试</td>
-                <td>T 场景检D060405</td>
-                <td>10:00:00</td>
-                <td>每周3</td>
-                <td><span class="tag tag-blue">启用</span></td>
-                <td>
-                  <span class="link-action">&#x1F441; 查看</span>
-                  <span class="link-action">&#x270F; 编辑</span>
-                  <span class="link-action link-danger">&#x1F5D1; 删除</span>
-                </td>
-              </tr>
-              <tr>
-                <td>T 计划名称D060406</td>
-                <td>T 场景检D060405</td>
-                <td>18:00:00</td>
-                <td>每天</td>
-                <td><span class="tag tag-blue">启用</span></td>
-                <td>
-                  <span class="link-action">&#x1F441; 查看</span>
-                  <span class="link-action">&#x270F; 编辑</span>
-                  <span class="link-action link-danger">&#x1F5D1; 删除</span>
-                </td>
-              </tr>
-              <tr>
-                <td>电表归置</td>
-                <td>电表控件1</td>
-                <td>21:15:00</td>
-                <td>每天</td>
-                <td><span class="tag tag-blue">启用</span></td>
-                <td>
-                  <span class="link-action">&#x1F441; 查看</span>
-                  <span class="link-action">&#x270F; 编辑</span>
-                  <span class="link-action link-danger">&#x1F5D1; 删除</span>
-                </td>
-              </tr>
-              <tr>
-                <td>按计划计22</td>
-                <td>T 场景检D041001(1,场景验证04...</td>
-                <td>22:00:00</td>
-                <td>每天</td>
-                <td><span class="tag tag-blue">启用</span></td>
-                <td>
-                  <span class="link-action">&#x1F441; 查看</span>
-                  <span class="link-action">&#x270F; 编辑</span>
-                  <span class="link-action link-danger">&#x1F5D1; 删除</span>
-                </td>
-              </tr>
-              <tr>
-                <td>T 场景化检D041002</td>
-                <td>T 场景检D041001</td>
-                <td>10:00:00</td>
-                <td>每周1,2,3,4,5,6,7</td>
-                <td><span class="tag tag-blue">启用</span></td>
-                <td>
-                  <span class="link-action">&#x1F441; 查看</span>
-                  <span class="link-action">&#x270F; 编辑</span>
-                  <span class="link-action link-danger">&#x1F5D1; 删除</span>
-                </td>
-              </tr>
-              <tr>
-                <td>T 设备控制计划</td>
-                <td>T 场景检D041001</td>
-                <td:00</td>
-                <td>每天</td>
-                <td><span class="tag tag-blue">启用</span></td>
-                <td>
-                  <span class="link-action">&#x1F441; 查看</span>
-                  <span class="link-action">&#x270F; 编辑</span>
-                  <span class="link-action link-danger">&#x1F5D1; 删除</span>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <div class="pagination">
-          <span>共 6 条</span>
-          <select style="border:1px solid #d9d9d9;border-radius:4px;padding:2px 8px;font-size:14px;">
-            <option>10条/页</option>
-          </select>
-          <button class="page-btn disabled">&lt;</button>
-          <button class="page-btn active">1</button>
-          <button class="page-btn disabled">&gt;</button>
-          <span style="margin-left:8px;">前往</span>
-          <input type="text" value="1" style="width:48px;border:1px solid #d9d9d9;border-radius:4px;text-align:center;font-size:14px;" />
-        </div>
+        <h1 class="page-title">计划日历</h1>
       </div>
 
       <!-- ========== 日历视图 ========== -->
-      <div class="calendar-view" id="calendarView">
-        <div class="calendar-card">
-          <div class="calendar-header">
-            <div class="calendar-title" id="calTitle">2026年9月</div>
-            <div class="calendar-nav">
-              <button class="cal-nav-btn" onclick="changeMonth(-1)">&laquo;</button>
-              <button class="cal-today-btn" onclick="goToday()">今天</button>
-              <button class="cal-nav-btn" onclick="changeMonth(1)">&raquo;</button>
-            </div>
+      <div class="calendar-card">
+        <div class="calendar-header">
+          <div class="calendar-title" id="calTitle">2026年9月</div>
+          <div class="calendar-nav">
+            <button class="cal-nav-btn" onclick="changeMonth(-1)">&laquo;</button>
+            <button class="cal-today-btn" onclick="goToday()">今天</button>
+            <button class="cal-nav-btn" onclick="changeMonth(1)">&raquo;</button>
           </div>
+        </div>
 
-          <div class="calendar-grid" id="calGrid">
-            <!-- 由 JS 渲染 -->
-          </div>
+        <div class="calendar-grid" id="calGrid">
+          <!-- 由 JS 渲染 -->
         </div>
       </div>
 
@@ -1176,22 +918,6 @@
 </div>
 
 <script>
-// ====== 视图切换 ======
-function switchView(view) {
-  const tabs = document.querySelectorAll('.view-tab');
-  tabs.forEach(t => t.classList.remove('active'));
-  event.currentTarget.classList.add('active');
-
-  if (view === 'list') {
-    document.getElementById('listView').classList.remove('hidden');
-    document.getElementById('calendarView').classList.remove('show');
-  } else {
-    document.getElementById('listView').classList.add('hidden');
-    document.getElementById('calendarView').classList.add('show');
-    renderCalendar(currentYear, currentMonth);
-  }
-}
-
 // ====== 日历逻辑 ======
 let currentYear = 2026;
 let currentMonth = 8;
@@ -1258,7 +984,7 @@ function renderCalendar(year, month) {
 
     const dayPlans = getPlansForDate(year, month, d);
     dayPlans.slice(0, 3).forEach((p) => {
-      html += '<div class="cal-event ' + p.type + '" onclick="openPlanDetail(' + plans.indexOf(p) + ')" title="' + p.name + ' (' + p.time + ')">' +
+      html += '<div class="cal-event" onclick="openPlanDetail(' + plans.indexOf(p) + ')" title="' + p.name + ' (' + p.time + ')">' +
               '<span class="event-time">' + p.time + '</span> ' + p.name + '</div>';
     });
     if (dayPlans.length > 3) {
@@ -1374,10 +1100,8 @@ function closeModalOnOverlay(e) { if (e.target === e.currentTarget) closeModal()
 
 // ====== 场景详情二级弹框 ======
 function openSceneModal(sceneName) {
-  // 填充场景信息
   document.getElementById('sLabel').textContent = sceneName;
   document.getElementById('sName').textContent = sceneName;
-  // 根据场景名推断类型
   const typeMap = {
     'T 场景控制D060405': '批量控制',
     '电表控件1': '单点控制',
