@@ -140,14 +140,6 @@
       <!-- 筛选栏 -->
       <div class="filter-bar">
         <div class="filter-item">
-          <label>统计周期</label>
-          <div class="seg" id="seg">
-            <span data-v="month">月</span>
-            <span data-v="quarter">季</span>
-            <span class="active" data-v="year">年</span>
-          </div>
-        </div>
-        <div class="filter-item">
           <label>日期范围</label>
           <input type="date" value="2025-10-01" /> <span class="tilde">~</span> <input type="date" value="2026-09-01" />
         </div>
@@ -188,7 +180,7 @@
       <!-- 图表第一行 -->
       <div class="grid-2">
         <div class="card">
-          <div class="card-title">报修量趋势（近 12 个月）<span class="right">单位：单</span></div>
+          <div class="card-title">报修量趋势<span class="right">单位：单</span></div>
           <div class="chart" id="trend"></div>
         </div>
         <div class="card">
@@ -204,7 +196,7 @@
           <div class="chart" id="region"></div>
         </div>
         <div class="card">
-          <div class="card-title">平均处理时长趋势（近 6 个月）<span class="right">单位：小时</span></div>
+          <div class="card-title">平均处理时长趋势<span class="right">单位：小时</span></div>
           <div class="chart" id="duration"></div>
         </div>
       </div>
