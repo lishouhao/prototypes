@@ -374,7 +374,7 @@
       <!-- 环境监测看板 tab 内容（本次新增，位于能耗看板右侧） -->
       <div class="tab-pane" id="pane-env">
 
-        <!-- 筛选区 -->
+        <!-- 筛选区：仅保留环境设备（默认展示一个） -->
         <div class="filter-bar" style="background:#fff;padding:16px 20px;border-radius:6px;margin-bottom:16px;">
           <div class="filter-item">
             <label>环境设备</label>
@@ -387,13 +387,6 @@
               <input type="hidden" id="env-device" value="plc-3f3" />
             </div>
           </div>
-          <div class="filter-item">
-            <label>日期范围（按天）</label>
-            <input type="date" id="env-start" />
-            <span class="tilde">~</span>
-            <input type="date" id="env-end" />
-          </div>
-          <button class="btn-primary" onclick="renderEnvCharts()">查询</button>
         </div>
 
         <!-- 指标折线图 2×2 -->
@@ -430,9 +423,9 @@
     document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
     document.querySelector('.second-tabs .tab[data-tab="' + name + '"]').classList.add('active');
     document.getElementById('pane-' + name).classList.add('active');
-    // 环境看板：首次进入初始化日期，并渲染图表
+    // 环境看板：首次进入渲染图表（固定近 7 天，不再展示日期范围）
     if (name === 'env') {
-      if (!envInited) { initEnvDates(); envInited = true; }
+      envInited = true;
       setTimeout(renderEnvCharts, 30);
     }
     // 重排图表
@@ -734,27 +727,20 @@
     if (ts && !ts.contains(e.target)) document.getElementById('env-tree-panel').style.display = 'none';
   });
 
-  // 日期工具
+  // 日期工具：固定返回近 7 天（去掉日期范围筛选后由系统默认给出）
   function fmtDate(d) {
     const y = d.getFullYear();
     const m = String(d.getMonth() + 1).padStart(2, '0');
     const day = String(d.getDate()).padStart(2, '0');
     return y + '-' + m + '-' + day;
   }
-  function initEnvDates() {
-    const end = new Date();
-    const start = new Date();
-    start.setDate(start.getDate() - 6); // 近 7 天
-    document.getElementById('env-start').value = fmtDate(start);
-    document.getElementById('env-end').value = fmtDate(end);
-  }
-  function buildDayRange(start, end) {
+  function buildLast7Days() {
     const res = [];
-    const s = new Date(start + 'T00:00:00');
-    const e = new Date(end + 'T00:00:00');
-    while (s <= e) {
-      res.push(fmtDate(s));
-      s.setDate(s.getDate() + 1);
+    const d = new Date();
+    d.setDate(d.getDate() - 6); // 从今天往前推 6 天，共 7 天
+    for (let i = 0; i < 7; i++) {
+      res.push(fmtDate(d));
+      d.setDate(d.getDate() + 1);
     }
     return res;
   }
@@ -762,10 +748,7 @@
   // 环境指标折线图（温度 / 湿度 / PM2.5 / 噪声）
   function renderEnvCharts() {
     const device = document.getElementById('env-device').value;
-    const start = document.getElementById('env-start').value;
-    const end = document.getElementById('env-end').value;
-    if (!start || !end) return;
-    const days = buildDayRange(start, end);
+    const days = buildLast7Days();
     const labels = days.map(d => d.slice(5).replace('-', '.')); // MM.DD
     const seedBase = hashId(device);
     const defs = [
@@ -802,7 +785,7 @@
         }]
       }, true);
     });
-    const rangeTxt = start.slice(5).replace('-', '.') + ' ~ ' + end.slice(5).replace('-', '.');
+    const rangeTxt = days[0].slice(5).replace('-', '.') + ' ~ ' + days[days.length - 1].slice(5).replace('-', '.');
     ['env-temp-range', 'env-humi-range', 'env-pm25-range', 'env-noise-range'].forEach(id => {
       const e = document.getElementById(id);
       if (e) e.textContent = rangeTxt;
