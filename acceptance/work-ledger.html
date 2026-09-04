@@ -254,9 +254,9 @@
                   <th>用户名称</th>
                   <th>用户昵称</th>
                   <th>部门</th>
-                  <th>岗位</th>
                   <th>工号</th>
-                  <th class="t-center">工作内容(条)</th>
+                  <th>考勤日期</th>
+                  <th class="t-right">工作时长(h)</th>
                   <th>台账状态</th>
                   <th style="width:120px;">操作</th>
                 </tr>
@@ -277,7 +277,7 @@
 <div class="mask" id="mask" onclick="closeDrawer()"></div>
 <div class="drawer" id="drawer">
   <div class="drawer-head">
-    <div class="t" id="drawerTitle">员工工作台账详情</div>
+    <div class="t" id="drawerTitle">工作台账</div>
     <span class="close" onclick="closeDrawer()">✕</span>
   </div>
   <div class="drawer-body" id="drawerBody"></div>
@@ -344,56 +344,7 @@ function pick(arr, r) { return arr[Math.floor(r() * arr.length)]; }
 function fmt(min) { const h = Math.floor(min / 60), m = min % 60; return `${String(h).padStart(2,"0")}:${String(m).padStart(2,"0")}`; }
 function hashStr(s) { let h = 0; for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) % 2147483647; return h; }
 
-// 规定时间：上班 08:30，下班 17:30
-function parseDate(s) { const [y, m, d] = s.split("-").map(Number); return new Date(y, m - 1, d); }
-function eachDate(startStr, endStr) {
-  const res = []; let cur = parseDate(startStr); const end = parseDate(endStr);
-  if (cur > end) return res;
-  while (cur <= end) {
-    const y = cur.getFullYear(), m = cur.getMonth() + 1, d = cur.getDate();
-    res.push(`${y}-${String(m).padStart(2,"0")}-${String(d).padStart(2,"0")}`);
-    cur.setDate(cur.getDate() + 1);
-  }
-  return res;
-}
-
-// 按日统计上下班打卡，无考勤周期
-function genRange(emp, startStr, endStr) {
-  const r = rng(emp.id * 100003 + hashStr(startStr + "|" + endStr));
-  const dates = eachDate(startStr, endStr);
-  const attend = []; const works = [];
-  let normal = 0, late = 0, early = 0, leave = 0, absent = 0, onSum = 0, offSum = 0, onCount = 0, offCount = 0;
-  dates.forEach(date => {
-    const roll = r();
-    if (roll < 0.035) { leave++; attend.push({ date, on: "--", off: "--", hours: 0, status: "请假" }); return; }
-    if (roll < 0.05) { absent++; attend.push({ date, on: "--", off: "--", hours: 0, status: "缺勤" }); return; }
-    // 上班：约 70% 在 08:00-09:00（正常），30% 在 09:00-09:45（迟到）
-    let onMin = r() < 0.7 ? 8 * 60 + Math.floor(r() * 60) : 9 * 60 + Math.floor(r() * 45);
-    let lateFlag = onMin > 9 * 60;                      // 上班晚于 09:00 → 迟到
-    // 下班：80% 在 17:30-18:30（正常），20% 在 17:00-17:30（早退）
-    let offMin = r() < 0.8 ? 17 * 60 + 30 + Math.floor(r() * 60) : 17 * 60 + Math.floor(r() * 30);
-    let earlyFlag = offMin < 17 * 60 + 30;              // 下班早于 17:30 → 早退
-    let hrs = Math.max(0, (offMin - onMin) / 60 - 1); hrs = Math.round(hrs * 10) / 10;
-    onSum += onMin; offSum += offMin; onCount++; offCount++;
-    const st = lateFlag ? "迟到" : (earlyFlag ? "早退" : "正常");
-    if (st === "正常") normal++; else if (st === "迟到") late++; else early++;
-    attend.push({ date, on: fmt(onMin), off: fmt(offMin), hours: hrs, status: st });
-    const n = 1 + (r() < 0.6 ? 1 : 0);
-    for (let i = 0; i < n; i++) works.push({ date, item: pick(WORK_ITEMS, r), hours: Math.round((hrs / n) * 10) / 10, output: pick(OUTPUTS, r) });
-  });
-  const totalDays = dates.length;
-  const avgOn = onCount ? fmt(Math.round(onSum / onCount)) : "--";
-  const avgOff = offCount ? fmt(Math.round(offSum / offCount)) : "--";
-  // 台账状态：正常 / 迟到 / 早退 / 请假 / 缺勤（迟到、早退二选一互斥；请假优先于缺勤）
-  let status = "正常", statusTag = "tag-green";
-  if (leave > 0) { status = "请假"; statusTag = "tag-gray"; }
-  else if (absent > 0) { status = "缺勤"; statusTag = "tag-red"; }
-  else if (late > 0) { status = "迟到"; statusTag = "tag-orange"; }
-  else if (early > 0) { status = "早退"; statusTag = "tag-orange"; }
-  else { status = "正常"; statusTag = "tag-green"; }
-  return { emp, range: `${startStr} ~ ${endStr}`, attend, works,
-    summary: { totalDays, normal, late, early, leave, absent, avgOn, avgOff, workCount: works.length, status, statusTag } };
-}
+// 规定打卡时间：上班 09:00，下班 17:30（全岗位统一）
 
 function statusTagOf(st) {
   if (st === "正常") return "tag-green";
@@ -402,38 +353,37 @@ function statusTagOf(st) {
   return "tag-orange"; // 迟到 / 早退
 }
 
-// 生成「今天」的考勤 + 工作内容（抽屉明细只展示今天）
-function genToday(emp) {
-  const now = new Date();
-  const y = now.getFullYear(), m = now.getMonth() + 1, d = now.getDate();
-  const today = `${y}-${String(m).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
-  const r = rng(emp.id * 7919 + hashStr(today));
+// 生成指定「考勤日期」当天的考勤 + 工作内容
+// 列表与抽屉共用同一份数据：列表取该日汇总，抽屉取该日明细 → 二者天然联动
+function genDay(emp, dateStr) {
+  const r = rng(emp.id * 7919 + hashStr(dateStr));
   const attend = []; const works = [];
   const roll = r();
-  // 演示锚点：固定 2 名员工今日分别请假 / 缺勤，确保评审可见全状态标签
+  // 演示锚点：固定 2 名员工分别请假 / 缺勤，确保评审可见全状态标签
   if (emp.id === 7163) {
-    attend.push({ date: today, on: "--", off: "--", hours: 0, status: "请假" });
+    attend.push({ date: dateStr, on: "--", off: "--", hours: 0, status: "请假" });
   }
   else if (emp.id === 7166) {
-    attend.push({ date: today, on: "--", off: "--", hours: 0, status: "缺勤" });
+    attend.push({ date: dateStr, on: "--", off: "--", hours: 0, status: "缺勤" });
   }
   else if (roll < 0.18) {
     // 无打卡：依员工确定性分流 请假 / 缺勤（单日样本少，提高比例以覆盖全状态便于演示）
     const stt = (emp.id % 2 === 0) ? "请假" : "缺勤";
-    attend.push({ date: today, on: "--", off: "--", hours: 0, status: stt });
+    attend.push({ date: dateStr, on: "--", off: "--", hours: 0, status: stt });
   }
   else {
     let onMin = r() < 0.7 ? 8 * 60 + Math.floor(r() * 60) : 9 * 60 + Math.floor(r() * 45);
-    let lateFlag = onMin > 9 * 60;
+    let lateFlag = onMin > 9 * 60;                      // 上班晚于 09:00 → 迟到
     let offMin = r() < 0.8 ? 17 * 60 + 30 + Math.floor(r() * 60) : 17 * 60 + Math.floor(r() * 30);
-    let earlyFlag = offMin < 17 * 60 + 30;
+    let earlyFlag = offMin < 17 * 60 + 30;              // 下班早于 17:30 → 早退
     let hrs = Math.max(0, (offMin - onMin) / 60 - 1); hrs = Math.round(hrs * 10) / 10;
     const st = lateFlag ? "迟到" : (earlyFlag ? "早退" : "正常");
-    attend.push({ date: today, on: fmt(onMin), off: fmt(offMin), hours: hrs, status: st });
+    attend.push({ date: dateStr, on: fmt(onMin), off: fmt(offMin), hours: hrs, status: st });
   }
-  const n = (attend[0].status === "请假" || attend[0].status === "缺勤") ? 0 : (1 + (r() < 0.6 ? 1 : 0));
-  for (let i = 0; i < n; i++) works.push({ date: today, item: pick(WORK_ITEMS, r), hours: n ? Math.round((attend[0].hours / n) * 10) / 10 : 0, output: pick(OUTPUTS, r) });
-  return { attend, works, date: today };
+  const a = attend[0];
+  const n = (a.status === "请假" || a.status === "缺勤") ? 0 : (1 + (r() < 0.6 ? 1 : 0));
+  for (let i = 0; i < n; i++) works.push({ date: dateStr, item: pick(WORK_ITEMS, r), hours: n ? Math.round((a.hours / n) * 10) / 10 : 0, output: pick(OUTPUTS, r) });
+  return { attend, works, date: dateStr };
 }
 
 // ===== 状态 =====
@@ -442,7 +392,21 @@ let DATA = [], FILTERED = [];
 let page = 1, PAGE_SIZE = 10;
 
 function buildData() {
-  DATA = EMPLOYEES.map(e => genRange(e, RANGE.start, RANGE.end));
+  // 考勤日期 = 日期范围的起始日（只选一天即为那一天）
+  DATA = EMPLOYEES.map(e => {
+    const day = genDay(e, RANGE.start);
+    const a = day.attend[0];
+    return {
+      emp: e, day,
+      summary: {
+        date: day.date,                    // 考勤日期
+        status: a.status,                  // 台账状态（当天）
+        statusTag: statusTagOf(a.status),
+        hours: a.hours,                    // 工作时长（当天工时 h）
+        workCount: day.works.length
+      }
+    };
+  });
 }
 
 function applyFilter() {
@@ -497,9 +461,9 @@ function renderList() {
         <td>${e.name}</td>
         <td>${e.nick}</td>
         <td>${DEPT_MAP[e.dept]}</td>
-        <td>${e.role}</td>
         <td>${e.code}</td>
-        <td class="t-center">${s.workCount}</td>
+        <td>${s.date}</td>
+        <td class="t-right">${s.hours}</td>
         <td><span class="tag ${s.statusTag}">${s.status}</span></td>
         <td class="op"><a onclick="openDrawer(${e.id})">查看台账</a></td>
       </tr>`;
@@ -522,13 +486,13 @@ function openDrawer(id) {
   const x = FILTERED.find(d => d.emp.id === id) || DATA.find(d => d.emp.id === id);
   if (!x) return;
   const e = x.emp, s = x.summary;
-  const today = genToday(e);
-  document.getElementById("drawerTitle").textContent = `${e.name} 工作台账 · 今日`;
-  const attendRows = today.attend.map(a => {
+  const day = x.day;                       // 与列表「考勤日期」联动：取同一天的数据
+  document.getElementById("drawerTitle").textContent = `${e.name} 工作台账`;
+  const attendRows = day.attend.map(a => {
     const stTag = statusTagOf(a.status);
     return `<tr><td>${a.date}</td><td class="t-center">${a.on}</td><td class="t-center">${a.off}</td><td class="t-right">${a.hours}</td><td class="t-center"><span class="tag ${stTag}">${a.status}</span></td></tr>`;
   }).join("");
-  const workRows = today.works.map(w => `<tr><td>${w.date}</td><td>${w.item}</td><td class="t-right">${w.hours}</td><td>${w.output}</td></tr>`).join("");
+  const workRows = day.works.map(w => `<tr><td>${w.date}</td><td>${w.item}</td><td class="t-right">${w.hours}</td><td>${w.output}</td></tr>`).join("");
   document.getElementById("drawerBody").innerHTML = `
     <div class="sec-card">
       <div class="sec-title">员工信息</div>
@@ -538,13 +502,12 @@ function openDrawer(id) {
         <div class="it"><span class="k">工号</span><span class="v">${e.code}</span></div>
         <div class="it"><span class="k">部门</span><span class="v">${DEPT_MAP[e.dept]}</span></div>
         <div class="it"><span class="k">岗位</span><span class="v">${e.role}</span></div>
-        <div class="it"><span class="k">记录日期</span><span class="v">${today.date}</span></div>
         <div class="it"><span class="k">台账状态</span><span class="v"><span class="tag ${s.statusTag}">${s.status}</span></span></div>
       </div>
     </div>
 
     <div class="sec-card">
-      <div class="collapse-hd open" onclick="toggleCollapse(this)"><div class="sec-title" style="margin:0;">今日考勤（上班 / 下班打卡）<span class="right" style="font-weight:normal;">${today.attend.length} 条</span></div><span class="arrow">▶</span></div>
+      <div class="collapse-hd open" onclick="toggleCollapse(this)"><div class="sec-title" style="margin:0;">考勤明细（上班 / 下班打卡）<span class="right" style="font-weight:normal;">${day.attend.length} 条</span></div><span class="arrow">▶</span></div>
       <div class="collapse-bd show">
         <table>
           <thead><tr><th>日期</th><th class="t-center">上班打卡</th><th class="t-center">下班打卡</th><th class="t-right">工时(h)</th><th class="t-center">状态</th></tr></thead>
@@ -554,7 +517,7 @@ function openDrawer(id) {
     </div>
 
     <div class="sec-card">
-      <div class="collapse-hd open" onclick="toggleCollapse(this)"><div class="sec-title" style="margin:0;">今日工作内容<span class="right" style="font-weight:normal;">${today.works.length} 条</span></div><span class="arrow">▶</span></div>
+      <div class="collapse-hd open" onclick="toggleCollapse(this)"><div class="sec-title" style="margin:0;">工作内容明细<span class="right" style="font-weight:normal;">${day.works.length} 条</span></div><span class="arrow">▶</span></div>
       <div class="collapse-bd show">
         <table>
           <thead><tr><th>日期</th><th>工作事项</th><th class="t-right">工时(h)</th><th>产出</th></tr></thead>
