@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<html lang="zh-CN" data-page-node-id="awlyyVHNIFvUP6fmhsAD3H">
+<head data-page-node-id="kPOPfqegMBjW0rxhue3BcN">
+<meta charset="UTF-8" data-page-node-id="88LJ7f0LBmuoW8Y8UM42MN" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" data-page-node-id="5p0RIWB7ChVQzuPAuRs7cP" />
 <title>维保任务（移动端）</title>
 <style>
   :root{
@@ -157,94 +157,94 @@
   .err-tip{color:var(--red); font-size:12px; margin-top:8px; display:none;}
 </style>
 </head>
-<body>
-<div class="phone">
+<body data-page-node-id="Li57h2tKE2mxVFRgzLoRjn">
+<div class="phone" data-page-node-id="ByWvL4MRXyiHq2gG4gtFJq">
   <!-- 顶部导航 -->
-  <div class="nav" id="nav">
-    <div class="back" id="navBack" style="visibility:hidden;">
-      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 5l-7 7 7 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  <div class="nav" id="nav" data-page-node-id="ksdcCgBnlPYjvfGGEvRPQY">
+    <div class="back" id="navBack" style="visibility:hidden;" data-page-node-id="N5UCFHvRD6quGYX9pwaOxa">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" data-page-node-id="8Sl7yTRXioA7ejgWgyBRWC"><path d="M15 5l-7 7 7 7" stroke-linecap="round" stroke-linejoin="round" data-page-node-id="BOnR6E462y0lOn7AGVDVTr"/></svg>
     </div>
-    <div class="title" id="navTitle">维保任务</div>
-    <div class="right" id="navRight"></div>
+    <div class="title" id="navTitle" data-page-node-id="bjne6DTopx4elLgJboWXQU">维保任务</div>
+    <div class="right" id="navRight" data-page-node-id="xE4LGZHP5gUGttnyEKykcY"></div>
   </div>
 
   <!-- ===== 视图：列表 ===== -->
-  <div class="view active" id="view-list">
-    <div class="tabs">
-      <div class="tab active" data-tab="task">维保任务</div>
-      <div class="tab" data-tab="history">维保历史</div>
+  <div class="view active" id="view-list" data-page-node-id="yeUHOjD68rseY1FxKWKzqn">
+    <div class="tabs" data-page-node-id="hwsH8VTHQFGmO6XIUyr9ds">
+      <div class="tab active" data-tab="task" data-page-node-id="QN76uHgYkJawzWIHx86BTD">维保任务</div>
+      <div class="tab" data-tab="history" data-page-node-id="KeOlkTCFzaCksdOxlpQEd0">维保历史</div>
     </div>
-    <div class="searchbar">
-      <div class="search">
-        <svg viewBox="0 0 16 16" width="15" height="15" fill="none" stroke="#8F9098" stroke-width="1.5"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5L14 14" stroke-linecap="round"/></svg>
-        <input id="listSearch" placeholder="输入关键字搜索" />
+    <div class="searchbar" data-page-node-id="tYashR5e1vAMyREP2oTb7L">
+      <div class="search" data-page-node-id="v4OCBIEGEtDwgEUC39l16t">
+        <svg viewBox="0 0 16 16" width="15" height="15" fill="none" stroke="#8F9098" stroke-width="1.5" data-page-node-id="fitE6XPiRiDE8U1RXfwT0M"><circle cx="7" cy="7" r="4.5" data-page-node-id="eJ4vFZBHwiQCbQMJXigALF"/><path d="M10.5 10.5L14 14" stroke-linecap="round" data-page-node-id="bEmpPT8R3uXToy0aDANByo"/></svg>
+        <input id="listSearch" placeholder="输入关键字搜索" data-page-node-id="yWzQDQH9REhXtj2vxXRceq" />
       </div>
-      <div class="filter-btn" id="listFilter">
-        <svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 4h12M4 8h8M6 12h4" stroke-linecap="round"/></svg>
+      <div class="filter-btn" id="listFilter" data-page-node-id="dd1iSeJ1NukrvBK0vuF7rM">
+        <svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" data-page-node-id="ub71ZmlraqVDaTJhTs7kvA"><path d="M2 4h12M4 8h8M6 12h4" stroke-linecap="round" data-page-node-id="Ta8Vu0WQOkRnP24NmondDz"/></svg>
       </div>
     </div>
-    <div class="scroll" id="listScroll"></div>
+    <div class="scroll" id="listScroll" data-page-node-id="TBYuhwefpnvnX0dbElNlGp"></div>
   </div>
 
   <!-- ===== 视图：任务详情 ===== -->
-  <div class="view" id="view-detail">
-    <div class="scroll" id="detailScroll"></div>
-    <div class="footer" id="detailFooter" style="display:none;">
-      <button class="btn btn-ghost" id="btnDelay">申请延期</button>
-      <button class="btn btn-primary" id="btnSubmit">提交</button>
+  <div class="view" id="view-detail" data-page-node-id="D5Cxju5DscInfEhc8TbE3d">
+    <div class="scroll" id="detailScroll" data-page-node-id="3C9zw5fOMlUbcuzfnOWnhN"></div>
+    <div class="footer" id="detailFooter" style="display:none;" data-page-node-id="mqDaXDHnXHcJ7SSHy7Wny6">
+      <button class="btn btn-ghost" id="btnDelay" data-page-node-id="ncOmDkL6DMTTdPeJoGnTth">申请延期</button>
+      <button class="btn btn-primary" id="btnSubmit" data-page-node-id="0UANHRyN1oZUg2L3ehMDLE">提交</button>
     </div>
   </div>
 
   <!-- ===== 视图：设备填写 ===== -->
-  <div class="view" id="view-fill">
-    <div class="scroll" id="fillScroll"></div>
-    <div class="footer">
-      <button class="btn btn-primary" id="btnSave">保存</button>
+  <div class="view" id="view-fill" data-page-node-id="LTVCMFq1HBTsjTmwEnh4sD">
+    <div class="scroll" id="fillScroll" data-page-node-id="AczFOCnCsBrY6uHkpAlfeU"></div>
+    <div class="footer" data-page-node-id="XQDrUMzVhI99jCHi4WqI4w">
+      <button class="btn btn-primary" id="btnSave" data-page-node-id="QVOlMWzLLe6NMZ8cxdWNUv">保存</button>
     </div>
   </div>
 
   <!-- 筛选弹层 -->
-  <div class="filter-pop" id="filterPop">
-    <div class="fp-mask" id="fpMask"></div>
-    <div class="fp-sheet">
-      <div class="fp-title">按状态筛选</div>
-      <div class="fp-opts" id="fpOpts">
-        <span class="fp-opt active" data-st="">全部</span>
-        <span class="fp-opt" data-st="unstart">未开始</span>
-        <span class="fp-opt" data-st="todo">待执行</span>
-        <span class="fp-opt" data-st="running">进行中</span>
-        <span class="fp-opt" data-st="done">已完成</span>
+  <div class="filter-pop" id="filterPop" data-page-node-id="Sf49ntFAUfjeh3RsCLAQ8j">
+    <div class="fp-mask" id="fpMask" data-page-node-id="HgLi66fMbh6q8fFLUGzztm"></div>
+    <div class="fp-sheet" data-page-node-id="OIsUFQgp8yHMkd8QZJGudz">
+      <div class="fp-title" data-page-node-id="WgQG4zLOq8H4sriLSJtgUW">按状态筛选</div>
+      <div class="fp-opts" id="fpOpts" data-page-node-id="tCNA5KVXHsdYdWrHLbv2mF">
+        <span class="fp-opt active" data-st="" data-page-node-id="ELw5F5QKB7ZMkFWPtiwaiP">全部</span>
+        <span class="fp-opt" data-st="unstart" data-page-node-id="TM9xY9xRytsWMzTT6hoji6">未开始</span>
+        <span class="fp-opt" data-st="todo" data-page-node-id="VwAjAgT2NXwLHfWky9vYwf">待执行</span>
+        <span class="fp-opt" data-st="running" data-page-node-id="nUKyQmED3n9K7e2AHpHzhM">进行中</span>
+        <span class="fp-opt" data-st="done" data-page-node-id="1V3FLHO8OXFLCE3dhvZg2F">已完成</span>
       </div>
-      <button class="fp-ok" id="fpOk">确定</button>
+      <button class="fp-ok" id="fpOk" data-page-node-id="lCFXehfuEuuL4rYaPRc1KO">确定</button>
     </div>
   </div>
 
-  <div class="toast" id="toast"></div>
+  <div class="toast" id="toast" data-page-node-id="DW49r9r0wepZ6oTtpnUF38"></div>
 
   <!-- 提交确认 -->
-  <div class="confirm-pop" id="confirmPop">
-    <div class="fp-mask" id="cfMask"></div>
-    <div class="cf-sheet">
-      <div class="cf-title">确认提交该维保任务？</div>
-      <div class="cf-tip">提交后任务将进入审批流程，且不可再修改填写内容。</div>
-      <div class="cf-btns">
-        <button class="cf-btn ghost" id="cfCancel">取消</button>
-        <button class="cf-btn primary" id="cfOk">确认提交</button>
+  <div class="confirm-pop" id="confirmPop" data-page-node-id="ZQj6soBlbtRrzTvTSIBeUo">
+    <div class="fp-mask" id="cfMask" data-page-node-id="GL8viDbxqggYC38oZNpfAr"></div>
+    <div class="cf-sheet" data-page-node-id="1jy1uBGip9sPyGdnhrb2bY">
+      <div class="cf-title" data-page-node-id="aQKYBUEcQgtDgGNnOroZC2">确认提交该维保任务？</div>
+      <div class="cf-tip" data-page-node-id="3TdOfA6mjmDIZwUUoI3JgB">提交后任务将进入审批流程，且不可再修改填写内容。</div>
+      <div class="cf-btns" data-page-node-id="rPwn2ttYnAKIaQ8QmH5SPP">
+        <button class="cf-btn ghost" id="cfCancel" data-page-node-id="OPofrKTCykZKGHKCxN6GHi">取消</button>
+        <button class="cf-btn primary" id="cfOk" data-page-node-id="VF6NY8SeLEp4RjFsDyE1aJ">确认提交</button>
       </div>
     </div>
   </div>
 
   <!-- 申请延期弹层 (#6) -->
-  <div class="delay-pop" id="delayPop">
-    <div class="fp-mask" id="delayMask"></div>
-    <div class="fp-sheet">
-      <div class="fp-title">申请延期</div>
-      <div class="field"><label>延期到日期 <span style="color:var(--red)">*</span></label>
-        <input type="date" class="ctrl" id="delayDate" /></div>
-      <div class="field"><label>延期原因 <span style="color:var(--red)">*</span></label>
+  <div class="delay-pop" id="delayPop" data-page-node-id="uTe2umtDYz5TVkMjGBrcCN">
+    <div class="fp-mask" id="delayMask" data-page-node-id="NKUoq3HNPajUfJX9qmMuHs"></div>
+    <div class="fp-sheet" data-page-node-id="xr7Du3TUABnuwBHtIw7k1p">
+      <div class="fp-title" data-page-node-id="tyTDDdO0t4t0YFXzy7i6iz">申请延期</div>
+      <div class="field" data-page-node-id="SdiUqiPdwRbqeMOY11qXsP"><label data-page-node-id="IztCJYSQkJkXtN0xXMrEa0">延期到日期 <span style="color:var(--red)" data-page-node-id="G7zGtvhq0Ku6YNI73rUOWi">*</span></label>
+        <input type="date" class="ctrl" id="delayDate" data-page-node-id="rlKlVSlGzGnviPfSns2Zxi" /></div>
+      <div class="field" data-page-node-id="Zhj9NUCGMT5jXmPAu6h8pn"><label data-page-node-id="UaKSxC2KaXtimusipvGBom">延期原因 <span style="color:var(--red)" data-page-node-id="Hrvf6PVUFj8dEpKgy7ZzoH">*</span></label>
         <textarea class="ctrl" id="delayReason" placeholder="请输入延期原因"></textarea></div>
-      <div class="err-tip" id="delayErr"></div>
-      <button class="fp-ok" id="delayOk">确定</button>
+      <div class="err-tip" id="delayErr" data-page-node-id="w6LqK2jBJwCVS7PkaPLWCj"></div>
+      <button class="fp-ok" id="delayOk" data-page-node-id="XbwEhJCLWacSHa7f9FKQfC">确定</button>
     </div>
   </div>
 </div>
@@ -434,7 +434,8 @@
         <div class="info-row"><div class="k">维保标准</div><div class="v">${curTask.std}</div></div>
         <div class="info-row"><div class="k">维保设备</div><div class="v">${curTask.devices.length} 台</div></div>
         <div class="info-row"><div class="k">本次维保时间</div><div class="v">${curTask.time}</div></div>
-        <div class="info-row"><div class="k">完成时间</div><div class="v">${curTask.dueTime||'-'}</div></div>
+        <div class="info-row"><div class="k">完成期限</div><div class="v">${curTask.dueTime||'-'}</div></div>
+        <div class="info-row"><div class="k">提交时间</div><div class="v">${curTask.submitTime||'-'}</div></div>
       </div>
       <div class="section-title">维保设备</div>
       ${devHtml}
