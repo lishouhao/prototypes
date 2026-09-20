@@ -1326,18 +1326,53 @@
             <td>${r.name}</td>
             <td>${r.major}</td>
             <td class="cell-ellipsis" title="${r.items.join(' / ')}">${cell}</td>
-            <td class="col-actions"><a class="btn-link" data-detail="${i}">详情</a></td>
+            <td class="col-actions"><a class="btn-link" data-detail="${i}">详情</a><a class="btn-link" data-edit="${i}">编辑</a><a class="btn-danger" data-del="${i}">删除</a></td>
           </tr>`;
       }).join('');
       document.getElementById('stdTotal').textContent = data.length;
     }
     render();
 
+    // ===== 与「维保计划」联动：引用校验 + 名称/专业变更同步 =====
+    function strippedStd(s) { return String(s || '').replace(/[.…]+$/, '').trim(); }
+    function refPlansFor(name) {
+      const mp = window.MB_PLAN;
+      if (!mp) return [];
+      return mp.plans.filter(p => {
+        const s = strippedStd(p.std);
+        return s && name.startsWith(s);
+      });
+    }
+    function syncPlan(oldName, oldMajor, newName, newMajor) {
+      const mp = window.MB_PLAN;
+      if (!mp) return;
+      if (oldMajor && mp.standards[oldMajor]) {
+        const arr = mp.standards[oldMajor];
+        const k = arr.indexOf(oldName);
+        if (k >= 0) arr.splice(k, 1);
+        if (!arr.length) delete mp.standards[oldMajor];
+      }
+      if (newName) {
+        if (!mp.standards[newMajor]) mp.standards[newMajor] = [];
+        if (!mp.standards[newMajor].includes(newName)) mp.standards[newMajor].push(newName);
+      }
+      if (oldName && newName && oldName !== newName) {
+        mp.plans.forEach(p => {
+          const s = strippedStd(p.std);
+          if (s && oldName.startsWith(s)) p.std = newName;
+        });
+      }
+      if (mp.refreshMajors) mp.refreshMajors();
+      mp.rerender();
+    }
+
     const drawerNew = document.getElementById('stdDrawerNew');
     const drawerDetail = document.getElementById('stdDrawerDetail');
     const clist = document.getElementById('stdClist');
 
+    let editingIndex = null;
     document.getElementById('stdBtnNew').addEventListener('click', () => {
+      editingIndex = null;
       document.getElementById('stdNewTitle').textContent = '添加维保标准';
       document.getElementById('stdForm').reset();
       document.querySelectorAll('#stdDrawerNew [data-err]').forEach(el => el.style.display='none');
@@ -1380,13 +1415,54 @@
       setErr('major', !major);
       setErr('items', items.length === 0);
       if (!ok) return;
-      data.unshift({ name, major, items });
+      if (editingIndex != null) {
+        const old = data[editingIndex];
+        data[editingIndex] = { name, major, items };
+        syncPlan(old.name, old.major, name, major);
+      } else {
+        data.unshift({ name, major, items });
+        syncPlan('', '', name, major);
+      }
+      editingIndex = null;
       render();
       closeAll();
       toast('保存成功', 'success');
     });
 
     tbody.addEventListener('click', e => {
+      const ed = e.target.closest('[data-edit]');
+      if (ed) {
+        const idx = +ed.dataset.edit;
+        const r = data[idx];
+        editingIndex = idx;
+        document.getElementById('stdNewTitle').textContent = '编辑维保标准';
+        document.querySelectorAll('#stdDrawerNew [data-err]').forEach(el => el.style.display='none');
+        const form = document.getElementById('stdForm');
+        form.reset();
+        form.name.value = r.name;
+        form.major.value = r.major;
+        clist.innerHTML = '';
+        r.items.forEach(it => addItemRow(it));
+        if (!r.items.length) addItemRow();
+        openDrawer(drawerNew);
+        return;
+      }
+      const dl = e.target.closest('[data-del]');
+      if (dl) {
+        const idx = +dl.dataset.del;
+        const r = data[idx];
+        if (!confirm('确认删除该维保标准？')) return;
+        const refs = refPlansFor(r.name);
+        if (refs.length) {
+          toast(`该标准已被 ${refs.length} 个维保计划引用，无法删除`, 'error');
+          return;
+        }
+        data.splice(idx, 1);
+        syncPlan(r.name, r.major, null, null);
+        render();
+        toast('删除成功', 'success');
+        return;
+      }
       const t = e.target.closest('[data-detail]');
       if (!t) return;
       const r = data[+t.dataset.detail];
@@ -1462,11 +1538,16 @@
 
     const selMajor = document.getElementById('planSelMajor');
     const selStd   = document.getElementById('planSelStd');
-    Object.keys(standards).forEach(m => {
-      const o = document.createElement('option');
-      o.value = m; o.textContent = m;
-      selMajor.appendChild(o);
-    });
+    function fillMajors(cur) {
+      selMajor.innerHTML = '<option value="">请选择专业</option>';
+      Object.keys(standards).forEach(m => {
+        const o = document.createElement('option');
+        o.value = m; o.textContent = m;
+        selMajor.appendChild(o);
+      });
+      if (cur) selMajor.value = cur;
+    }
+    fillMajors();
     function refreshStd(major, cur) {
       selStd.innerHTML = '<option value="">请选择标准</option>';
       (standards[major] || []).forEach(s => {
@@ -1477,6 +1558,14 @@
       if (cur) selStd.value = cur;
     }
     selMajor.addEventListener('change', () => refreshStd(selMajor.value));
+
+    // ===== 跨模块桥接：供「维保标准」模块做引用校验与联动 =====
+    window.MB_PLAN = {
+      standards,
+      plans: data,
+      rerender: render,
+      refreshMajors: fillMajors
+    };
 
     const rowLoop = document.getElementById('planRowLoop');
     const rowFixed = document.getElementById('planRowFixed');
