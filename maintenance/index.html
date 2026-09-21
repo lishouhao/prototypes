@@ -258,6 +258,14 @@
   .btn-primary:disabled { background: #B6C0EC; border-color: #B6C0EC; cursor: not-allowed; }
   .btn-ghost { background: var(--bg-input); border-color: var(--border); }
   .btn-ghost:hover { border-color: #BFBFBF; background: #F0F1F5; }
+  .btn-pick {
+    height: 32px; padding: 0 12px; border-radius: var(--radius-btn);
+    border: 1px solid var(--border); background: var(--bg-input); color: var(--primary);
+    font-size: 14px; display: inline-flex; align-items: center; gap: 6px; cursor: pointer;
+  }
+  .btn-pick:hover { border-color: var(--primary); background: #F2F5FE; }
+  .btn-pick svg { width: 12px; height: 12px; flex: none; }
+  .btn-pick:focus-visible { outline: none; box-shadow: 0 0 0 3px var(--ring); }
   .btn-link { background: transparent; color: var(--primary); border: 0; padding: 0 6px; height: auto; }
   .btn-link:hover { color: var(--primary-hover); }
   .btn-danger { background: transparent; color: var(--red); border: 0; padding: 0 6px; height: auto; }
@@ -302,6 +310,12 @@
   .table th.col-check { background: #F4F6FA; z-index: 3; }
   .table tbody tr:hover .col-check, .table tbody tr:hover .col-actions { background: #FAFBFE; }
   .table .col-time { width: 90px; color: var(--text-sub); }
+  /* 表单内已选设备表：名称过长按原型既有范式截断（同弹窗「设备ID」列），位置与来源不折行 */
+  #planDevWrap th:nth-child(3), #planDevWrap td:nth-child(3) {
+    max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  #planDevWrap th:nth-child(4), #planDevWrap td:nth-child(4),
+  #planDevWrap th:nth-child(5), #planDevWrap td:nth-child(5) { white-space: nowrap; }
   .table tbody tr { transition: background .15s; }
   .table tbody tr:hover { background: #F6F8FE; }
   .rep-dev { padding: 10px 0; border-bottom: 1px dashed #EEE; }
@@ -527,6 +541,7 @@
     background: var(--bg-input); border: 1px solid var(--border); border-radius: var(--radius-btn);
   }
   .form .row .err { color: var(--red); font-size: 12px; margin-top: 4px; }
+  .form-actions { display: flex; align-items: center; gap: 8px; }
 
   .form-block {
     background: #F4F6FA; border-radius: 6px; padding: 16px 18px;
@@ -1575,8 +1590,15 @@
       { type: '照明回路',      code: 'ZL',  seg: 'ZL-HL1',     src: '设备资产' },
       { type: '灌溉阀门',      code: 'GG',  seg: 'GG-FM1',     src: '设备资产' },
     ];
-    const DEV_LOCS   = ['苏州实验室', '智慧场馆', '会议中心', '综合楼', '能源中心', '一食堂', '二食堂', '一区电梯', '学生公寓'];
-    const DEV_BLDS   = ['KY1', 'KY2', 'KY3'];
+    // 楼栋：code 用于设备名称前缀，name 用于「设备位置」列（两者同源，保证名称与位置自洽）
+    const DEV_BLDS = [
+      { code: 'KY1', name: '133综合楼' },
+      { code: 'KY2', name: '415观微院' },
+      { code: 'KY3', name: '518探理院' },
+      { code: 'KY4', name: '499学生公寓' },
+      { code: 'KY5', name: '517能源中心' },
+      { code: 'KY6', name: '047地库' },
+    ];
     const DEV_FLOORS = ['B1', 'D1', 'D2', 'D3'];
     const DEV_PROS   = ['RD', 'PD', 'XF', 'AF', 'JS', 'NT'];
     let _devSeed = 20260921;
@@ -1592,12 +1614,13 @@
     const devices = [];
     DEV_TYPE_DICT.forEach(t => {
       for (let i = 1; i <= DEV_PER_TYPE; i++) {
+        const bld = _pick(DEV_BLDS);
         devices.push({
           id: 'GD' + t.code + _hex(18),
-          name: _pick(DEV_BLDS) + '-' + _pick(DEV_FLOORS) + '-' + (1 + Math.floor(_rnd() * 3)) + '-' +
+          name: bld.code + '-' + _pick(DEV_FLOORS) + '-' + (1 + Math.floor(_rnd() * 3)) + '-' +
                 _pick(DEV_PROS) + '-' + (101 + Math.floor(_rnd() * 299)) + '-' + t.seg + '-' + ('00' + i).slice(-3),
           type: t.type,
-          loc: _pick(DEV_LOCS),
+          loc: bld.name,
           src: t.src
         });
       }
