@@ -210,6 +210,41 @@
   }
   .filter .actions { margin-left: auto; display: flex; gap: 8px; }
 
+  /* ============== Combo（可模糊查询的单选下拉） ============== */
+  .combo { position: relative; }
+  .combo .input { padding-right: 30px; }
+  .combo .combo-caret {
+    position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+    display: inline-flex; color: var(--text-sub); pointer-events: none;
+  }
+  .combo .combo-caret svg { width: 12px; height: 12px; }
+  .combo.open .combo-caret { transform: translateY(-50%) rotate(180deg); }
+  .combo .combo-clear {
+    position: absolute; right: 28px; top: 50%; transform: translateY(-50%);
+    width: 16px; height: 16px; border-radius: 50%; display: none;
+    align-items: center; justify-content: center;
+    background: #E9EBF1; color: var(--text-sub);
+  }
+  .combo .combo-clear:hover { background: #DDDFE7; color: var(--text-main); }
+  .combo .combo-clear svg { width: 8px; height: 8px; }
+  .combo.has-value .combo-clear { display: inline-flex; }
+  .combo .combo-panel {
+    position: absolute; left: 0; top: calc(100% + 4px); z-index: 40;
+    min-width: 100%; max-height: 220px; overflow-y: auto;
+    padding: 4px; background: #fff;
+    border: 1px solid var(--border-light); border-radius: var(--radius-btn);
+    box-shadow: 0 6px 18px rgba(20,26,48,.12);
+    display: none;
+  }
+  .combo.open .combo-panel { display: block; }
+  .combo .combo-opt {
+    padding: 6px 10px; border-radius: 3px;
+    font-size: 14px; color: var(--text-main); white-space: nowrap; cursor: pointer;
+  }
+  .combo .combo-opt:hover { background: #F2F5FE; }
+  .combo .combo-opt.active { color: var(--primary); background: #EEF2FE; font-weight: 600; }
+  .combo .combo-empty { padding: 10px; font-size: 13px; color: var(--text-sub); text-align: center; }
+
   /* ============== Buttons ============== */
   .btn {
     height: 32px; padding: 0 14px; border-radius: var(--radius-btn);
@@ -298,7 +333,9 @@
     border-radius: 3px; display: inline-flex; align-items: center; justify-content: center;
   }
   .pagination .page-btn.active { color: var(--primary); border-color: var(--primary); font-weight: 600; }
-  .pagination .page-btn:hover:not(.active) { color: var(--primary); border-color: var(--primary); }
+  .pagination .page-btn:hover:not(.active):not(:disabled) { color: var(--primary); border-color: var(--primary); }
+  .pagination .page-btn:disabled { color: #C4C7CF; cursor: not-allowed; }
+  .pagination .page-btn:disabled svg { opacity: .5; }
   .pagination .page-jump { display: inline-flex; align-items: center; gap: 4px; color: var(--text-sub); }
   .pagination .page-jump input {
     width: 44px; height: 24px; text-align: center;
@@ -463,6 +500,20 @@
     border-top: 1px solid var(--border-light);
     padding: 12px 20px; display: flex; gap: 8px; justify-content: flex-end;
   }
+
+  /* 「选择设备」弹窗：数据量大 → 加宽 + 表体内部滚动，筛选区与分页始终可见 */
+  #planModalPick { width: 1080px; }
+  #planModalPick .body {
+    display: flex; flex-direction: column;
+    max-height: calc(100vh - 208px);
+    overflow: hidden;
+  }
+  #planModalPick .table-wrap {
+    display: flex; flex-direction: column;
+    flex: 1; min-height: 0; overflow: hidden;
+  }
+  #planModalPick .pick-scroll { flex: 1; min-height: 0; overflow-y: auto; }
+  #planModalPick .table thead th { position: sticky; top: 0; z-index: 2; }
 
   /* ============== Form ============== */
   .form .row { margin-bottom: 18px; }
@@ -1077,6 +1128,7 @@
                 <th>设备类型</th>
                 <th>设备名称</th>
                 <th>设备位置</th>
+                <th>设备来源</th>
                 <th class="col-actions">操作</th>
               </tr>
             </thead>
@@ -1122,7 +1174,7 @@
 <div class="modal" id="planModalPick">
   <div class="head">
     <div class="title">选择设备</div>
-    <button class="close" data-close>
+    <button class="close" data-close-modal="planModalPick">
       <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 3l8 8M11 3l-8 8" stroke-linecap="round"/></svg>
     </button>
   </div>
@@ -1130,43 +1182,55 @@
     <div class="filter" style="margin-bottom:12px;">
       <div class="field"><label>设备名称</label><input class="input" placeholder="请输入" id="planPickName" /></div>
       <div class="field"><label>设备ID</label><input class="input" placeholder="请输入" id="planPickId" /></div>
+      <div class="field">
+        <label>设备类型</label>
+        <div class="combo" id="planPickTypeCombo">
+          <input class="input" placeholder="全部" id="planPickType" autocomplete="off" />
+          <span class="combo-clear" id="planPickTypeClear" title="清除">
+            <svg viewBox="0 0 8 8" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M1 1l6 6M7 1L1 7" stroke-linecap="round"/></svg>
+          </span>
+          <span class="combo-caret">
+            <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 4.5L6 7.5L9 4.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </span>
+          <div class="combo-panel" id="planPickTypePanel"></div>
+        </div>
+      </div>
       <div class="actions">
         <button class="btn btn-primary" id="planPickSearch">查询</button>
         <button class="btn btn-ghost" id="planPickReset">重置</button>
       </div>
     </div>
     <div class="table-wrap" style="margin-top:0;">
+      <div class="pick-scroll">
       <table class="table simple">
         <thead>
           <tr>
             <th style="width:40px;"><label class="checkbox"><input type="checkbox" id="planPickAll" /><span class="box"></span></label></th>
-            <th>设备ID</th><th>设备名称</th><th>设备类型</th><th>设备位置</th>
+            <th style="width:210px;">设备ID</th><th>设备名称</th><th style="width:130px;">设备类型</th><th style="width:120px;">设备位置</th><th style="width:100px;">设备来源</th>
           </tr>
         </thead>
         <tbody id="planPickTbody"></tbody>
       </table>
+      </div>
       <div class="pagination">
         <span>已选 <em id="planPickSel" style="color:var(--primary);font-style:normal;">0</em> 台设备</span>
-        <span style="margin-left:8px;">共 <em style="color:var(--text-main);font-style:normal;">94</em> 条</span>
+        <span style="margin-left:8px;">共 <em id="planPickTotal" style="color:var(--text-main);font-style:normal;">0</em> 条</span>
         <div class="pager">
-          <select class="page-size"><option>10条/页</option></select>
-          <button class="page-btn"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7.5 3L4.5 6l3 3" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-          <button class="page-btn active">1</button>
-          <button class="page-btn">2</button>
-          <button class="page-btn">3</button>
-          <button class="page-btn">4</button>
-          <button class="page-btn">5</button>
-          <button class="page-btn">6</button>
-          <span style="color:var(--text-sub);">…</span>
-          <button class="page-btn">10</button>
-          <button class="page-btn"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4.5 3l3 3-3 3" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-          <span class="page-jump">前往<input value="1" />页</span>
+          <select class="page-size" id="planPickSize">
+            <option value="10">10条/页</option>
+            <option value="20">20条/页</option>
+            <option value="50">50条/页</option>
+          </select>
+          <button class="page-btn" id="planPickPrev"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7.5 3L4.5 6l3 3" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <span id="planPickPages" style="display:inline-flex;align-items:center;gap:8px;"></span>
+          <button class="page-btn" id="planPickNext"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4.5 3l3 3-3 3" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <span class="page-jump">前往<input id="planPickJump" value="1" />页</span>
         </div>
       </div>
     </div>
   </div>
   <div class="foot">
-    <button class="btn btn-ghost" data-close>取消</button>
+    <button class="btn btn-ghost" data-close-modal="planModalPick">取消</button>
     <button class="btn btn-primary" id="planBtnPickOk">确定</button>
   </div>
 </div>
@@ -1281,7 +1345,18 @@
     mask.classList.remove('show');
   }
   document.querySelectorAll('[data-close]').forEach(el => el.addEventListener('click', closeAll));
-  mask.addEventListener('click', closeAll);
+  // 只关闭指定/最上层的弹窗，保留其下层抽屉（如「选择设备」弹窗叠加在「新建/编辑维保计划」抽屉之上）
+  function closeTopModal(sel) {
+    const m = sel ? document.getElementById(sel) : document.querySelector('.modal.show');
+    if (m) m.classList.remove('show');
+    if (!document.querySelector('.drawer.show, .modal.show')) mask.classList.remove('show');
+  }
+  document.querySelectorAll('[data-close-modal]').forEach(el =>
+    el.addEventListener('click', () => closeTopModal(el.dataset.closeModal)));
+  // 点遮罩：有弹窗时只关弹窗，无弹窗时整体关闭
+  mask.addEventListener('click', () => {
+    if (document.querySelector('.modal.show')) closeTopModal(null); else closeAll();
+  });
 
   // ============== 视图切换 ==============
   const views = ['standard', 'plan', 'task'];
@@ -1484,21 +1559,49 @@
       '维修':     ['测试维修标准'],
       'Codex暖通专业': ['Codex暖通维保标准-20260724'],
     };
-    const devices = [
-      { id: 'CCTV-ELEV-001', name: '电梯监控摄像头', type: '摄像头', loc: '一区电梯' },
-      { id: 'ENERGY-METER-001', name: '会议中心1号电表', type: '电表', loc: '会议中心' },
-      { id: 'TER-ELEVATOR-002', name: '园区电梯信息发布终端', type: '信息发布终端', loc: '智慧场馆' },
-      { id: 'TER-ELEVATOR-001', name: '酒店电梯信息发布终端', type: '信息发布终端', loc: '酒店' },
-      { id: 'TER-PARK-002', name: '会议中心综合信息发布终端', type: '信息发布终端', loc: '会议中心' },
-      { id: 'TER-PARK-001', name: '园区大厅综合信息发布终端', type: '信息发布终端', loc: '智慧场馆' },
-      { id: 'TER-CANTEEN-002', name: '二食堂大厅菜单发布终端', type: '信息发布终端', loc: '二食堂-大厅' },
-      { id: 'TER-CANTEEN-001', name: '一食堂大厅菜单发布终端', type: '信息发布终端', loc: '一食堂-大厅' },
-      { id: 'hh-AM107-1', name: 'hh-空气质量探测器1', type: '空气质量探测器', loc: '智慧场馆' },
+    // ===== 设备类型字典（数据源：设施管理 / 设备资产 / 设备台账）=====
+    // src：设备台账 = 系统自动纳管；设备资产 = 人工手动维护
+    const DEV_TYPE_DICT = [
+      { type: '门禁',          code: 'MJ',  seg: 'MJ(S)-MJQ2', src: '设备台账' },
+      { type: '摄像头',        code: 'SXJ', seg: 'SXJ-QJ2',    src: '设备台账' },
+      { type: '电表',          code: 'DB',  seg: 'DB-3X1',     src: '设备台账' },
+      { type: '水表',          code: 'SB',  seg: 'SB-LX1',     src: '设备台账' },
+      { type: '信息发布终端',   code: 'FB',  seg: 'FB-ZH1',     src: '设备台账' },
+      { type: '空气质量探测器', code: 'KQ',  seg: 'KQ-ZD1',     src: '设备台账' },
+      { type: '空调',          code: 'KT',  seg: 'KT-FJ2',     src: '设备资产' },
+      { type: '水泵',          code: 'BS',  seg: 'BS-LB1',     src: '设备资产' },
+      { type: '电梯',          code: 'DT',  seg: 'DT-KT1',     src: '设备资产' },
+      { type: '消防主机',      code: 'XF',  seg: 'XF-ZJ1',     src: '设备资产' },
+      { type: '照明回路',      code: 'ZL',  seg: 'ZL-HL1',     src: '设备资产' },
+      { type: '灌溉阀门',      code: 'GG',  seg: 'GG-FM1',     src: '设备资产' },
     ];
-    while (devices.length < 94) {
-      const base = devices[devices.length % 9];
-      devices.push({ id: base.id + '-' + (devices.length+1), name: base.name + '-' + (devices.length+1), type: base.type, loc: base.loc });
+    const DEV_LOCS   = ['苏州实验室', '智慧场馆', '会议中心', '综合楼', '能源中心', '一食堂', '二食堂', '一区电梯', '学生公寓'];
+    const DEV_BLDS   = ['KY1', 'KY2', 'KY3'];
+    const DEV_FLOORS = ['B1', 'D1', 'D2', 'D3'];
+    const DEV_PROS   = ['RD', 'PD', 'XF', 'AF', 'JS', 'NT'];
+    let _devSeed = 20260921;
+    function _rnd() { _devSeed = (_devSeed * 1103515245 + 12345) % 2147483648; return _devSeed / 2147483648; }
+    function _pick(a) { return a[Math.floor(_rnd() * a.length)]; }
+    function _hex(n) {
+      const H = '0123456789ABCDEF'; let s = '';
+      for (let i = 0; i < n; i++) s += H[Math.floor(_rnd() * 16)];
+      return s;
     }
+    // 演示数据：12 类设备 × 每类 40 台 = 480 台（ID / 名称编码对齐真实系统口径）
+    const DEV_PER_TYPE = 40;
+    const devices = [];
+    DEV_TYPE_DICT.forEach(t => {
+      for (let i = 1; i <= DEV_PER_TYPE; i++) {
+        devices.push({
+          id: 'GD' + t.code + _hex(18),
+          name: _pick(DEV_BLDS) + '-' + _pick(DEV_FLOORS) + '-' + (1 + Math.floor(_rnd() * 3)) + '-' +
+                _pick(DEV_PROS) + '-' + (101 + Math.floor(_rnd() * 299)) + '-' + t.seg + '-' + ('00' + i).slice(-3),
+          type: t.type,
+          loc: _pick(DEV_LOCS),
+          src: t.src
+        });
+      }
+    });
     const data = [
       { id: 'BM2089972849...', name: 'T 维保计划创建0819...', sched: 'loop', rule: '2026年08月19日；每2天', std: 'T 维保要求0819...', enabled: true, req:'one', limit: 5, devices: [] },
       { id: 'BM2084112236...', name: 'ceshi', sched: 'fixed', rule: '每月；3日', std: '测试维修标准', enabled: true, req:'one', limit: 5, devices: [] },
@@ -1717,45 +1820,183 @@
     // ===== 选择设备 =====
     let selectedDevs = [];
     let pickChecked = new Set();
-    const pickTbody = document.getElementById('planPickTbody');
-    const pickSel = document.getElementById('planPickSel');
+    const pickTbody  = document.getElementById('planPickTbody');
+    const pickSel    = document.getElementById('planPickSel');
+    const pickTotal  = document.getElementById('planPickTotal');
+    const pickPages  = document.getElementById('planPickPages');
+    const pickSizeEl = document.getElementById('planPickSize');
+    const pickPrev   = document.getElementById('planPickPrev');
+    const pickNext   = document.getElementById('planPickNext');
+    const pickJump   = document.getElementById('planPickJump');
+    const pickAllEl  = document.getElementById('planPickAll');
+
+    // 已生效的筛选条件（点「查询」才写入）
+    let pickFilter = { name: '', id: '', type: '' };
+    let pickPage = 1;
+
+    // 设备名称 / 设备ID / 设备类型 三者 AND，均支持模糊匹配
+    function pickList() {
+      const n = pickFilter.name.trim().toLowerCase();
+      const d = pickFilter.id.trim().toLowerCase();
+      const t = pickFilter.type.trim().toLowerCase();
+      return devices.filter(x =>
+        (!n || x.name.toLowerCase().indexOf(n) > -1) &&
+        (!d || x.id.toLowerCase().indexOf(d) > -1) &&
+        (!t || x.type.toLowerCase().indexOf(t) > -1)
+      );
+    }
+    function pickPagesCount(len) {
+      return Math.max(1, Math.ceil(len / (+pickSizeEl.value || 10)));
+    }
+    function pickCurRows() {
+      const list = pickList();
+      const size = +pickSizeEl.value || 10;
+      const pages = pickPagesCount(list.length);
+      if (pickPage > pages) pickPage = pages;
+      const start = (pickPage - 1) * size;
+      return { list, rows: list.slice(start, start + size) };
+    }
     function renderPick() {
-      pickTbody.innerHTML = devices.slice(0,10).map((d, i) => {
+      const { list, rows } = pickCurRows();
+      pickTbody.innerHTML = rows.length ? rows.map(d => {
         const checked = pickChecked.has(d.id) ? 'checked' : '';
         return `<tr>
           <td><label class="checkbox"><input type="checkbox" data-pick="${d.id}" ${checked}/><span class="box"></span></label></td>
-          <td>${d.id}</td><td>${d.name}</td><td>${d.type}</td><td>${d.loc}</td>
+          <td class="col-id" title="${d.id}">${d.id}</td>
+          <td>${d.name}</td><td>${d.type}</td><td>${d.loc}</td><td>${d.src}</td>
         </tr>`;
-      }).join('');
+      }).join('') : `<tr><td colspan="6" style="text-align:center;color:var(--text-sub);padding:30px 0;">暂无数据</td></tr>`;
       pickSel.textContent = pickChecked.size;
+      pickTotal.textContent = list.length;
+
+      // 当前页全选 / 半选
+      const hit = rows.filter(d => pickChecked.has(d.id)).length;
+      pickAllEl.checked = rows.length > 0 && hit === rows.length;
+      const allBox = pickAllEl.closest('.checkbox');
+      if (allBox) allBox.classList.toggle('partial', hit > 0 && hit < rows.length);
+
+      // 分页器
+      const pages = pickPagesCount(list.length);
+      pickPrev.disabled = pickPage <= 1;
+      pickNext.disabled = pickPage >= pages;
+      pickJump.value = pickPage;
+      let s = Math.max(1, pickPage - 2), e = Math.min(pages, s + 4);
+      s = Math.max(1, e - 4);
+      let html = '';
+      if (s > 1) html += `<button class="page-btn" data-page="1">1</button>` + (s > 2 ? `<span style="color:var(--text-sub);">…</span>` : '');
+      for (let i = s; i <= e; i++) html += `<button class="page-btn${i === pickPage ? ' active' : ''}" data-page="${i}">${i}</button>`;
+      if (e < pages) html += (e < pages - 1 ? `<span style="color:var(--text-sub);">…</span>` : '') + `<button class="page-btn" data-page="${pages}">${pages}</button>`;
+      pickPages.innerHTML = html;
     }
-    renderPick();
+
+    // ----- 设备类型：支持输入关键字模糊查询的单选下拉 -----
+    const typeCombo = document.getElementById('planPickTypeCombo');
+    const typeInput = document.getElementById('planPickType');
+    const typePanel = document.getElementById('planPickTypePanel');
+    const TYPE_ALL  = '全部';
+    function renderTypePanel(kw) {
+      const k = (kw || '').trim().toLowerCase();
+      const opts = [TYPE_ALL].concat(DEV_TYPE_DICT.map(t => t.type))
+        .filter(t => !k || t.toLowerCase().indexOf(k) > -1);
+      const cur = typeInput.value.trim();
+      typePanel.innerHTML = opts.length
+        ? opts.map(t => `<div class="combo-opt${t === cur ? ' active' : ''}" data-opt="${t}">${t}</div>`).join('')
+        : `<div class="combo-empty">无匹配的设备类型</div>`;
+    }
+    function setPickType(v) {
+      typeInput.value = v || '';
+      typeCombo.classList.toggle('has-value', !!v);
+    }
+    function openTypePanel() { typeCombo.classList.add('open'); renderTypePanel(''); }
+    function closeTypePanel() { typeCombo.classList.remove('open'); }
+    typeInput.addEventListener('focus', openTypePanel);
+    typeInput.addEventListener('click', () => { if (!typeCombo.classList.contains('open')) openTypePanel(); });
+    typeInput.addEventListener('input', () => { typeCombo.classList.add('open'); renderTypePanel(typeInput.value); });
+    typePanel.addEventListener('mousedown', e => {
+      const o = e.target.closest('[data-opt]');
+      if (!o) return;
+      e.preventDefault();
+      setPickType(o.dataset.opt === TYPE_ALL ? '' : o.dataset.opt);
+      closeTypePanel();
+    });
+    document.getElementById('planPickTypeClear').addEventListener('click', e => {
+      e.stopPropagation();
+      setPickType('');
+      renderTypePanel('');
+      typeInput.focus();
+    });
+    document.addEventListener('click', e => { if (!typeCombo.contains(e.target)) closeTypePanel(); });
+
+    // ----- 查询 / 重置 -----
+    document.getElementById('planPickSearch').addEventListener('click', () => {
+      const t = typeInput.value.trim();
+      pickFilter = {
+        name: document.getElementById('planPickName').value,
+        id:   document.getElementById('planPickId').value,
+        type: t === TYPE_ALL ? '' : t
+      };
+      pickPage = 1;
+      renderPick();
+    });
+    document.getElementById('planPickReset').addEventListener('click', () => {
+      document.getElementById('planPickName').value = '';
+      document.getElementById('planPickId').value = '';
+      setPickType('');
+      pickFilter = { name: '', id: '', type: '' };
+      pickPage = 1;
+      renderPick();
+    });
+
+    // ----- 勾选 / 分页 -----
     pickTbody.addEventListener('change', e => {
       const cb = e.target.closest('[data-pick]');
       if (!cb) return;
       if (cb.checked) pickChecked.add(cb.dataset.pick); else pickChecked.delete(cb.dataset.pick);
-      pickSel.textContent = pickChecked.size;
-    });
-    document.getElementById('planPickAll').addEventListener('change', e => {
-      if (e.target.checked) devices.slice(0,10).forEach(d => pickChecked.add(d.id));
-      else devices.slice(0,10).forEach(d => pickChecked.delete(d.id));
       renderPick();
     });
-    document.getElementById('planPickSearch').addEventListener('click', renderPick);
-    document.getElementById('planPickReset').addEventListener('click', () => {
-      document.getElementById('planPickName').value = '';
-      document.getElementById('planPickId').value = '';
+    pickAllEl.addEventListener('change', e => {
+      const { rows } = pickCurRows();
+      rows.forEach(d => { if (e.target.checked) pickChecked.add(d.id); else pickChecked.delete(d.id); });
       renderPick();
     });
+    pickPages.addEventListener('click', e => {
+      const b = e.target.closest('[data-page]');
+      if (!b) return;
+      pickPage = +b.dataset.page;
+      renderPick();
+    });
+    pickPrev.addEventListener('click', () => { if (pickPage > 1) { pickPage--; renderPick(); } });
+    pickNext.addEventListener('click', () => {
+      if (pickPage < pickPagesCount(pickList().length)) { pickPage++; renderPick(); }
+    });
+    pickSizeEl.addEventListener('change', () => { pickPage = 1; renderPick(); });
+    pickJump.addEventListener('change', () => {
+      const pages = pickPagesCount(pickList().length);
+      let v = parseInt(pickJump.value, 10);
+      if (!v || v < 1) v = 1;
+      if (v > pages) v = pages;
+      pickPage = v;
+      renderPick();
+    });
+
+    renderPick();
+
     document.getElementById('planBtnPick').addEventListener('click', () => {
       pickChecked = new Set(selectedDevs.map(d => d.id));
+      document.getElementById('planPickName').value = '';
+      document.getElementById('planPickId').value = '';
+      setPickType('');
+      pickFilter = { name: '', id: '', type: '' };
+      pickPage = 1;
+      closeTypePanel();
       renderPick();
       openModal(modalPick);
     });
     document.getElementById('planBtnPickOk').addEventListener('click', () => {
       selectedDevs = devices.filter(d => pickChecked.has(d.id));
+      closeTypePanel();
       renderDevs();
-      closeAll();
+      closeTopModal('planModalPick');   // 只关「选择设备」弹窗，保留维保计划表单抽屉
     });
 
     const devTbody = document.getElementById('planDevTbody');
@@ -1765,7 +2006,7 @@
       devWrap.style.display = '';
       devTbody.innerHTML = selectedDevs.map((d, i) => `
         <tr>
-          <td>${i+1}</td><td>${d.type}</td><td>${d.name}</td><td>${d.loc}</td>
+          <td>${i+1}</td><td>${d.type}</td><td>${d.name}</td><td>${d.loc}</td><td>${d.src || '设备台账'}</td>
           <td class="col-actions"><a class="btn-danger" data-rm="${d.id}">删除</a></td>
         </tr>`).join('');
     }
