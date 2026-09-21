@@ -2029,7 +2029,7 @@
       devWrap.style.display = '';
       devTbody.innerHTML = selectedDevs.map((d, i) => `
         <tr>
-          <td>${i+1}</td><td>${d.type}</td><td>${d.name}</td><td>${d.loc}</td><td>${d.src || '设备台账'}</td>
+          <td>${i+1}</td><td>${d.type}</td><td title="${d.name}">${d.name}</td><td>${d.loc}</td><td>${d.src || '设备台账'}</td>
           <td class="col-actions"><a class="btn-danger" data-rm="${d.id}">删除</a></td>
         </tr>`).join('');
     }
