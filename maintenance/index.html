@@ -1,9 +1,8 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-<meta charset="UTF-8" />
+<html lang="zh-CN"><head>
+<meta charset="UTF-8">
 <title>设备维保 - 智慧园区集成管理平台</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
   :root {
     --primary: #4165EC;
@@ -209,6 +208,9 @@
     background-repeat: no-repeat; background-position: right 10px center;
   }
   .filter .actions { margin-left: auto; display: flex; gap: 8px; }
+  /* 选设备弹窗：三个筛选条件（设备名称/设备ID/设备类型）与「查询/重置」同行 */
+  #planModalPick .filter { gap: 12px; }
+  #planModalPick .filter .input { width: 136px; min-width: 136px; }
 
   /* ============== Combo（可模糊查询的单选下拉） ============== */
   .combo { position: relative; }
@@ -310,7 +312,7 @@
   .table th.col-check { background: #F4F6FA; z-index: 3; }
   .table tbody tr:hover .col-check, .table tbody tr:hover .col-actions { background: #FAFBFE; }
   .table .col-time { width: 90px; color: var(--text-sub); }
-  /* 表单内已选设备表：名称过长按原型既有范式截断（同弹窗「设备ID」列），位置与来源不折行 */
+  /* 表单内已选设备表：名称过长按原型既有范式截断（同弹窗「设备ID」列），位置不折行 */
   #planDevWrap th:nth-child(3), #planDevWrap td:nth-child(3) {
     max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
   }
@@ -528,6 +530,23 @@
   }
   #planModalPick .pick-scroll { flex: 1; min-height: 0; overflow-y: auto; }
   #planModalPick .table thead th { position: sticky; top: 0; z-index: 2; }
+  /* 顶部数据源 TAB：智能设备（设备台账）/ 非智能设备（设备资产） */
+  #planModalPick .pick-tabs {
+    display: flex; align-items: center; gap: 28px;
+    border-bottom: 1px solid var(--border-light);
+    margin-bottom: 16px; flex: 0 0 auto;
+  }
+  #planModalPick .pick-tab {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 0 1px 10px; cursor: pointer; line-height: 22px;
+    font-size: 14px; color: var(--text-sub);
+    border-bottom: 2px solid transparent; margin-bottom: -1px;
+    transition: color .15s, border-color .15s;
+  }
+  #planModalPick .pick-tab:hover { color: var(--primary); }
+  #planModalPick .pick-tab.active {
+    color: var(--primary); font-weight: 500; border-bottom-color: var(--primary);
+  }
 
   /* ============== Form ============== */
   .form .row { margin-bottom: 18px; }
@@ -711,7 +730,7 @@
   </div>
   <button class="topnav-toggle" title="折叠侧栏">
     <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
-      <path d="M2 4h12M2 8h12M2 12h12" stroke-linecap="round"/>
+      <path d="M2 4h12M2 8h12M2 12h12" stroke-linecap="round"></path>
     </svg>
   </button>
   <div class="breadcrumb">
@@ -724,12 +743,12 @@
   <div class="topbar-right">
     <button class="icon-btn" title="刷新">
       <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
-        <path d="M13.5 8a5.5 5.5 0 1 1-1.61-3.89M13.5 2.5v3h-3" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M13.5 8a5.5 5.5 0 1 1-1.61-3.89M13.5 2.5v3h-3" stroke-linecap="round" stroke-linejoin="round"></path>
       </svg>
     </button>
     <button class="icon-btn" title="通知">
       <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
-        <path d="M3.5 12V8a4.5 4.5 0 0 1 9 0v4M2.5 12h11M8 14a1.5 1.5 0 0 1-1.5-1.5h3A1.5 1.5 0 0 1 8 14z" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M3.5 12V8a4.5 4.5 0 0 1 9 0v4M2.5 12h11M8 14a1.5 1.5 0 0 1-1.5-1.5h3A1.5 1.5 0 0 1 8 14z" stroke-linecap="round" stroke-linejoin="round"></path>
       </svg>
     </button>
     <div class="avatar">
@@ -745,12 +764,12 @@
     <div class="title">
       <span class="ico">
         <svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5">
-          <rect x="2" y="3" width="14" height="12" rx="1.5"/>
-          <path d="M5 6h8M5 9h8M5 12h5" stroke-linecap="round"/>
+          <rect x="2" y="3" width="14" height="12" rx="1.5"></rect>
+          <path d="M5 6h8M5 9h8M5 12h5" stroke-linecap="round"></path>
         </svg>
       </span>
       <span>智能设备</span>
-      <span class="caret"><svg viewBox="0 0 12 12" fill="currentColor"><path d="M4 3l4 3-4 3V3z"/></svg></span>
+      <span class="caret"><svg viewBox="0 0 12 12" fill="currentColor"><path d="M4 3l4 3-4 3V3z"></path></svg></span>
     </div>
     <div class="sub">
       <a class="item">物业报修</a>
@@ -759,11 +778,11 @@
         <div class="title">
           <span class="ico" style="width:14px;height:14px;">
             <svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5">
-              <path d="M9 2l2.2 4.5 5 .7-3.6 3.5.9 5L9 13.3 4.5 15.7l.9-5L1.8 7.2l5-.7L9 2z"/>
+              <path d="M9 2l2.2 4.5 5 .7-3.6 3.5.9 5L9 13.3 4.5 15.7l.9-5L1.8 7.2l5-.7L9 2z"></path>
             </svg>
           </span>
           <span>设备维保</span>
-          <span class="caret"><svg viewBox="0 0 12 12" fill="currentColor"><path d="M4 3l4 3-4 3V3z"/></svg></span>
+          <span class="caret"><svg viewBox="0 0 12 12" fill="currentColor"><path d="M4 3l4 3-4 3V3z"></path></svg></span>
         </div>
         <div class="sub">
           <a class="item active" data-view="standard">维保标准管理</a>
@@ -783,15 +802,15 @@
 <main class="content">
   <div class="tabbar">
     <div class="scroll">
-      <div class="tab"><span class="home-ico"><svg viewBox="0 0 12 12" fill="currentColor"><path d="M6 1.5L1 5.5h1.5V10h3V7h1v3h3V5.5H11z"/></svg></span>首页</div>
+      <div class="tab"><span class="home-ico"><svg viewBox="0 0 12 12" fill="currentColor"><path d="M6 1.5L1 5.5h1.5V10h3V7h1v3h3V5.5H11z"></path></svg></span>首页</div>
       <div class="tab" data-tab="standard">维保标准管理</div>
-      <div class="tab" data-tab="plan">维保计划</div>
+      <div class="tab active" data-tab="plan">维保计划</div>
       <div class="tab" data-tab="task">维保任务</div>
     </div>
     <div class="arrows">
-      <button class="abtn"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7.5 3L4.5 6l3 3" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-      <button class="abtn"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4.5 3l3 3-3 3" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-      <button class="abtn"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2.5 6a3.5 3.5 0 0 1 6-2.5M9.5 6a3.5 3.5 0 0 1-6 2.5" stroke-linecap="round"/><path d="M8 2v2h-2M4 10V8h2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <button class="abtn"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7.5 3L4.5 6l3 3" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
+      <button class="abtn"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4.5 3l3 3-3 3" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
+      <button class="abtn"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2.5 6a3.5 3.5 0 0 1 6-2.5M9.5 6a3.5 3.5 0 0 1-6 2.5" stroke-linecap="round"></path><path d="M8 2v2h-2M4 10V8h2" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
     </div>
   </div>
 
@@ -802,24 +821,24 @@
       <div class="filter">
         <div class="field">
           <label>维保标准名称</label>
-          <input class="input" placeholder="请输入" />
+          <input class="input" placeholder="请输入">
         </div>
         <div class="field">
           <label>所属专业</label>
-          <input class="input" placeholder="请输入" />
+          <input class="input" placeholder="请输入">
         </div>
         <div class="actions">
           <button class="btn btn-primary">
-            <span class="ico"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="6" cy="6" r="4.5"/><path d="M9.5 9.5L12 12" stroke-linecap="round"/></svg></span>搜索
+            <span class="ico"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="6" cy="6" r="4.5"></circle><path d="M9.5 9.5L12 12" stroke-linecap="round"></path></svg></span>搜索
           </button>
           <button class="btn btn-ghost">
-            <span class="ico"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2.5 4.5h9M5 7h4M7 9.5h0" stroke-linecap="round"/></svg></span>重置
+            <span class="ico"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2.5 4.5h9M5 7h4M7 9.5h0" stroke-linecap="round"></path></svg></span>重置
           </button>
         </div>
       </div>
       <div style="margin-top:16px;">
         <button class="btn btn-primary" id="stdBtnNew">
-          <span class="ico"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="7" cy="7" r="5.5"/><path d="M7 4.5v5M4.5 7h5" stroke-linecap="round"/></svg></span>新建维保标准
+          <span class="ico"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="7" cy="7" r="5.5"></circle><path d="M7 4.5v5M4.5 7h5" stroke-linecap="round"></path></svg></span>新建维保标准
         </button>
       </div>
       <div class="table-wrap">
@@ -839,10 +858,10 @@
           <span>共 <em id="stdTotal" style="color:var(--text-main);font-style:normal;">4</em> 条</span>
           <div class="pager">
             <select class="page-size"><option>10条/页</option><option>20条/页</option><option>50条/页</option></select>
-            <button class="page-btn"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7.5 3L4.5 6l3 3" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+            <button class="page-btn"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7.5 3L4.5 6l3 3" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
             <button class="page-btn active">1</button>
-            <button class="page-btn"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4.5 3l3 3-3 3" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-            <span class="page-jump">前往<input value="1" />页</span>
+            <button class="page-btn"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4.5 3l3 3-3 3" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
+            <span class="page-jump">前往<input value="1">页</span>
           </div>
         </div>
       </div>
@@ -856,7 +875,7 @@
       <div class="filter">
         <div class="field">
           <label>维保计划名称</label>
-          <input class="input" placeholder="请输入" id="planFName" />
+          <input class="input" placeholder="请输入" id="planFName">
         </div>
         <div class="field">
           <label>状态</label>
@@ -868,16 +887,16 @@
         </div>
         <div class="actions">
           <button class="btn btn-primary" id="planBtnSearch">
-            <span class="ico"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="6" cy="6" r="4.5"/><path d="M9.5 9.5L12 12" stroke-linecap="round"/></svg></span>搜索
+            <span class="ico"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="6" cy="6" r="4.5"></circle><path d="M9.5 9.5L12 12" stroke-linecap="round"></path></svg></span>搜索
           </button>
           <button class="btn btn-ghost" id="planBtnReset">
-            <span class="ico"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2.5 4.5h9M5 7h4M7 9.5h0" stroke-linecap="round"/></svg></span>重置
+            <span class="ico"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2.5 4.5h9M5 7h4M7 9.5h0" stroke-linecap="round"></path></svg></span>重置
           </button>
         </div>
       </div>
       <div style="margin-top:16px;">
         <button class="btn btn-primary" id="planBtnNew">
-          <span class="ico"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="7" cy="7" r="5.5"/><path d="M7 4.5v5M4.5 7h5" stroke-linecap="round"/></svg></span>新建维保计划
+          <span class="ico"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="7" cy="7" r="5.5"></circle><path d="M7 4.5v5M4.5 7h5" stroke-linecap="round"></path></svg></span>新建维保计划
         </button>
       </div>
       <div class="table-wrap">
@@ -901,10 +920,10 @@
           <span>共 <em id="planTotal" style="color:var(--text-main);font-style:normal;">7</em> 条</span>
           <div class="pager">
             <select class="page-size"><option>10条/页</option><option>20条/页</option><option>50条/页</option></select>
-            <button class="page-btn"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7.5 3L4.5 6l3 3" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+            <button class="page-btn"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7.5 3L4.5 6l3 3" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
             <button class="page-btn active">1</button>
-            <button class="page-btn"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4.5 3l3 3-3 3" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-            <span class="page-jump">前往<input value="1" />页</span>
+            <button class="page-btn"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4.5 3l3 3-3 3" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
+            <span class="page-jump">前往<input value="1">页</span>
           </div>
         </div>
       </div>
@@ -918,7 +937,7 @@
     <div class="filter">
         <div class="field">
           <label>任务名称</label>
-          <input class="input" id="taskFName" placeholder="请输入" />
+          <input class="input" id="taskFName" placeholder="请输入">
         </div>
         <div class="field">
           <label>任务状态</label>
@@ -932,27 +951,27 @@
         </div>
         <div class="field">
           <label>任务时长</label>
-          <input class="input" id="taskFTime" placeholder="请输入" />
+          <input class="input" id="taskFTime" placeholder="请输入">
         </div>
         <div class="actions">
           <button class="btn btn-primary" id="taskBtnSearch">
-            <span class="ico"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="6" cy="6" r="4.5"/><path d="M9.5 9.5L12 12" stroke-linecap="round"/></svg></span>搜索
+            <span class="ico"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="6" cy="6" r="4.5"></circle><path d="M9.5 9.5L12 12" stroke-linecap="round"></path></svg></span>搜索
           </button>
           <button class="btn btn-ghost" id="taskBtnReset">
-            <span class="ico"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2.5 4.5h9M5 7h4M7 9.5h0" stroke-linecap="round"/></svg></span>重置
+            <span class="ico"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2.5 4.5h9M5 7h4M7 9.5h0" stroke-linecap="round"></path></svg></span>重置
           </button>
         </div>
       </div>
       <div style="margin-top:16px;">
-        <button class="btn btn-ghost" id="taskBtnBatch" disabled>
-          <span class="ico"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 5l5-3 5 3M2 5v6h10V5M5 8h4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>批量指派
+        <button class="btn btn-ghost" id="taskBtnBatch" disabled="">
+          <span class="ico"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 5l5-3 5 3M2 5v6h10V5M5 8h4" stroke-linecap="round" stroke-linejoin="round"></path></svg></span>批量指派
         </button>
       </div>
       <div class="table-wrap">
         <table class="table">
           <thead>
             <tr>
-              <th class="col-check"><label class="checkbox" id="taskCkAll"><input type="checkbox" /><span class="box"></span></label></th>
+              <th class="col-check"><label class="checkbox" id="taskCkAll"><input type="checkbox"><span class="box"></span></label></th>
               <th class="col-num">序号</th>
               <th>任务编号</th>
               <th>任务名称</th>
@@ -971,11 +990,11 @@
           <span>共 <em id="taskTotal" style="color:var(--text-main);font-style:normal;">15</em> 条</span>
           <div class="pager">
             <select class="page-size"><option>10条/页</option><option>20条/页</option><option>50条/页</option></select>
-            <button class="page-btn"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7.5 3L4.5 6l3 3" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+            <button class="page-btn"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7.5 3L4.5 6l3 3" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
             <button class="page-btn active">1</button>
             <button class="page-btn">2</button>
-            <button class="page-btn"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4.5 3l3 3-3 3" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-            <span class="page-jump">前往<input value="1" />页</span>
+            <button class="page-btn"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4.5 3l3 3-3 3" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
+            <span class="page-jump">前往<input value="1">页</span>
           </div>
         </div>
       </div>
@@ -990,23 +1009,23 @@
 <aside class="drawer" id="stdDrawerNew">
   <div class="head">
     <div class="title">
-      <span class="ico"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 3h10v10H3z M3 6h10 M6 3v10" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+      <span class="ico"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 3h10v10H3z M3 6h10 M6 3v10" stroke-linecap="round" stroke-linejoin="round"></path></svg></span>
       <span id="stdNewTitle">添加维保标准</span>
     </div>
     <button class="close" data-close>
-      <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 3l8 8M11 3l-8 8" stroke-linecap="round"/></svg>
+      <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 3l8 8M11 3l-8 8" stroke-linecap="round"></path></svg>
     </button>
   </div>
   <div class="body">
     <form class="form" id="stdForm" onsubmit="return false">
       <div class="row">
         <label class="lbl"><span class="req">*</span>维保标准名称</label>
-        <input class="input" name="name" placeholder="请输入" />
+        <input class="input" name="name" placeholder="请输入">
         <div class="err" data-err="name" style="display:none;">请输入维保标准名称</div>
       </div>
       <div class="row">
         <label class="lbl"><span class="req">*</span>所属专业</label>
-        <input class="input" name="major" placeholder="请输入" />
+        <input class="input" name="major" placeholder="请输入">
         <div class="err" data-err="major" style="display:none;">请输入所属专业</div>
       </div>
       <div class="row">
@@ -1014,7 +1033,7 @@
         <div class="checklist" id="stdClist"></div>
         <div style="margin-top:8px;">
           <button class="add-row" type="button" id="stdAddItem">
-            <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="6" cy="6" r="5"/><path d="M6 4v4M4 6h4" stroke-linecap="round"/></svg>添加标准
+            <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="6" cy="6" r="5"></circle><path d="M6 4v4M4 6h4" stroke-linecap="round"></path></svg>添加标准
           </button>
         </div>
         <div class="err" data-err="items" style="display:none;">请填写保养标准</div>
@@ -1031,11 +1050,11 @@
 <aside class="drawer" id="stdDrawerDetail">
   <div class="head">
     <div class="title">
-      <span class="ico"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6"/><path d="M8 5v3.5M8 11h.01" stroke-linecap="round"/></svg></span>
+      <span class="ico"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6"></circle><path d="M8 5v3.5M8 11h.01" stroke-linecap="round"></path></svg></span>
       维保标准详情
     </div>
     <button class="close" data-close>
-      <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 3l8 8M11 3l-8 8" stroke-linecap="round"/></svg>
+      <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 3l8 8M11 3l-8 8" stroke-linecap="round"></path></svg>
     </button>
   </div>
   <div class="body">
@@ -1053,18 +1072,18 @@
 <aside class="drawer" id="planDrawerForm">
   <div class="head">
     <div class="title">
-      <span class="ico"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 3h10v10H3z" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+      <span class="ico"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 3h10v10H3z" stroke-linecap="round" stroke-linejoin="round"></path></svg></span>
       <span id="planFormTitle">新建维保计划</span>
     </div>
     <button class="close" data-close>
-      <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 3l8 8M11 3l-8 8" stroke-linecap="round"/></svg>
+      <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 3l8 8M11 3l-8 8" stroke-linecap="round"></path></svg>
     </button>
   </div>
   <div class="body">
     <form class="form" id="planForm" onsubmit="return false">
       <div class="row">
         <label class="lbl"><span class="req">*</span>维保计划名称</label>
-        <input class="input" name="name" placeholder="请输入" />
+        <input class="input" name="name" placeholder="请输入">
         <div class="err" data-err="name" style="display:none;">请输入维保计划名称</div>
       </div>
       <div class="row">
@@ -1080,20 +1099,20 @@
         <div class="form-block">
           <div class="row" style="margin-bottom:0;">
             <div class="radio-group">
-              <label class="radio"><input type="radio" name="sched" value="loop" checked /><span class="dot"></span>周期循环</label>
-              <label class="radio"><input type="radio" name="sched" value="fixed" /><span class="dot"></span>日历定点</label>
+              <label class="radio"><input type="radio" name="sched" value="loop" checked=""><span class="dot"></span>周期循环</label>
+              <label class="radio"><input type="radio" name="sched" value="fixed"><span class="dot"></span>日历定点</label>
             </div>
           </div>
           <div class="row" id="planRowLoop">
             <div class="grid2">
               <div>
                 <label class="lbl" style="font-size:13px;"><span class="req">*</span>开始时间</label>
-                <input type="date" class="date-input" name="startDate" />
+                <input type="date" class="date-input" name="startDate">
               </div>
               <div>
                 <label class="lbl" style="font-size:13px;"><span class="req">*</span>间隔时间</label>
                 <div class="with-unit">
-                  <input type="number" class="input" name="interval" placeholder="请输入" min="1" />
+                  <input type="number" class="input" name="interval" placeholder="请输入" min="1">
                   <span class="unit">天</span>
                 </div>
               </div>
@@ -1104,7 +1123,7 @@
             <div class="fixed-list" id="planFixedList"></div>
             <div style="margin-top:10px;">
               <button class="add-row" type="button" id="planAddFixed">
-                <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="6" cy="6" r="5"/><path d="M6 4v4M4 6h4" stroke-linecap="round"/></svg>添加日期
+                <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="6" cy="6" r="5"></circle><path d="M6 4v4M4 6h4" stroke-linecap="round"></path></svg>添加日期
               </button>
             </div>
             <div class="err" data-err="fixed" style="display:none;">请至少添加一条日期规则</div>
@@ -1114,7 +1133,7 @@
       <div class="row">
         <label class="lbl"><span class="req">*</span>执行时限</label>
         <div style="display:flex; align-items:center; gap:8px; max-width:220px;">
-          <input type="number" class="input" name="limit" placeholder="请输入" min="0" step="1" value="1" style="flex:1; min-width:0;" />
+          <input type="number" class="input" name="limit" placeholder="请输入" min="0" step="1" value="1" style="flex:1; min-width:0;">
           <span style="color:var(--text-sub); font-size:14px;">天</span>
         </div>
         <div style="font-size:12px; color:var(--text-sub); margin-top:6px; line-height:1.5;">完成期限 = 该期排程日期 + 执行时限（填 0 表示当日完成）</div>
@@ -1123,15 +1142,15 @@
       <div class="row">
         <label class="lbl"><span class="req">*</span>巡检要求</label>
         <div class="radio-group">
-          <label class="radio"><input type="radio" name="req" value="one" checked /><span class="dot"></span>逐个</label>
-          <label class="radio"><input type="radio" name="req" value="batch" /><span class="dot"></span>批量</label>
+          <label class="radio"><input type="radio" name="req" value="one" checked=""><span class="dot"></span>逐个</label>
+          <label class="radio"><input type="radio" name="req" value="batch"><span class="dot"></span>批量</label>
         </div>
       </div>
       <div class="row">
         <label class="lbl"><span class="req">*</span>巡检设备</label>
         <div class="form-actions">
           <button class="btn-pick" type="button" id="planBtnPick">
-            <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 2v8M2 6h8" stroke-linecap="round"/></svg>从设备选择
+            <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 2v8M2 6h8" stroke-linecap="round"></path></svg>从设备选择
           </button>
         </div>
         <div class="err" data-err="dev" style="display:none;">巡检设备不能为空</div>
@@ -1143,7 +1162,6 @@
                 <th>设备类型</th>
                 <th>设备名称</th>
                 <th>设备位置</th>
-                <th>设备来源</th>
                 <th class="col-actions">操作</th>
               </tr>
             </thead>
@@ -1163,11 +1181,11 @@
 <aside class="drawer" id="planDrawerDetail">
   <div class="head">
     <div class="title">
-      <span class="ico"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6"/><path d="M8 5v3.5M8 11h.01" stroke-linecap="round"/></svg></span>
+      <span class="ico"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6"></circle><path d="M8 5v3.5M8 11h.01" stroke-linecap="round"></path></svg></span>
       维保计划详情
     </div>
     <button class="close" data-close>
-      <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 3l8 8M11 3l-8 8" stroke-linecap="round"/></svg>
+      <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 3l8 8M11 3l-8 8" stroke-linecap="round"></path></svg>
     </button>
   </div>
   <div class="body">
@@ -1190,22 +1208,26 @@
   <div class="head">
     <div class="title">选择设备</div>
     <button class="close" data-close-modal="planModalPick">
-      <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 3l8 8M11 3l-8 8" stroke-linecap="round"/></svg>
+      <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 3l8 8M11 3l-8 8" stroke-linecap="round"></path></svg>
     </button>
   </div>
   <div class="body">
+    <div class="pick-tabs" id="planPickTabs">
+      <div class="pick-tab active" data-pick-tab="ledger">智能设备</div>
+      <div class="pick-tab" data-pick-tab="asset">非智能设备</div>
+    </div>
     <div class="filter" style="margin-bottom:12px;">
-      <div class="field"><label>设备名称</label><input class="input" placeholder="请输入" id="planPickName" /></div>
-      <div class="field"><label>设备ID</label><input class="input" placeholder="请输入" id="planPickId" /></div>
+      <div class="field"><label>设备名称</label><input class="input" placeholder="请输入" id="planPickName"></div>
+      <div class="field"><label>设备ID</label><input class="input" placeholder="请输入" id="planPickId"></div>
       <div class="field">
         <label>设备类型</label>
         <div class="combo" id="planPickTypeCombo">
-          <input class="input" placeholder="全部" id="planPickType" autocomplete="off" />
+          <input class="input" placeholder="全部" id="planPickType" autocomplete="off">
           <span class="combo-clear" id="planPickTypeClear" title="清除">
-            <svg viewBox="0 0 8 8" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M1 1l6 6M7 1L1 7" stroke-linecap="round"/></svg>
+            <svg viewBox="0 0 8 8" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M1 1l6 6M7 1L1 7" stroke-linecap="round"></path></svg>
           </span>
           <span class="combo-caret">
-            <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 4.5L6 7.5L9 4.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 4.5L6 7.5L9 4.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>
           </span>
           <div class="combo-panel" id="planPickTypePanel"></div>
         </div>
@@ -1220,8 +1242,8 @@
       <table class="table simple">
         <thead>
           <tr>
-            <th style="width:40px;"><label class="checkbox"><input type="checkbox" id="planPickAll" /><span class="box"></span></label></th>
-            <th style="width:210px;">设备ID</th><th>设备名称</th><th style="width:130px;">设备类型</th><th style="width:120px;">设备位置</th><th style="width:100px;">设备来源</th>
+            <th style="width:40px;"><label class="checkbox"><input type="checkbox" id="planPickAll"><span class="box"></span></label></th>
+            <th style="width:210px;">设备ID</th><th>设备名称</th><th style="width:130px;">设备类型</th><th style="width:150px;">设备位置</th>
           </tr>
         </thead>
         <tbody id="planPickTbody"></tbody>
@@ -1236,10 +1258,10 @@
             <option value="20">20条/页</option>
             <option value="50">50条/页</option>
           </select>
-          <button class="page-btn" id="planPickPrev"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7.5 3L4.5 6l3 3" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <button class="page-btn" id="planPickPrev"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7.5 3L4.5 6l3 3" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
           <span id="planPickPages" style="display:inline-flex;align-items:center;gap:8px;"></span>
-          <button class="page-btn" id="planPickNext"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4.5 3l3 3-3 3" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-          <span class="page-jump">前往<input id="planPickJump" value="1" />页</span>
+          <button class="page-btn" id="planPickNext"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4.5 3l3 3-3 3" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
+          <span class="page-jump">前往<input id="planPickJump" value="1">页</span>
         </div>
       </div>
     </div>
@@ -1254,11 +1276,11 @@
 <aside class="drawer wide" id="taskDrawerDetail">
   <div class="head">
     <div class="title">
-      <span class="ico"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6"/><path d="M8 5v3.5M8 11h.01" stroke-linecap="round"/></svg></span>
+      <span class="ico"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6"></circle><path d="M8 5v3.5M8 11h.01" stroke-linecap="round"></path></svg></span>
       维保任务详情
     </div>
     <button class="close" data-close>
-      <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 3l8 8M11 3l-8 8" stroke-linecap="round"/></svg>
+      <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 3l8 8M11 3l-8 8" stroke-linecap="round"></path></svg>
     </button>
   </div>
   <div class="body pad0">
@@ -1266,7 +1288,7 @@
       <div class="col">
         <div class="section">
           <div class="sec-head">
-            <span class="ico"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="12" height="10" rx="1.5"/><path d="M5 6h6M5 9h4" stroke-linecap="round"/></svg></span>
+            <span class="ico"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="12" height="10" rx="1.5"></rect><path d="M5 6h6M5 9h4" stroke-linecap="round"></path></svg></span>
             基本信息
           </div>
           <div class="sec-body">
@@ -1285,14 +1307,14 @@
         </div>
         <div class="section">
           <div class="sec-head">
-            <span class="ico"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 12l3-2 2 2 3-4 4 5" stroke-linecap="round" stroke-linejoin="round"/><path d="M11 2.5l1.5 1.5-4 4L7 7l4-4.5z" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            <span class="ico"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 12l3-2 2 2 3-4 4 5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M11 2.5l1.5 1.5-4 4L7 7l4-4.5z" stroke-linecap="round" stroke-linejoin="round"></path></svg></span>
             维保报告
           </div>
           <div class="sec-body" id="taskDReport"></div>
         </div>
         <div class="section">
           <div class="sec-head">
-            <span class="ico"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2.5" y="3" width="11" height="10" rx="1.5"/><path d="M2.5 6h11M5.5 1.5v3M10.5 1.5v3" stroke-linecap="round"/></svg></span>
+            <span class="ico"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2.5" y="3" width="11" height="10" rx="1.5"></rect><path d="M2.5 6h11M5.5 1.5v3M10.5 1.5v3" stroke-linecap="round"></path></svg></span>
             延期记录
           </div>
           <div class="sec-body" id="taskDDelays"></div>
@@ -1301,7 +1323,7 @@
       <div class="col">
         <div class="section">
           <div class="sec-head">
-            <span class="ico"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 4h10M3 8h10M3 12h7" stroke-linecap="round"/></svg></span>
+            <span class="ico"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 4h10M3 8h10M3 12h7" stroke-linecap="round"></path></svg></span>
             流转记录
           </div>
           <div class="sec-body" id="taskDFlow"></div>
@@ -1319,7 +1341,7 @@
   <div class="head">
     <div class="title">批量指派任务</div>
     <button class="close" data-close>
-      <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 3l8 8M11 3l-8 8" stroke-linecap="round"/></svg>
+      <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 3l8 8M11 3l-8 8" stroke-linecap="round"></path></svg>
     </button>
   </div>
   <div class="body">
@@ -1328,7 +1350,7 @@
     <div class="form">
       <div class="row" style="margin-bottom:0; position:relative;">
         <label class="lbl"><span class="req">*</span>指派人员</label>
-        <input class="input" id="taskAssignUser" placeholder="请输入姓名搜索人员" autocomplete="off" style="width:100%;" />
+        <input class="input" id="taskAssignUser" placeholder="请输入姓名搜索人员" autocomplete="off" style="width:100%;">
         <div class="user-suggest" id="taskUserSuggest"></div>
         <div class="err" data-err="assign" style="display:none;">请选择指派人员</div>
       </div>
@@ -1601,6 +1623,7 @@
     ];
     const DEV_FLOORS = ['B1', 'D1', 'D2', 'D3'];
     const DEV_PROS   = ['RD', 'PD', 'XF', 'AF', 'JS', 'NT'];
+    const SPACE_ROOMS = ['101', '103', '105'];   // 演示数据：房间号，参与设备名称编码
     let _devSeed = 20260921;
     function _rnd() { _devSeed = (_devSeed * 1103515245 + 12345) % 2147483648; return _devSeed / 2147483648; }
     function _pick(a) { return a[Math.floor(_rnd() * a.length)]; }
@@ -1615,12 +1638,14 @@
     DEV_TYPE_DICT.forEach(t => {
       for (let i = 1; i <= DEV_PER_TYPE; i++) {
         const bld = _pick(DEV_BLDS);
+        const fl  = _pick(DEV_FLOORS);
+        const rm  = _pick(SPACE_ROOMS);
         devices.push({
           id: 'GD' + t.code + _hex(18),
-          name: bld.code + '-' + _pick(DEV_FLOORS) + '-' + (1 + Math.floor(_rnd() * 3)) + '-' +
-                _pick(DEV_PROS) + '-' + (101 + Math.floor(_rnd() * 299)) + '-' + t.seg + '-' + ('00' + i).slice(-3),
+          name: bld.code + '-' + fl + '-' + (1 + Math.floor(_rnd() * 3)) + '-' +
+                _pick(DEV_PROS) + '-' + rm + '-' + t.seg + '-' + ('00' + i).slice(-3),
           type: t.type,
-          loc: bld.name,
+          loc: bld.name,           // 「设备位置」列显示楼栋名（与既有口径一致）
           src: t.src
         });
       }
@@ -1853,16 +1878,22 @@
     const pickJump   = document.getElementById('planPickJump');
     const pickAllEl  = document.getElementById('planPickAll');
 
+    // 顶部数据源 TAB：智能设备 = 设备台账（系统自动纳管）；非智能设备 = 设备资产（人工手动维护）
+    const PICK_TABS = { ledger: '设备台账', asset: '设备资产' };
+    let pickTab = 'ledger';
+
     // 已生效的筛选条件（点「查询」才写入）
     let pickFilter = { name: '', id: '', type: '' };
     let pickPage = 1;
 
-    // 设备名称 / 设备ID / 设备类型 三者 AND，均支持模糊匹配
+    // 数据源（TAB）→ 设备名称 / 设备ID / 设备类型，三者 AND，均为模糊匹配
     function pickList() {
+      const src = PICK_TABS[pickTab];
       const n = pickFilter.name.trim().toLowerCase();
       const d = pickFilter.id.trim().toLowerCase();
       const t = pickFilter.type.trim().toLowerCase();
       return devices.filter(x =>
+        x.src === src &&
         (!n || x.name.toLowerCase().indexOf(n) > -1) &&
         (!d || x.id.toLowerCase().indexOf(d) > -1) &&
         (!t || x.type.toLowerCase().indexOf(t) > -1)
@@ -1886,11 +1917,12 @@
         return `<tr>
           <td><label class="checkbox"><input type="checkbox" data-pick="${d.id}" ${checked}/><span class="box"></span></label></td>
           <td class="col-id" title="${d.id}">${d.id}</td>
-          <td>${d.name}</td><td>${d.type}</td><td>${d.loc}</td><td>${d.src}</td>
+          <td>${d.name}</td><td>${d.type}</td><td>${d.loc}</td>
         </tr>`;
-      }).join('') : `<tr><td colspan="6" style="text-align:center;color:var(--text-sub);padding:30px 0;">暂无数据</td></tr>`;
+      }).join('') : `<tr><td colspan="5" style="text-align:center;color:var(--text-sub);padding:30px 0;">暂无数据</td></tr>`;
       pickSel.textContent = pickChecked.size;
       pickTotal.textContent = list.length;
+      renderPickTabs();
 
       // 当前页全选 / 半选
       const hit = rows.filter(d => pickChecked.has(d.id)).length;
@@ -1912,43 +1944,61 @@
       pickPages.innerHTML = html;
     }
 
-    // ----- 设备类型：支持输入关键字模糊查询的单选下拉 -----
-    const typeCombo = document.getElementById('planPickTypeCombo');
+    // ----- 顶部数据源 TAB：智能设备（设备台账）/ 非智能设备（设备资产）-----
+    const pickTabEls = Array.from(document.querySelectorAll('#planPickTabs .pick-tab'));
+    function renderPickTabs() {
+      pickTabEls.forEach(el => el.classList.toggle('active', el.dataset.pickTab === pickTab));
+    }
+
+    // ----- 可模糊查询的单选下拉（combo）：设备类型 -----
+    const TYPE_ALL = '全部';
+    function makeCombo(cfg) {
+      const { combo, input, panel, clearEl, options, emptyText } = cfg;
+      function render(kw) {
+        const k = (kw || '').trim().toLowerCase();
+        const opts = [TYPE_ALL].concat(options()).filter(t => !k || t.toLowerCase().indexOf(k) > -1);
+        const cur = input.value.trim();
+        panel.innerHTML = opts.length
+          ? opts.map(t => `<div class="combo-opt${t === cur ? ' active' : ''}" data-opt="${t}">${t}</div>`).join('')
+          : `<div class="combo-empty">${emptyText}</div>`;
+      }
+      function setVal(v) {
+        input.value = v || '';
+        combo.classList.toggle('has-value', !!v);
+      }
+      const open  = () => { combo.classList.add('open'); render(''); };
+      const close = () => combo.classList.remove('open');
+      input.addEventListener('focus', open);
+      input.addEventListener('click', () => { if (!combo.classList.contains('open')) open(); });
+      input.addEventListener('input', () => { combo.classList.add('open'); render(input.value); });
+      panel.addEventListener('mousedown', e => {
+        const o = e.target.closest('[data-opt]');
+        if (!o) return;
+        e.preventDefault();
+        setVal(o.dataset.opt === TYPE_ALL ? '' : o.dataset.opt);
+        close();
+      });
+      clearEl.addEventListener('click', e => {
+        e.stopPropagation();
+        setVal(''); render(''); input.focus();
+      });
+      document.addEventListener('click', e => { if (!combo.contains(e.target)) close(); });
+      return { render, setVal, open, close };
+    }
+
+    // 设备类型（取值 = 系统设备类型字典）
     const typeInput = document.getElementById('planPickType');
-    const typePanel = document.getElementById('planPickTypePanel');
-    const TYPE_ALL  = '全部';
-    function renderTypePanel(kw) {
-      const k = (kw || '').trim().toLowerCase();
-      const opts = [TYPE_ALL].concat(DEV_TYPE_DICT.map(t => t.type))
-        .filter(t => !k || t.toLowerCase().indexOf(k) > -1);
-      const cur = typeInput.value.trim();
-      typePanel.innerHTML = opts.length
-        ? opts.map(t => `<div class="combo-opt${t === cur ? ' active' : ''}" data-opt="${t}">${t}</div>`).join('')
-        : `<div class="combo-empty">无匹配的设备类型</div>`;
-    }
-    function setPickType(v) {
-      typeInput.value = v || '';
-      typeCombo.classList.toggle('has-value', !!v);
-    }
-    function openTypePanel() { typeCombo.classList.add('open'); renderTypePanel(''); }
-    function closeTypePanel() { typeCombo.classList.remove('open'); }
-    typeInput.addEventListener('focus', openTypePanel);
-    typeInput.addEventListener('click', () => { if (!typeCombo.classList.contains('open')) openTypePanel(); });
-    typeInput.addEventListener('input', () => { typeCombo.classList.add('open'); renderTypePanel(typeInput.value); });
-    typePanel.addEventListener('mousedown', e => {
-      const o = e.target.closest('[data-opt]');
-      if (!o) return;
-      e.preventDefault();
-      setPickType(o.dataset.opt === TYPE_ALL ? '' : o.dataset.opt);
-      closeTypePanel();
+    const typeApi = makeCombo({
+      combo: document.getElementById('planPickTypeCombo'),
+      input: typeInput,
+      panel: document.getElementById('planPickTypePanel'),
+      clearEl: document.getElementById('planPickTypeClear'),
+      options: () => DEV_TYPE_DICT.filter(t => t.src === PICK_TABS[pickTab]).map(t => t.type),
+      emptyText: '无匹配的设备类型'
     });
-    document.getElementById('planPickTypeClear').addEventListener('click', e => {
-      e.stopPropagation();
-      setPickType('');
-      renderTypePanel('');
-      typeInput.focus();
-    });
-    document.addEventListener('click', e => { if (!typeCombo.contains(e.target)) closeTypePanel(); });
+    function renderTypePanel(kw) { typeApi.render(kw); }
+    function setPickType(v)      { typeApi.setVal(v); }
+    function closeTypePanel()    { typeApi.close(); }
 
     // ----- 查询 / 重置 -----
     document.getElementById('planPickSearch').addEventListener('click', () => {
@@ -1969,6 +2019,19 @@
       pickPage = 1;
       renderPick();
     });
+
+    // ----- 切换数据源 TAB：筛选条件与分页一并重置；设备类型选项随 TAB 收窄 -----
+    pickTabEls.forEach(el => el.addEventListener('click', () => {
+      if (el.dataset.pickTab === pickTab) return;
+      pickTab = el.dataset.pickTab;
+      document.getElementById('planPickName').value = '';
+      document.getElementById('planPickId').value = '';
+      setPickType('');
+      pickFilter = { name: '', id: '', type: '' };
+      pickPage = 1;
+      closeTypePanel();
+      renderPick();
+    }));
 
     // ----- 勾选 / 分页 -----
     pickTbody.addEventListener('change', e => {
@@ -2006,6 +2069,7 @@
 
     document.getElementById('planBtnPick').addEventListener('click', () => {
       pickChecked = new Set(selectedDevs.map(d => d.id));
+      pickTab = 'ledger';               // 每次打开弹窗默认回到「智能设备」
       document.getElementById('planPickName').value = '';
       document.getElementById('planPickId').value = '';
       setPickType('');
@@ -2029,7 +2093,7 @@
       devWrap.style.display = '';
       devTbody.innerHTML = selectedDevs.map((d, i) => `
         <tr>
-          <td>${i+1}</td><td>${d.type}</td><td title="${d.name}">${d.name}</td><td>${d.loc}</td><td>${d.src || '设备台账'}</td>
+          <td>${i+1}</td><td>${d.type}</td><td title="${d.name}">${d.name}</td><td>${d.loc}</td>
           <td class="col-actions"><a class="btn-danger" data-rm="${d.id}">删除</a></td>
         </tr>`).join('');
     }
@@ -2463,5 +2527,6 @@
     });
   })();
 </script>
-</body>
-</html>
+
+
+</body></html>
