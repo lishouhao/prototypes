@@ -171,8 +171,12 @@
     display: inline-block; margin-top: 8px; padding: 4px 12px; border-radius: 4px;
     border: 1px solid #4C7AE8; color: #4C7AE8; font-size: 12px; float: right; cursor: pointer;
   }
+  .end-mini {
+    display: inline-block; margin-top: 8px; padding: 4px 12px; border-radius: 4px;
+    border: 1px solid #FFB020; color: #D48806; font-size: 12px; float: right; cursor: pointer;
+  }
   .mini-bar { overflow: hidden; display: flex; justify-content: flex-end; gap: 8px; }
-  .mini-bar .cancel-mini, .mini-bar .change-mini, .mini-bar .edit-mini { float: none; margin-top: 8px; }
+  .mini-bar .cancel-mini, .mini-bar .change-mini, .mini-bar .edit-mini, .mini-bar .end-mini { float: none; margin-top: 8px; }
   .receipt-btn {
     display: inline-block; margin-top: 8px; padding: 4px 14px; border-radius: 4px;
     font-size: 12px; float: right; cursor: pointer;
@@ -802,6 +806,28 @@
     </div>
   </div>
 
+  <!-- N5：会中「提前结束 / 延后结束」弹窗 -->
+  <div class="modal-mask" id="mEndModal">
+    <div class="modal-box">
+      <div class="modal-title" id="mEndTitle">提前结束</div>
+      <div class="modal-body" id="mEndText"></div>
+      <div id="mEndActualWrap" style="display:none;margin:12px 0;">
+        <div style="font-size:13px;color:#585858;margin-bottom:6px;">实际结束时间</div>
+        <div id="mEndActual" style="font-size:14px;color:#36373B;font-weight:600;">12:30</div>
+      </div>
+      <div id="mEndTimeWrap" style="display:none;margin:12px 0;">
+        <div style="font-size:13px;color:#585858;margin-bottom:6px;">新的结束时间</div>
+        <select class="form-input" id="mEndTime"></select>
+      </div>
+      <div id="mEndHint" style="font-size:12px;color:#999;margin-bottom:8px;line-height:1.6;"></div>
+      <div id="mEndErr" style="display:none;color:#cf1322;font-size:12px;margin-bottom:8px;line-height:1.6;"></div>
+      <div class="modal-btns">
+        <div class="btn cancel" onclick="closeEndModal()">取消</div>
+        <div class="btn confirm" id="mEndBtn" onclick="confirmEndModal()">确认</div>
+      </div>
+    </div>
+  </div>
+
   <!-- 会议室选择弹窗 -->
   <div class="modal-mask" id="roomModal">
     <div class="modal-box">
@@ -862,6 +888,17 @@ allData.forEach(d => { if (!d.occupancy) d.occupancy = '已预定'; }); // 预�
 allData.forEach(d => { if (d.needService === undefined) d.needService = '否'; }); // 会务服务字段默认值：未声明视为无需
 
 const currentUser = '陈琼梦';
+/* N3：申请人默认联系电话（取当前登录人手机号；原型以演示数据代替账号档案） */
+const ME_PHONE = '0512-65881200';
+
+/* N5 演示数据：一条「会中」会议（演示基准时间 2026-08-09 12:32 落在其进行中），用于演示「提前结束 / 延后结束」 */
+allData.push({ id: 14, status: 'approved', statusText: '已通过', name: '项目周例会（会中演示）', members: '5人',
+  occupancy: '已预定', // 必须在 push 时显式声明：上面的「默认已预定」初始化早于此行执行，缺失会导致 N5 两按钮不渲染
+  time: '2026-08-09 11:30-14:00', place: '中会议室', createTime: '2026-08-08 10:00:00',
+  category: '管理类', type: '部门例会', convener: '陈琼梦', dept: '主任办公室', applicant: '陈琼梦', contact: '0512-65881200',
+  content: '项目进度同步，需现场确认下周排期', needService: '是', serviceType: '茶水×1', costShare: '否', notice: '否',
+  room: '302', scale: '中会议室', location: '2F', seats: 40, cost: '80元/小时',
+  facilities: ['投影仪','白板'], attendees: ['陈琼梦','王芳','李华'], receipts: {} });
 let currentTab = 'initiated';
 let selectedRoom = null;
 let currentDetailId = null;
@@ -949,6 +986,9 @@ function renderMeeting() {
       list = allData.filter(d => ((d.attendees && String(d.attendees).split(/[,，]/).map(s => s.trim()).includes(currentUser)) || d.convener === currentUser) && d.status === 'approved' && d.applicant !== currentUser);
       from = 'mine';
     }
+  // 进行中（会中）的会议置顶：便于优先看到「提前结束 / 延后结束」；其余保持原顺序
+  const _ongoingList = list.filter(d => mOngoing(d));
+  if (_ongoingList.length) list = _ongoingList.concat(list.filter(d => !mOngoing(d)));
   if (!list.length) {
     container.innerHTML = '<div style="padding:48px 0;text-align:center;color:#999;font-size:13px;">暂无数据</div>';
     return;
@@ -969,8 +1009,14 @@ function renderMeeting() {
             + '<span class="cancel-mini" onclick="event.stopPropagation();openCancelModal(' + item.id + ')">取消会议</span>'
             + '<span class="change-mini" onclick="event.stopPropagation();mChange(' + item.id + ')">变更</span>'
             + '</div>';
+        } else if (mOngoing(item) && item.occupancy === '已预定') {
+          // N5：会中可「提前结束 / 延后结束」（仅发起人、不重走审批）
+          acts = '<div class="mini-bar">'
+            + '<span class="end-mini" onclick="event.stopPropagation();openEndModal(' + item.id + ',\'early\')">提前结束</span>'
+            + '<span class="end-mini" onclick="event.stopPropagation();openEndModal(' + item.id + ',\'postpone\')">延后结束</span>'
+            + '</div>';
         }
-        // 进行中/已释放：取消会议与变更按钮隐藏（不做置灰）
+        // 已结束/已释放：取消会议与变更按钮隐藏（不做置灰）
       }
       // 非本人发起（我参加的）：不展示取消会议/变更按钮（无权限，隐藏，不置灰）
     } else if (item.status === 'draft') {
@@ -1132,6 +1178,97 @@ function openCancelModal(id) {
 function closeCancelModal() {
   document.getElementById('cancelModal').classList.remove('show');
 }
+/* ===== N5：会中「提前结束 / 延后结束」（仅我发起的、仅会中、不重走审批） ===== */
+let mEndId = null, mEndMode = null;
+/* 解析会议结束时间(毫秒)：time 形如 "2026-08-09 19:02-20:00" */
+function mEndMs(item) {
+  const m = (item.time || '').match(/(\d{4})-(\d{2})-(\d{2})\s+(\d{1,2}):(\d{2})-(\d{1,2}):(\d{2})/);
+  if (!m) return null;
+  return new Date(+m[1], +m[2] - 1, +m[3], +m[6], +m[7], 0).getTime();
+}
+/* 会议进行中：开始时间 <= 演示基准 < 结束时间 */
+function mOngoing(item) {
+  const s = mStartMs(item), e = mEndMs(item);
+  return s != null && e != null && mNowMs() >= s && mNowMs() < e;
+}
+/* 半点颗粒度：当前时刻向下取整到最近的 00 / 30（15:47 → 15:30） */
+function mHalfHourNow() {
+  const d = new Date(mNowMs());
+  const half = (d.getMinutes() >= 30) ? 30 : 0;
+  return String(d.getHours()).padStart(2, '0') + ':' + String(half).padStart(2, '0');
+}
+function openEndModal(id, mode) {
+  if (id) currentDetailId = id;
+  const item = allData.find(d => d.id === currentDetailId);
+  if (!item) return;
+  mEndId = item.id; mEndMode = mode;
+  const tp = (item.time || '').split(' ');
+  const mDate = tp[0] || '', mRange = tp[1] || '';
+  document.getElementById('mEndTitle').textContent = (mode === 'early') ? '提前结束' : '延后结束';
+  document.getElementById('mEndText').textContent = (mode === 'early')
+    ? '确定提前结束「' + (item.name || '') + '」吗？'
+    : '确定延后结束「' + (item.name || '') + '」吗？';
+  document.getElementById('mEndActual').textContent = mHalfHourNow();
+  document.getElementById('mEndActualWrap').style.display = (mode === 'early') ? '' : 'none';
+  document.getElementById('mEndHint').textContent = (mode === 'early') ? '剩余时段将释放，费用按实际时长计算' : '仅可延至空闲时段';
+  const wrap = document.getElementById('mEndTimeWrap');
+  const sel = document.getElementById('mEndTime');
+  if (mode === 'postpone') {
+    const cur = (mRange.split('-')[1] || '');
+    const opts = [];
+    for (let h = 6; h <= 24; h++) {
+      const hh = String(h).padStart(2, '0');
+      if (h === 24) { if ('24:00' > cur) opts.push('<option value="24:00">24:00</option>'); break; }
+      ['00', '30'].forEach(mm => { const t = hh + ':' + mm; if (t > cur) opts.push('<option value="' + t + '">' + t + '</option>'); });
+    }
+    sel.innerHTML = opts.join('');
+    wrap.style.display = '';
+  } else {
+    wrap.style.display = 'none';
+  }
+  document.getElementById('mEndErr').style.display = 'none';
+  document.getElementById('mEndModal').classList.add('show');
+}
+function closeEndModal() {
+  mEndId = null; mEndMode = null;
+  document.getElementById('mEndModal').classList.remove('show');
+}
+function confirmEndModal() {
+  const item = allData.find(d => d.id === mEndId);
+  if (!item) { closeEndModal(); return; }
+  const errEl = document.getElementById('mEndErr');
+  const fail = msg => { errEl.textContent = msg; errEl.style.display = ''; };
+  const tp = (item.time || '').split(' ');
+  const dateStr = tp[0] || '', range = tp[1] || '';
+  const startT = range.split('-')[0] || '', curEnd = range.split('-')[1] || '';
+  if (mEndMode === 'early') {
+    const actual = mHalfHourNow();                        // 实际结束时间按半点颗粒度记录（向下取整到 00 / 30）
+    const newEnd = (actual > startT) ? actual : startT;   // 实际结束时间不早于开始时间
+    item.time = dateStr + ' ' + startT + '-' + newEnd;    // 会议时间显示实际起止时间
+    item.actualEnd = newEnd;                              // 留痕：实际结束时间
+    item.endMode = '提前结束';
+    item.occupancy = '已释放';                             // 释放剩余时段
+    showToast('已提前结束「' + (item.name || '') + '」，剩余时段已释放');
+  } else {
+    const val = document.getElementById('mEndTime').value;
+    if (!val) return fail('请选择新的结束时间');
+    if (val <= curEnd) return fail('新的结束时间需晚于 ' + curEnd);
+    if (val > '24:00') return fail('最晚可延至 24:00');
+    const clash = allData.some(o => {
+      if (o.id === item.id || o.room !== item.room || o.occupancy === '已释放') return false;
+      const om = (o.time || '').match(/(\d{4}-\d{2}-\d{2})\s+(\d{1,2}:\d{2})-(\d{1,2}:\d{2})/);
+      if (!om || om[1] !== dateStr) return false;
+      return toMin(om[2]) < toMin(val) && toMin(om[3]) > toMin(curEnd);
+    });
+    if (clash) return fail('该时段已被占用，无法延后');
+    item.time = dateStr + ' ' + startT + '-' + val;
+    item.endMode = '延后结束';
+    showToast('已将「' + (item.name || '') + '」延后至 ' + val);
+  }
+  closeEndModal();
+  renderMeeting();
+  if (typeof renderDetailActions === 'function') renderDetailActions(item);
+}
 function renderDetailActions(item) {
   const acts = document.getElementById('detailActions');
   if (!acts) return;
@@ -1157,6 +1294,10 @@ function renderDetailActions(item) {
         // 取消会议 + 变更 两个一级操作并列（原单仅在新单提交成功时释放）
         html = '<div class="bottom-btn secondary danger" style="flex:1;" onclick="openCancelModal()">取消会议</div>'
              + '<div class="bottom-btn" style="flex:1;" onclick="mChange(' + item.id + ')">变更</div>';
+      } else if (mOngoing(item) && item.occupancy === '已预定') {
+        // N5：会中可「提前结束 / 延后结束」（仅发起人、不重走审批）
+        html = '<div class="bottom-btn secondary" style="flex:1;border-color:#FFB020;color:#D48806;" onclick="openEndModal(' + item.id + ',\'early\')">提前结束</div>'
+             + '<div class="bottom-btn" style="flex:1;" onclick="openEndModal(' + item.id + ',\'postpone\')">延后结束</div>';
       }
     }
     // 我参加的：无取消会议/变更按钮（无权限，隐藏，不置灰），仅保留回执（决策⑤：回执截止=会议开始前）
@@ -1248,7 +1389,8 @@ function openEditDraft(id) {
 /* 清空表单，回到新建预约的初始态 */
 function clearForm() {
   const setVal = (id, v) => { const el = document.getElementById(id); if (el) el.value = v; };
-  ['fName','fConvener','fContact','fContent','fRemark','fShareGroup','fDeptAttend','fMembers'].forEach(id => setVal(id, ''));
+  ['fName','fConvener','fContent','fRemark','fShareGroup','fDeptAttend','fMembers'].forEach(id => setVal(id, ''));
+  setVal('fContact', ME_PHONE); // N3：默认带出申请人联系电话，支持编辑
   { const _a = document.getElementById('fAttachments'); if (_a) { _a.value=''; const _l=document.getElementById('fAttachList'); if(_l) _l.innerHTML=''; } }
   setVal('fCategory', ''); setVal('fType', ''); setVal('fNeedService', '否');
   selectedRoom = null;
@@ -1299,7 +1441,7 @@ function prefillForm(item) {
   setVal('fCategory', item.category);
   setVal('fType', item.type);
   setVal('fConvener', item.convener);
-  setVal('fContact', item.contact);
+  setVal('fContact', item.contact || ME_PHONE); // N3：带出申请人联系电话（无历史值时取默认），可编辑
   setVal('fContent', item.content);
   { const _a = document.getElementById('fAttachments'); if (_a) { _a.value=''; const _l=document.getElementById('fAttachList'); if(_l) _l.innerHTML=''; } }
   const tm = (item.time || '').match(/(\d{4}-\d{2}-\d{2})\s+(\d{1,2}:\d{2})-(\d{1,2}:\d{2})/);
