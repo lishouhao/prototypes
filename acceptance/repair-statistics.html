@@ -249,8 +249,8 @@ function initCharts(){
   // 处理人排行（按已办结：审批通过 + 审批不通过）
   var performer = echarts.init(document.getElementById('performer'));
   var performerData = [
-    {name:'张伟', value:58},{name:'李强', value:52},{name:'王芳', value:48},
-    {name:'刘洋', value:44},{name:'陈静', value:38},{name:'赵磊', value:32}
+    {name:'张伟', value:62},{name:'李强', value:55},{name:'王芳', value:51},
+    {name:'刘洋', value:47},{name:'陈静', value:41},{name:'赵磊', value:35}
   ];
   performer.setOption({
     tooltip: { trigger: 'axis', axisPointer:{type:'shadow'}, formatter: '{b}: {c} 单' },
@@ -265,9 +265,9 @@ function initCharts(){
   duration.setOption({
     tooltip: { trigger: 'axis' },
     grid: { left: 40, right: 20, top: 20, bottom: 30 },
-    xAxis: { type: 'category', data: ['2026-04','2026-05','2026-06','2026-07','2026-08','2026-09'], axisLine:{lineStyle:{color:'#e5e6eb'}}, axisLabel:{color:'#8c8c8c'} },
-    yAxis: { type: 'value', name:'小时', splitLine:{lineStyle:{color:'#f0f0f0'}}, axisLabel:{color:'#8c8c8c'} },
-    series: [{ type:'line', smooth:true, data:[7.8,7.2,6.9,6.5,6.4,6.1], itemStyle:{color:'#4165EC'}, areaStyle:{color:'rgba(65,101,236,0.08)'}, label:{show:true, color:'#4e5969', formatter:'{c}h'} }]
+    xAxis: { type: 'category', data: ['2025-10','2025-11','2025-12','2026-01','2026-02','2026-03','2026-04','2026-05','2026-06','2026-07','2026-08','2026-09'], axisLine:{lineStyle:{color:'#e5e6eb'}}, axisLabel:{color:'#8c8c8c'} },
+    yAxis: { type: 'value', splitLine:{lineStyle:{color:'#f0f0f0'}}, axisLabel:{color:'#8c8c8c'} },
+    series: [{ type:'line', smooth:true, data:[7.9,7.5,7.2,6.9,6.8,6.6,6.5,6.4,6.3,6.2,6.2,6.1], itemStyle:{color:'#4165EC'}, areaStyle:{color:'rgba(65,101,236,0.08)'} }]
   });
 
   window.addEventListener('resize', function(){
