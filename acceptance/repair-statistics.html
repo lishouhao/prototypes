@@ -192,8 +192,8 @@
       <!-- 图表第二行 -->
       <div class="grid-2" style="margin-top:16px;">
         <div class="card">
-          <div class="card-title">区域故障排行<span class="right">单位：单</span></div>
-          <div class="chart" id="region"></div>
+          <div class="card-title">维修人绩效排行<span class="right">单位：单</span></div>
+          <div class="chart" id="performer"></div>
         </div>
         <div class="card">
           <div class="card-title">平均处理时长趋势<span class="right">单位：小时</span></div>
@@ -240,18 +240,18 @@ function initCharts(){
     }]
   });
 
-  // 区域故障排行
-  var region = echarts.init(document.getElementById('region'));
-  var regionData = [
-    {name:'地下区', value:12},{name:'公共区', value:18},{name:'能源区', value:22},
-    {name:'生活区', value:62},{name:'科研区', value:75},{name:'办公区', value:88}
+  // 维修人绩效排行
+  var performer = echarts.init(document.getElementById('performer'));
+  var performerData = [
+    {name:'张伟', value:64},{name:'李强', value:58},{name:'王芳', value:52},
+    {name:'刘洋', value:47},{name:'陈静', value:41},{name:'赵磊', value:35}
   ];
-  region.setOption({
-    tooltip: { trigger: 'axis', axisPointer:{type:'shadow'} },
-    grid: { left: 70, right: 30, top: 10, bottom: 20 },
+  performer.setOption({
+    tooltip: { trigger: 'axis', axisPointer:{type:'shadow'}, formatter: '{b}: {c} 单' },
+    grid: { left: 60, right: 40, top: 10, bottom: 20 },
     xAxis: { type: 'value', splitLine:{lineStyle:{color:'#f0f0f0'}}, axisLabel:{color:'#8c8c8c'} },
-    yAxis: { type: 'category', data: regionData.map(function(d){return d.name;}), axisLabel:{color:'#4e5969'} },
-    series: [{ type:'bar', data: regionData.map(function(d){return d.value;}), itemStyle:{color:'#54a0ff', borderRadius:[0,4,4,0]}, barWidth:'55%' }]
+    yAxis: { type: 'category', data: performerData.map(function(d){return d.name;}), axisLabel:{color:'#4e5969'} },
+    series: [{ type:'bar', data: performerData.map(function(d){return d.value;}), itemStyle:{color:'#4165EC', borderRadius:[0,4,4,0]}, barWidth:'55%', label:{show:true, position:'right', color:'#4e5969'} }]
   });
 
   // 平均处理时长趋势
@@ -265,24 +265,11 @@ function initCharts(){
   });
 
   window.addEventListener('resize', function(){
-    [trend,status,region,duration].forEach(function(c){ c.resize(); });
+    [trend,status,performer,duration].forEach(function(c){ c.resize(); });
   });
 }
 
 window.addEventListener('load', function(){ setTimeout(initCharts, 0); });
-
-// 统计周期切换
-document.addEventListener('DOMContentLoaded', function(){
-  var seg = document.getElementById('seg');
-  if(seg){
-    seg.addEventListener('click', function(e){
-      if(e.target.tagName === 'SPAN'){
-        Array.from(this.children).forEach(function(s){ s.classList.remove('active'); });
-        e.target.classList.add('active');
-      }
-    });
-  }
-});
 
 // 区域下拉多选
 (function(){
