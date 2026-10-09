@@ -1,10 +1,9 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-<meta charset="UTF-8" />
-<title>报修统计 - 报修管理</title>
-<script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
-<style>
+<html lang="zh-CN" data-page-node-id="3io9ECuXpVr2aplfUUUlxA"><head data-page-node-id="OwWRWLiFpEb1tcmTpHVGt2">
+<meta charset="UTF-8" data-page-node-id="FS6DigtrLaI3Zyn54GnvxK">
+<title data-page-node-id="uUPtNsL00NNQMODUIK6bBk">报修统计 - 报修管理</title>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js" data-page-node-id="zaa1A0DAlNPEefgVQCe9md"></script>
+<style data-page-node-id="oBpsOBcLB0Cdo1RLtDfDgU">
   * { margin: 0; padding: 0; box-sizing: border-box; }
   html, body { height: 100%; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif; color: #1f2329; font-size: 14px; background: #f0f2f5; }
 
@@ -99,114 +98,110 @@
 
   .note { font-size: 12px; color: #c9cdd4; margin-top: 12px; text-align: right; }
 </style>
-</head>
-<body>
-<div class="app">
-  <aside class="sidebar">
-    <div class="logo"><span class="logo-icon">园</span>智慧园区 · 管理端</div>
-    <ul class="menu">
-      <li class="menu-item"><span class="icon">▦</span>综合态势</li>
-      <li class="menu-item open"><span class="icon">🛡</span>智慧安防<span class="arrow">▶</span></li>
-      <ul class="submenu">
-        <li class="menu-item">安防告警</li>
-        <li class="menu-item">访客管理</li>
-        <li class="menu-item">资产管理</li>
+<style id="__dm_no_drag_style__">* { -webkit-user-drag: none !important; }</style><style id="__dm_bindable_badge_style__">[data-sp-bindable="database"]{outline:1px dashed #0088ff;outline-offset:2px;border-radius:4px;}[data-sp-bindable="database"] *{pointer-events:none !important;transition:none !important;animation:none !important;}[data-sp-bindable="database"]{transition:none !important;animation:none !important;}</style></head>
+<body data-page-node-id="y3wOXBObAPAAnu0HQP3HW3" style="">
+<div class="app" data-page-node-id="syOYXWVEeZSnH5RwNi40Y8">
+  <aside class="sidebar" data-page-node-id="CRtH4lxsjhjiKHA4l1XEWZ">
+    <div class="logo" data-page-node-id="l3bwkQTokWXjeFYR4DAUKb"><span class="logo-icon" data-page-node-id="05t5zBN44AH5Gq7D9d0SsV">园</span>智慧园区 · 管理端</div>
+    <ul class="menu" data-page-node-id="iJihGD0zNXIeqxaYQIm41F">
+      <li class="menu-item" data-page-node-id="EMAXkvDNACLt1dD9E9LHZJ"><span class="icon" data-page-node-id="FIyTLacxxAYvj3m4ku7aUW">▦</span>综合态势</li>
+      <li class="menu-item open" data-page-node-id="pyT2VXha2uFGu1ETjtKfEw"><span class="icon" data-page-node-id="UgLExUVD35fpm0KiLaUDKB">🛡</span>智慧安防<span class="arrow" data-page-node-id="LZnf53QQdjRFUuc0yImiNr">▶</span></li>
+      <ul class="submenu" data-page-node-id="fG0TIp9erlAnsjuC0f1TuE">
+        <li class="menu-item" data-page-node-id="HnXUQcdMmKB5pBFyIXGWvZ">安防告警</li>
+        <li class="menu-item" data-page-node-id="qrg9EiYfxVWHT4PcyNDfG9">访客管理</li>
+        <li class="menu-item" data-page-node-id="6k9ovZ3OjlYlOphOjcz8xx">资产管理</li>
       </ul>
-      <li class="menu-item open"><span class="icon">🔧</span>报修管理<span class="arrow">▶</span></li>
-      <ul class="submenu">
-        <li class="menu-item">一键报修</li>
-        <li class="menu-item active">报修统计</li>
+      <li class="menu-item open" data-page-node-id="ikowUmp7yCd9DvR4eK7h0e"><span class="icon" data-page-node-id="5Bh8sspsEUcAGW9mQ67Heq">🔧</span>报修管理<span class="arrow" data-page-node-id="supugx7GPfYBYZjzqZTv8o">▶</span></li>
+      <ul class="submenu" data-page-node-id="KXu3qYyfeG8O9SvnHwfvvH">
+        <li class="menu-item" data-page-node-id="7KX2GvE9ayGj8tmLcf5wic">一键报修</li>
+        <li class="menu-item active" data-page-node-id="uQxqdz7YybSP3vw5HXSoyj">报修统计</li>
       </ul>
-      <li class="menu-item"><span class="icon">⚡</span>能耗管理</li>
-      <li class="menu-item"><span class="icon">📋</span>巡检管理</li>
-      <li class="menu-item"><span class="icon">📢</span>工作动态</li>
+      <li class="menu-item" data-page-node-id="6EAIFAO6MIXqqa8Vo9CGRD"><span class="icon" data-page-node-id="hsQadHUcNwXe6X3DT1c4I0">⚡</span>能耗管理</li>
+      <li class="menu-item" data-page-node-id="vFCwFbpYHn6JS5IevpCWGf"><span class="icon" data-page-node-id="mUqhDABMR8EGSnALuQewPY">📋</span>巡检管理</li>
+      <li class="menu-item" data-page-node-id="yuwzvaFKlY4BIhKrfG0idi"><span class="icon" data-page-node-id="w3rXDp5cjSpyvtHAgeakAZ">📢</span>工作动态</li>
     </ul>
   </aside>
 
-  <section class="main">
-    <div class="topbar">
-      <div class="breadcrumb">报修管理<span class="sep">/</span>报修统计</div>
-      <div class="topbar-right">
-        <span class="bell">🔔</span>
-        <span class="user"><span class="avatar">李</span>李守浩</span>
+  <section class="main" data-page-node-id="rGwIGmaAVMn1V1QUFFwD8Z">
+    <div class="topbar" data-page-node-id="YbpoWkGOl08bHZXBouxMN2">
+      <div class="breadcrumb" data-page-node-id="hYIamsgjpSuGiHoMY0D7c3">报修管理<span class="sep" data-page-node-id="NsG6OSpTOLWKIZNPJlksCa">/</span>报修统计</div>
+      <div class="topbar-right" data-page-node-id="Eyt09a9Cvu5MtYJQAhEC88">
+        <span class="bell" data-page-node-id="DMmIpy9A7PZBefbJKZQniZ">🔔</span>
+        <span class="user" data-page-node-id="kD0AwByyTBfDvcB4DzQ2Go"><span class="avatar" data-page-node-id="tHPAXSuwuLmGjQMUQiE5Av">李</span>李守浩</span>
       </div>
     </div>
 
-    <div class="page-head">
-      <span class="page-title">报修统计</span>
+    <div class="page-head" data-page-node-id="zOF6qW2pFXS409LJsfoQyc">
+      <span class="page-title" data-page-node-id="kBexJd8v23OX1E0NJqHE9T">报修统计</span>
     </div>
 
-    <div class="content">
+    <div class="content" data-page-node-id="COJQEHkqRNfDqh602fGMAx">
       <!-- 筛选栏 -->
-      <div class="filter-bar">
-        <div class="filter-item">
-          <label>日期范围</label>
-          <input type="date" value="2025-10-01" /> <span class="tilde">~</span> <input type="date" value="2026-09-01" />
+      <div class="filter-bar" data-page-node-id="KSlpFkBzgxd73WuTnFuA3w">
+        <div class="filter-item" data-page-node-id="FwHHq70E9nj8CrpWJyOdgX">
+          <label data-page-node-id="jtvjOswM23jgebNw6qI4tc">日期范围</label>
+          <input type="date" value="2025-10-01" data-page-node-id="4u0ipYtHCkEf4DMpYXxHaJ"> <span class="tilde" data-page-node-id="FckElIDDpQaY7XFrIuvkDm">~</span> <input type="date" value="2026-09-01" data-page-node-id="rHJwcrcdy7kvfyMHeFGt49">
         </div>
-        <div class="filter-item">
-          <label>区域</label>
-          <div class="ms" id="regionMs">
-            <div class="ms-box">
-              <span class="ms-tags" id="regionTags"></span>
-              <span class="ms-placeholder" id="regionPlaceholder">全部区域</span>
-              <span class="ms-caret">▾</span>
-            </div>
-            <div class="ms-drop">
-              <div class="ms-search"><input type="text" placeholder="搜索区域" id="regionSearch" /></div>
-              <ul class="ms-list">
-                <li class="ms-li ms-li-all" data-v="__all__"><label><input type="checkbox" /> 全部区域</label></li>
-                <li class="ms-li" data-v="办公区"><label><input type="checkbox" /> 办公区</label></li>
-                <li class="ms-li" data-v="生活区"><label><input type="checkbox" /> 生活区</label></li>
-                <li class="ms-li" data-v="科研区"><label><input type="checkbox" /> 科研区</label></li>
-                <li class="ms-li" data-v="能源区"><label><input type="checkbox" /> 能源区</label></li>
-                <li class="ms-li" data-v="公共区"><label><input type="checkbox" /> 公共区</label></li>
-                <li class="ms-li" data-v="地下区"><label><input type="checkbox" /> 地下区</label></li>
+        <div class="filter-item" data-page-node-id="sFeazgnN75EvLvjlxJj2Ij">
+          
+          <div class="ms" id="regionMs" data-page-node-id="CO9n7p6VDV9VBflOWdSta6">
+            
+            <div class="ms-drop" data-page-node-id="AVOstex73ZLnPTb0L52rqV">
+              <div class="ms-search" data-page-node-id="pHAgwcm9hxQI29pvqwOGsj"><input type="text" placeholder="搜索区域" id="regionSearch" data-page-node-id="XsOVda7mLbTDCka1GGvaG4"></div>
+              <ul class="ms-list" data-page-node-id="HGcRzJfaLN2vwMFBo7RX7I">
+                <li class="ms-li ms-li-all" data-v="__all__" data-page-node-id="45Zzd1q4vvm4HZ9CFPGGP3"><label data-page-node-id="RmC3JQ1fPHlVwlHx3fXbEL"><input type="checkbox" data-page-node-id="NCsCkqeXRMcNqvGH1Px6zO"> 全部区域</label></li>
+                <li class="ms-li" data-v="办公区" data-page-node-id="iR8QeX3RNfcrqgIBLttfZk"><label data-page-node-id="swyRFFzTKHQj6i9X4djGes"><input type="checkbox" data-page-node-id="njtv8DxR1paH1L0YFr0bZt"> 办公区</label></li>
+                <li class="ms-li" data-v="生活区" data-page-node-id="UNh8cwn67BFzawJnoiZXXm"><label data-page-node-id="5O9e3FkBhzwFXAXWX5pISa"><input type="checkbox" data-page-node-id="xUPG1TDBFXTBqjWjjprGBp"> 生活区</label></li>
+                <li class="ms-li" data-v="科研区" data-page-node-id="ekVMoNXn3HYvpCS21UMjP9"><label data-page-node-id="abX21ap4X7IL7zLHemGQBV"><input type="checkbox" data-page-node-id="sxGNUAAcJOLBbVOsTsc3xU"> 科研区</label></li>
+                <li class="ms-li" data-v="能源区" data-page-node-id="G253I44vbH2FxXTHdsToYg"><label data-page-node-id="pmzsAlAJ7O4gHaZEtKVyUd"><input type="checkbox" data-page-node-id="9ArPAklVuVHDsgaF4ARr2s"> 能源区</label></li>
+                <li class="ms-li" data-v="公共区" data-page-node-id="qP1BurM8yrhVNqjoHzGJ0V"><label data-page-node-id="wcc9BJWCGfJ7tXig9eRedX"><input type="checkbox" data-page-node-id="3MyF6Y2otGU1H9Kzbo7T7g"> 公共区</label></li>
+                <li class="ms-li" data-v="地下区" data-page-node-id="88Uj6RVhftmhA9R3fwHFjw"><label data-page-node-id="WR6RtWIHP753aabPNs3fsU"><input type="checkbox" data-page-node-id="dXBzurbX1weErTIwoRIy99"> 地下区</label></li>
               </ul>
             </div>
           </div>
         </div>
-        <button class="btn-primary">查询</button>
+        <button class="btn-primary" data-page-node-id="dKktqqeGDHeVlljx0pJ1Tl">查询</button>
       </div>
 
       <!-- KPI 卡片 -->
-      <div class="kpi-row">
-        <div class="kpi"><div class="label">报修总量</div><div class="value">326<span class="unit">单</span></div></div>
-        <div class="kpi"><div class="label">待处理</div><div class="value">18<span class="unit">单</span></div></div>
-        <div class="kpi"><div class="label">已完成</div><div class="value">276<span class="unit">单</span></div></div>
-        <div class="kpi blue"><div class="label">完成率</div><div class="value">84.7<span class="unit">%</span></div></div>
-        <div class="kpi blue"><div class="label">平均处理时长</div><div class="value">6.4<span class="unit">小时</span></div></div>
+      <div class="kpi-row" data-page-node-id="nSQ4jajEw76Mg0TwObN5eQ">
+        <div class="kpi" data-page-node-id="bX5vQXJqi4ARta623dHJoX"><div class="label" data-page-node-id="1PMkndzs6yh6RAd4e3LLhr">报修总量</div><div class="value" data-page-node-id="wXm4xKZ8z7Uq8FzTVDu2Rp">326<span class="unit" data-page-node-id="FABODl0SybvBL7EjnvH5C1">单</span></div></div>
+        <div class="kpi" data-page-node-id="3s9MLlTMMowX2WMAbdIcft"><div class="label" data-page-node-id="kz68JHI0tTBUVVmwiQBG0q">待处理</div><div class="value" data-page-node-id="viWsJd0DiLdMqYEOiQFnca">18<span class="unit" data-page-node-id="ZKJP4gXdhZnOrDjbe5Fqux">单</span></div></div>
+        <div class="kpi" data-page-node-id="9KHSCL1ykSYFe3yvMZVKJ1"><div class="label" data-page-node-id="KfYD7afqu6EtOYAx7BVBmv">已完成</div><div class="value" data-page-node-id="ifajAVmO2JfZep4RFJYCOi">276<span class="unit" data-page-node-id="EmmUxNw5BB6u6nNiWjr6qU">单</span></div></div>
+        <div class="kpi blue" data-page-node-id="md0e0adpRLy7dCZEKZswsG"><div class="label" data-page-node-id="5y1l8jCxxDGGyjC0FBosfJ">完成率</div><div class="value" data-page-node-id="EOr15HMU2ROF8AJVYCcXzC">84.7<span class="unit" data-page-node-id="ji50J7fE5KXIRbn2C3lRbV">%</span></div></div>
+        <div class="kpi blue" data-page-node-id="5h02oAnqfZFXvYZ6qhgitm"><div class="label" data-page-node-id="iUz3ITUvL4soMfeJcZmtcn">平均处理时长</div><div class="value" data-page-node-id="uiVGHt13uf2dj5PpO4hAOg">6.4<span class="unit" data-page-node-id="oSr8R3KRTOdF27DLEGxHP3">小时</span></div></div>
       </div>
 
       <!-- 图表第一行 -->
-      <div class="grid-2">
-        <div class="card">
-          <div class="card-title">报修量趋势<span class="right">单位：单</span></div>
-          <div class="chart" id="trend"></div>
+      <div class="grid-2" data-page-node-id="txByU9N1BapQUjOkvj5bIW">
+        <div class="card" data-page-node-id="kssEfFO7Ko9u2xDjKdqHIC">
+          <div class="card-title" data-page-node-id="tMc4P96fB9ZK3mFyOVsk5C" style="">报修量趋势<span class="right" data-page-node-id="EwZzvqegDLDcVFDGw2UTDE">单位：单</span></div>
+          <div class="chart" id="trend" _echarts_instance_="ec_1791523994116" style="user-select: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); position: relative;" data-page-node-id="fdbYqQa17ic5uDO5IaBW0o"><div style="position: relative; width: 464px; height: 320px; padding: 0px; margin: 0px; border-width: 0px; cursor: default;" data-page-node-id="jWZ3GcxrdgYGeUkd2kQN5s"><canvas data-zr-dom-id="zr_0" width="700" height="483" style="position: absolute; left: 0px; top: 0px; width: 464px; height: 320px; user-select: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); padding: 0px; margin: 0px; border-width: 0px;" data-page-node-id="e5srL74lSzxAaQf1dYYlIz"></canvas></div><div class="" data-page-node-id="Q4H6s2TQUvWM9iePcFLsV9"></div></div>
         </div>
-        <div class="card">
-          <div class="card-title">工单状态分布</div>
-          <div class="chart" id="status"></div>
+        <div class="card" data-page-node-id="lltBe5sU29dfqHTeC8btc1">
+          <div class="card-title" data-page-node-id="UejW7UEvp3YiofEGVLSGFa">工单状态分布</div>
+          <div class="chart" id="status" _echarts_instance_="ec_1791523994117" style="user-select: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); position: relative;" data-page-node-id="Eyrv8T5AmF6MOOCsgNurir"><div style="position: relative; width: 464px; height: 320px; padding: 0px; margin: 0px; border-width: 0px;" data-page-node-id="CfiRZjNHjPjX6NxiXPVPb6"><canvas data-zr-dom-id="zr_0" width="700" height="483" style="position: absolute; left: 0px; top: 0px; width: 464px; height: 320px; user-select: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); padding: 0px; margin: 0px; border-width: 0px;" data-page-node-id="dIxPjS6AqUUUZU0O7A43oy"></canvas></div><div class="" data-page-node-id="WF3cHtTb8GjQBKw6ejJ5cj"></div></div>
         </div>
       </div>
 
       <!-- 图表第二行 -->
-      <div class="grid-2" style="margin-top:16px;">
-        <div class="card">
-          <div class="card-title">维修人绩效排行<span class="right">单位：单</span></div>
-          <div class="chart" id="performer"></div>
+      <div class="grid-2" style="margin-top:16px;" data-page-node-id="bBNqCwwgbWdBXtyKs9PokA">
+        <div class="card" data-page-node-id="UqJQz6xNAvktBD7n1MOzYX">
+          <div class="card-title" data-page-node-id="q3vUVYPJc7LiWzKNYfjepC">维修人绩效排行<span class="right" data-page-node-id="iDwPHEwdgYobNYrI7W5TIF">单位：单</span></div>
+          <div class="chart" id="performer" _echarts_instance_="ec_1791523994118" style="user-select: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); position: relative;" data-page-node-id="M3AedTHzoDxeb1rsZ4DIuD"><div style="position: relative; width: 464px; height: 320px; padding: 0px; margin: 0px; border-width: 0px;" data-page-node-id="niAh91aBcIwqO9hYxArMIW"><canvas data-zr-dom-id="zr_0" width="700" height="483" style="position: absolute; left: 0px; top: 0px; width: 464px; height: 320px; user-select: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); padding: 0px; margin: 0px; border-width: 0px;" data-page-node-id="hLk9xRUDUSzYKcxEJFEAHo"></canvas></div><div class="" data-page-node-id="7mjRSWf3UbhODmxdktBReW"></div></div>
         </div>
-        <div class="card">
-          <div class="card-title">平均处理时长趋势<span class="right">单位：小时</span></div>
-          <div class="chart" id="duration"></div>
+        <div class="card" data-page-node-id="T8Mb8iLZuVzxnXJVCj9jXw">
+          <div class="card-title" data-page-node-id="hJOr1ry6SWUk7D7cN1xq0w">平均处理时长趋势<span class="right" data-page-node-id="aMSgAB9mV90ZALgdjSRPV4">单位：小时</span></div>
+          <div class="chart" id="duration" _echarts_instance_="ec_1791523994119" style="user-select: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); position: relative;" data-page-node-id="Yj1iHTsDD9ufcUbMNVh3QV"><div style="position: relative; width: 464px; height: 320px; padding: 0px; margin: 0px; border-width: 0px;" data-page-node-id="iZq8QbZBzmJHyfHQWCl2gb"><canvas data-zr-dom-id="zr_0" width="700" height="483" style="position: absolute; left: 0px; top: 0px; width: 464px; height: 320px; user-select: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); padding: 0px; margin: 0px; border-width: 0px;" data-page-node-id="OQHwkyqrrpnAbJXoW3Tm5d"></canvas></div><div class="" data-page-node-id="0mNVxJIy7ueDZemYculX8e"></div></div>
         </div>
       </div>
 
-      <div class="note">* 本页面为原型示意，数据均为演示用模拟值，实际数据以系统统计接口为准。</div>
+      <div class="note" data-page-node-id="sP6HmbmzOseiRjQAwDIKB8">* 本页面为原型示意，数据均为演示用模拟值，实际数据以系统统计接口为准。</div>
     </div>
   </section>
 </div>
 
-<script>
+<script data-page-node-id="aSxqic3bGgtJf2JPywB2Bj">
 function initCharts(){
   // 报修量趋势
   var trend = echarts.init(document.getElementById('trend'));
@@ -348,5 +343,6 @@ window.addEventListener('load', function(){ setTimeout(initCharts, 0); });
   render();
 })();
 </script>
-</body>
-</html>
+
+
+</body></html>
