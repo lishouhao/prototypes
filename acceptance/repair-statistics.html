@@ -97,6 +97,11 @@
   .chart { width: 100%; height: 320px; }
 
   .note { font-size: 12px; color: #c9cdd4; margin-top: 12px; text-align: right; }
+
+  /* 统计基准说明行 */
+  .scope-note { font-size: 12px; color: #8c8c8c; margin: -4px 0 12px 2px; }
+  /* 图表脚注 */
+  .chart-foot { font-size: 12px; color: #c9cdd4; margin-top: 6px; }
 </style>
 <style id="__dm_no_drag_style__">* { -webkit-user-drag: none !important; }</style><style id="__dm_bindable_badge_style__">[data-sp-bindable="database"]{outline:1px dashed #0088ff;outline-offset:2px;border-radius:4px;}[data-sp-bindable="database"] *{pointer-events:none !important;transition:none !important;animation:none !important;}[data-sp-bindable="database"]{transition:none !important;animation:none !important;}</style></head>
 <body data-page-node-id="y3wOXBObAPAAnu0HQP3HW3" style="">
@@ -173,12 +178,14 @@
         <button class="btn-primary" data-page-node-id="dKktqqeGDHeVlljx0pJ1Tl">查询</button>
       </div>
 
+      <div class="scope-note" data-page-node-id="scopeNote1">以下指标均按所选范围内创建的工单统计</div>
+
       <!-- KPI 卡片 -->
       <div class="kpi-row" data-page-node-id="nSQ4jajEw76Mg0TwObN5eQ">
         <div class="kpi" data-page-node-id="bX5vQXJqi4ARta623dHJoX"><div class="label" data-page-node-id="1PMkndzs6yh6RAd4e3LLhr">工单总量</div><div class="value" data-page-node-id="wXm4xKZ8z7Uq8FzTVDu2Rp">326<span class="unit" data-page-node-id="FABODl0SybvBL7EjnvH5C1">单</span></div></div>
-        <div class="kpi" data-page-node-id="3s9MLlTMMowX2WMAbdIcft"><div class="label" data-page-node-id="kz68JHI0tTBUVVmwiQBG0q">待处理</div><div class="value" data-page-node-id="viWsJd0DiLdMqYEOiQFnca">18<span class="unit" data-page-node-id="ZKJP4gXdhZnOrDjbe5Fqux">单</span></div></div>
-        <div class="kpi" data-page-node-id="9KHSCL1ykSYFe3yvMZVKJ1"><div class="label" data-page-node-id="KfYD7afqu6EtOYAx7BVBmv">已完成</div><div class="value" data-page-node-id="ifajAVmO2JfZep4RFJYCOi">276<span class="unit" data-page-node-id="EmmUxNw5BB6u6nNiWjr6qU">单</span></div></div>
-        <div class="kpi blue" data-page-node-id="md0e0adpRLy7dCZEKZswsG"><div class="label" data-page-node-id="5y1l8jCxxDGGyjC0FBosfJ">完成率</div><div class="value" data-page-node-id="EOr15HMU2ROF8AJVYCcXzC">84.7<span class="unit" data-page-node-id="ji50J7fE5KXIRbn2C3lRbV">%</span></div></div>
+        <div class="kpi" data-page-node-id="3s9MLlTMMowX2WMAbdIcft"><div class="label" data-page-node-id="kz68JHI0tTBUVVmwiQBG0q">审批中</div><div class="value" data-page-node-id="viWsJd0DiLdMqYEOiQFnca">46<span class="unit" data-page-node-id="ZKJP4gXdhZnOrDjbe5Fqux">单</span></div></div>
+        <div class="kpi" data-page-node-id="9KHSCL1ykSYFe3yvMZVKJ1"><div class="label" data-page-node-id="KfYD7afqu6EtOYAx7BVBmv">已办结</div><div class="value" data-page-node-id="ifajAVmO2JfZep4RFJYCOi">272<span class="unit" data-page-node-id="EmmUxNw5BB6u6nNiWjr6qU">单</span></div></div>
+        <div class="kpi blue" data-page-node-id="md0e0adpRLy7dCZEKZswsG"><div class="label" data-page-node-id="5y1l8jCxxDGGyjC0FBosfJ">办结率</div><div class="value" data-page-node-id="EOr15HMU2ROF8AJVYCcXzC">85.5<span class="unit" data-page-node-id="ji50J7fE5KXIRbn2C3lRbV">%</span></div></div>
         <div class="kpi blue" data-page-node-id="5h02oAnqfZFXvYZ6qhgitm"><div class="label" data-page-node-id="iUz3ITUvL4soMfeJcZmtcn">平均处理时长</div><div class="value" data-page-node-id="uiVGHt13uf2dj5PpO4hAOg">6.4<span class="unit" data-page-node-id="oSr8R3KRTOdF27DLEGxHP3">小时</span></div></div>
       </div>
 
@@ -187,6 +194,7 @@
         <div class="card" data-page-node-id="kssEfFO7Ko9u2xDjKdqHIC">
           <div class="card-title" data-page-node-id="tMc4P96fB9ZK3mFyOVsk5C" style="">工单量趋势<span class="right" data-page-node-id="EwZzvqegDLDcVFDGw2UTDE">单位：单</span></div>
           <div class="chart" id="trend" _echarts_instance_="ec_1791523994116" style="user-select: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); position: relative;" data-page-node-id="fdbYqQa17ic5uDO5IaBW0o"><div style="position: relative; width: 464px; height: 320px; padding: 0px; margin: 0px; border-width: 0px; cursor: default;" data-page-node-id="jWZ3GcxrdgYGeUkd2kQN5s"><canvas data-zr-dom-id="zr_0" width="700" height="483" style="position: absolute; left: 0px; top: 0px; width: 464px; height: 320px; user-select: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); padding: 0px; margin: 0px; border-width: 0px;" data-page-node-id="e5srL74lSzxAaQf1dYYlIz"></canvas></div><div class="" data-page-node-id="Q4H6s2TQUvWM9iePcFLsV9"></div></div>
+          <div class="chart-foot" data-page-node-id="trendFoot1">近 1–2 个月完成量偏低属正常：当月新工单仍在审批中</div>
         </div>
         <div class="card" data-page-node-id="lltBe5sU29dfqHTeC8btc1">
           <div class="card-title" data-page-node-id="UejW7UEvp3YiofEGVLSGFa">工单状态分布</div>
@@ -223,7 +231,7 @@ function initCharts(){
     yAxis: { type: 'value', splitLine:{lineStyle:{color:'#f0f0f0'}}, axisLabel:{color:'#8c8c8c'} },
     series: [
       { name:'发起量', type:'line', smooth:true, data:[18,22,25,20,15,28,31,30,29,34,32,42], itemStyle:{color:'#4165EC'}, areaStyle:{color:'rgba(65,101,236,0.08)'} },
-      { name:'完成量', type:'line', smooth:true, data:[16,20,23,18,14,26,28,27,26,31,29,38], itemStyle:{color:'#5ad8a6'} }
+      { name:'完成量', type:'line', smooth:true, data:[17,21,24,19,14,27,30,28,27,31,20,14], itemStyle:{color:'#5ad8a6'} }
     ]
   });
 
@@ -245,11 +253,11 @@ function initCharts(){
     }]
   });
 
-  // 处理人排行
+  // 处理人排行（按已办结：审批通过 + 审批不通过）
   var performer = echarts.init(document.getElementById('performer'));
   var performerData = [
-    {name:'张伟', value:64},{name:'李强', value:58},{name:'王芳', value:52},
-    {name:'刘洋', value:47},{name:'陈静', value:41},{name:'赵磊', value:35}
+    {name:'张伟', value:58},{name:'李强', value:52},{name:'王芳', value:48},
+    {name:'刘洋', value:44},{name:'陈静', value:38},{name:'赵磊', value:32}
   ];
   performer.setOption({
     tooltip: { trigger: 'axis', axisPointer:{type:'shadow'}, formatter: '{b}: {c} 单' },
