@@ -218,13 +218,13 @@ function initCharts(){
   var trend = echarts.init(document.getElementById('trend'));
   trend.setOption({
     tooltip: { trigger: 'axis' },
-    legend: { data: ['发起量','完成量'], top: 0, right: 0, textStyle:{color:'#8c8c8c'} },
+    legend: { data: ['发起量','办结量'], top: 0, right: 0, textStyle:{color:'#8c8c8c'} },
     grid: { left: 40, right: 20, top: 40, bottom: 30 },
     xAxis: { type: 'category', data: ['2025-10','2025-11','2025-12','2026-01','2026-02','2026-03','2026-04','2026-05','2026-06','2026-07','2026-08','2026-09'], axisLine:{lineStyle:{color:'#e5e6eb'}}, axisLabel:{color:'#8c8c8c'} },
     yAxis: { type: 'value', splitLine:{lineStyle:{color:'#f0f0f0'}}, axisLabel:{color:'#8c8c8c'} },
     series: [
       { name:'发起量', type:'line', smooth:true, data:[18,22,25,20,15,28,31,30,29,34,32,42], itemStyle:{color:'#4165EC'}, areaStyle:{color:'rgba(65,101,236,0.08)'} },
-      { name:'完成量', type:'line', smooth:true, data:[17,21,24,19,14,27,30,28,27,31,20,14], itemStyle:{color:'#5ad8a6'} }
+      { name:'办结量', type:'line', smooth:true, data:[17,21,24,19,14,27,30,28,27,31,20,14], itemStyle:{color:'#5ad8a6'} }
     ]
   });
 
