@@ -49,7 +49,6 @@
   .filter-item select, .filter-item input { height: 32px; border: 1px solid #d9d9d9; border-radius: 4px; padding: 0 10px; font-size: 13px; color: #1f2329; outline: none; }
   .filter-item select:focus, .filter-item input:focus { border-color: #4165EC; }
   .filter-item .tilde { color: #c9cdd4; }
-  .filter-item .hint { font-size: 12px; color: #c9cdd4; }
 
   /* 区域下拉多选 */
   .ms { position: relative; width: 230px; }
@@ -73,7 +72,6 @@
   .ms-li label { display: flex; align-items: center; gap: 8px; width: 100%; cursor: pointer; }
   .ms-li input[type=checkbox] { accent-color: #4165EC; width: 14px; height: 14px; }
   .ms-li-all { border-bottom: 1px solid #f0f0f0; margin-bottom: 2px; font-weight: 500; }
-  .filter-item .hint { font-size: 12px; color: #c9cdd4; }
   .seg { display: inline-flex; border: 1px solid #d9d9d9; border-radius: 4px; overflow: hidden; }
   .seg span { padding: 0 12px; height: 32px; line-height: 32px; cursor: pointer; font-size: 13px; color: #4e5969; background: #fff; }
   .seg span.active { background: #4165EC; color: #fff; border-color: #4165EC; }
@@ -96,12 +94,10 @@
   .card-title .right { margin-left: auto; font-size: 12px; color: #8c8c8c; font-weight: normal; }
   .chart { width: 100%; height: 320px; }
 
-  .note { font-size: 12px; color: #c9cdd4; margin-top: 12px; text-align: right; }
 
   /* 统计基准说明行 */
   .scope-note { font-size: 12px; color: #8c8c8c; margin: -4px 0 12px 2px; }
   /* 图表脚注 */
-  .chart-foot { font-size: 12px; color: #c9cdd4; margin-top: 6px; }
 </style>
 <style id="__dm_no_drag_style__">* { -webkit-user-drag: none !important; }</style><style id="__dm_bindable_badge_style__">[data-sp-bindable="database"]{outline:1px dashed #0088ff;outline-offset:2px;border-radius:4px;}[data-sp-bindable="database"] *{pointer-events:none !important;transition:none !important;animation:none !important;}[data-sp-bindable="database"]{transition:none !important;animation:none !important;}</style></head>
 <body data-page-node-id="y3wOXBObAPAAnu0HQP3HW3" style="">
@@ -146,7 +142,6 @@
         <div class="filter-item" data-page-node-id="FwHHq70E9nj8CrpWJyOdgX">
           <label data-page-node-id="jtvjOswM23jgebNw6qI4tc">日期范围</label>
           <input type="date" value="2025-10-01" data-page-node-id="4u0ipYtHCkEf4DMpYXxHaJ"> <span class="tilde" data-page-node-id="FckElIDDpQaY7XFrIuvkDm">~</span> <input type="date" value="2026-09-01" data-page-node-id="rHJwcrcdy7kvfyMHeFGt49">
-          <span class="hint">按创建时间筛选</span>
         </div>
         <div class="filter-item" data-page-node-id="sFeazgnN75EvLvjlxJj2Ij">
           <div class="ms" id="nameMs" data-page-node-id="CO9n7p6VDV9VBflOWdSta6">
@@ -194,7 +189,6 @@
         <div class="card" data-page-node-id="kssEfFO7Ko9u2xDjKdqHIC">
           <div class="card-title" data-page-node-id="tMc4P96fB9ZK3mFyOVsk5C" style="">工单量趋势<span class="right" data-page-node-id="EwZzvqegDLDcVFDGw2UTDE">单位：单</span></div>
           <div class="chart" id="trend" _echarts_instance_="ec_1791523994116" style="user-select: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); position: relative;" data-page-node-id="fdbYqQa17ic5uDO5IaBW0o"><div style="position: relative; width: 464px; height: 320px; padding: 0px; margin: 0px; border-width: 0px; cursor: default;" data-page-node-id="jWZ3GcxrdgYGeUkd2kQN5s"><canvas data-zr-dom-id="zr_0" width="700" height="483" style="position: absolute; left: 0px; top: 0px; width: 464px; height: 320px; user-select: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); padding: 0px; margin: 0px; border-width: 0px;" data-page-node-id="e5srL74lSzxAaQf1dYYlIz"></canvas></div><div class="" data-page-node-id="Q4H6s2TQUvWM9iePcFLsV9"></div></div>
-          <div class="chart-foot" data-page-node-id="trendFoot1">近 1–2 个月完成量偏低属正常：当月新工单仍在审批中</div>
         </div>
         <div class="card" data-page-node-id="lltBe5sU29dfqHTeC8btc1">
           <div class="card-title" data-page-node-id="UejW7UEvp3YiofEGVLSGFa">工单状态分布</div>
@@ -214,7 +208,6 @@
         </div>
       </div>
 
-      <div class="note" data-page-node-id="sP6HmbmzOseiRjQAwDIKB8">* 本页面为原型示意，数据均为演示用模拟值，实际数据以系统统计接口为准。</div>
     </div>
   </section>
 </div>
