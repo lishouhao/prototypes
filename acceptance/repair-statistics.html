@@ -77,6 +77,8 @@
   .seg span.active { background: #4165EC; color: #fff; border-color: #4165EC; }
   .btn-primary { height: 32px; padding: 0 16px; background: #4165EC; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-size: 13px; }
   .btn-primary:hover { background: #3a5bd0; }
+  .btn-default { height: 32px; padding: 0 16px; background: #fff; color: #4165EC; border: 1px solid #4165EC; border-radius: 4px; cursor: pointer; font-size: 13px; margin-left: 8px; }
+  .btn-default:hover { background: #f0f4ff; }
 
   /* KPI 卡片 */
   .kpi-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; margin-bottom: 16px; }
@@ -141,7 +143,7 @@
       <div class="filter-bar" data-page-node-id="KSlpFkBzgxd73WuTnFuA3w">
         <div class="filter-item" data-page-node-id="FwHHq70E9nj8CrpWJyOdgX">
           <label data-page-node-id="jtvjOswM23jgebNw6qI4tc">日期范围</label>
-          <input type="date" value="2025-10-01" data-page-node-id="4u0ipYtHCkEf4DMpYXxHaJ"> <span class="tilde" data-page-node-id="FckElIDDpQaY7XFrIuvkDm">~</span> <input type="date" value="2026-09-30" data-page-node-id="rHJwcrcdy7kvfyMHeFGt49">
+          <input type="date" value="2025-10-01" id="dateStart" data-page-node-id="4u0ipYtHCkEf4DMpYXxHaJ"> <span class="tilde" data-page-node-id="FckElIDDpQaY7XFrIuvkDm">~</span> <input type="date" value="2026-09-30" id="dateEnd" data-page-node-id="rHJwcrcdy7kvfyMHeFGt49">
         </div>
         <div class="filter-item" data-page-node-id="sFeazgnN75EvLvjlxJj2Ij">
           <div class="ms" id="nameMs" data-page-node-id="CO9n7p6VDV9VBflOWdSta6">
@@ -171,6 +173,7 @@
           </div>
         </div>
         <button class="btn-primary" data-page-node-id="dKktqqeGDHeVlljx0pJ1Tl">查询</button>
+        <button class="btn-default" id="resetBtn" data-page-node-id="RstBtn">重置</button>
       </div>
 
       <div class="scope-note" data-page-node-id="scopeNote1">以下指标均按所选范围内创建的工单统计，数据截至当前时刻</div>
@@ -351,6 +354,28 @@ window.addEventListener('load', function(){ setTimeout(initCharts, 0); });
   }
 
   render();
+
+  // 暴露重置钩子：还原工单名称为「全部工单名称」（全选）
+  window.__resetNameSelect = function(){
+    selected = new Set(ALL);
+    if(searchInput) searchInput.value = '';
+    ms.classList.remove('open');
+    list.forEach(function(li){ li.style.display = ''; });
+    render();
+  };
+})();
+
+// 重置按钮：仅还原筛选控件为默认态（原型为静态演示，不触发后台筛选）
+(function(){
+  var btn = document.getElementById('resetBtn');
+  if(!btn) return;
+  btn.addEventListener('click', function(){
+    var ds = document.getElementById('dateStart');
+    var de = document.getElementById('dateEnd');
+    if(ds) ds.value = '2025-10-01';
+    if(de) de.value = '2026-09-30';
+    if(window.__resetNameSelect) window.__resetNameSelect();
+  });
 })();
 </script>
 
