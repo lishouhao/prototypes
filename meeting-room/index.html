@@ -1018,8 +1018,8 @@ tr:hover td { background: #F7F7FA; }
         <div class="page-title">预约审批</div>
         <div class="search-bar">
           <div class="form-item">
-            <label>申请人</label>
-            <input type="text" id="sp-searchName" placeholder="请输入" style="width: 220px;">
+            <label>会议开始时间</label>
+            <input type="date" id="sp-startFrom" style="width: 130px;"> <span>~</span> <input type="date" id="sp-startTo" style="width: 130px;">
           </div>
           <div class="form-item">
             <label>审批状态</label>
@@ -1031,20 +1031,16 @@ tr:hover td { background: #F7F7FA; }
             </select>
           </div>
           <div class="form-item">
-            <label>开始时间</label>
-            <input type="date" id="sp-startFrom" style="width: 130px;"> <span>~</span> <input type="date" id="sp-startTo" style="width: 130px;">
-          </div>
-          <div class="form-item">
-            <label>结束时间</label>
-            <input type="date" id="sp-endFrom" style="width: 130px;"> <span>~</span> <input type="date" id="sp-endTo" style="width: 130px;">
-          </div>
-          <div class="form-item">
             <label>会务服务</label>
             <select id="sp-searchService" style="width: 120px;">
               <option value="">请选择</option>
               <option value="是">是</option>
               <option value="否">否</option>
             </select>
+          </div>
+          <div class="form-item">
+            <label>申请人</label>
+            <input type="text" id="sp-searchName" placeholder="请输入" style="width: 220px;">
           </div>
           <button class="btn btn-primary" onclick="spSearch()"><span>&#x1F50D;</span> 搜索</button>
           <button class="btn btn-default" onclick="spReset()">重置</button>
@@ -2926,23 +2922,18 @@ function spRenderPg() {
 function spSearch() {
   const kw = document.getElementById('sp-searchName').value.trim();
   const status = document.getElementById('sp-searchStatus').value;
-  // N2：新增筛选条件——会务服务（是/否）、会议开始时间范围、会议结束时间范围（两组范围可只填其一）
+  // N2：筛选条件——会议开始时间范围、会务服务（是/否）
   const service = document.getElementById('sp-searchService').value;
   const sFrom = document.getElementById('sp-startFrom').value;
   const sTo = document.getElementById('sp-startTo').value;
-  const eFrom = document.getElementById('sp-endFrom').value;
-  const eTo = document.getElementById('sp-endTo').value;
   // 以「日期 + 时刻」拼成可比较字符串（YYYY-MM-DD HH:mm，字典序即时间序）
   const startKey = it => (it.date || '') + ' ' + (it.start || '');
-  const endKey = it => (it.date || '') + ' ' + (it.end || '');
   spFiltered = spData.filter(it =>
     (it.applicant || '').includes(kw) &&
     (!status || it.status === status) &&
     (!service || (it.needService || '否') === service) &&
     (!sFrom || startKey(it) >= sFrom + ' 00:00') &&
-    (!sTo || startKey(it) <= sTo + ' 23:59') &&
-    (!eFrom || endKey(it) >= eFrom + ' 00:00') &&
-    (!eTo || endKey(it) <= eTo + ' 23:59')
+    (!sTo || startKey(it) <= sTo + ' 23:59')
   );
   spRender();
 }
@@ -2952,11 +2943,25 @@ function spReset() {
   document.getElementById('sp-searchService').value = '';
   document.getElementById('sp-startFrom').value = '';
   document.getElementById('sp-startTo').value = '';
-  document.getElementById('sp-endFrom').value = '';
-  document.getElementById('sp-endTo').value = '';
   spFiltered = [...spData];
   spRender();
 }
+/* 补一条「今天」的已通过演示数据：保证默认筛选（今天~今天 + 已通过）有内容 */
+(function spSeedToday(){
+  const _t = yyFormatDate(new Date());
+  spData.push({ id: 11, title: '今日审批示例会议', category: '管理类', type: '部门例会', convener: '陈琼梦', dept: '产品部', applicant: 'admin', contact: '176221189702', date: _t, start: '10:00', end: '11:00', content: '今日审批演示', room: '301', scale: '大报告厅', location: '3F', seats: '263', needService: '否', serviceType: '', note: '', costShare: '否', shareGroup: '', notice: '是', noticeObj: '部门联络人', deptAttend: '', attendees: 'admin', receipt: '否', attachment: '', status: '已通过' });
+})();
+/* 预约审批筛选默认值（仅初次进入预填）：会议开始时间=今天~今天、审批状态=已通过，并即筛 */
+(function spInitDefaults(){
+  const _t = yyFormatDate(new Date());
+  const sf = document.getElementById('sp-startFrom');
+  const stt = document.getElementById('sp-startTo');
+  const statusEl = document.getElementById('sp-searchStatus');
+  if (sf) sf.value = _t;
+  if (stt) stt.value = _t;
+  if (statusEl) statusEl.value = '已通过';
+  spSearch();
+})();
 /* 参会人员回执标注：每人 + 回执状态（参加/不参加/未回执） */
 function spAttendeeList(it) {
   let list = it.attendees;
