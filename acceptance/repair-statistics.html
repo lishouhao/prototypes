@@ -50,28 +50,6 @@
   .filter-item select:focus, .filter-item input:focus { border-color: #4165EC; }
   .filter-item .tilde { color: #c9cdd4; }
 
-  /* 区域下拉多选 */
-  .ms { position: relative; width: 230px; }
-  .ms-box { min-height: 32px; border: 1px solid #d9d9d9; border-radius: 4px; padding: 3px 26px 3px 8px; display: flex; flex-wrap: wrap; align-items: center; gap: 4px; background: #fff; cursor: pointer; transition: border-color .2s, box-shadow .2s; }
-  .ms-box:hover { border-color: #4165EC; }
-  .ms.open .ms-box { border-color: #4165EC; box-shadow: 0 0 0 2px rgba(65,101,236,0.12); }
-  .ms-placeholder { color: #bfbfbf; font-size: 13px; line-height: 24px; }
-  .ms-tag { display: inline-flex; align-items: center; height: 22px; padding: 0 6px; background: #f0f5ff; border: 1px solid #d6e0ff; color: #4165EC; border-radius: 3px; font-size: 12px; }
-  .ms-tag .x { margin-left: 4px; cursor: pointer; font-size: 13px; line-height: 1; opacity: .65; }
-  .ms-tag .x:hover { opacity: 1; }
-  .ms-caret { position: absolute; right: 9px; top: 50%; transform: translateY(-50%); color: #bfbfbf; font-size: 10px; pointer-events: none; transition: transform .2s; }
-  .ms.open .ms-caret { transform: translateY(-50%) rotate(180deg); }
-  .ms-drop { position: absolute; top: calc(100% + 4px); left: 0; width: 100%; background: #fff; border: 1px solid #e8e8e8; border-radius: 4px; box-shadow: 0 6px 16px rgba(0,0,0,0.12); padding: 4px 0; z-index: 50; display: none; }
-  .ms.open .ms-drop { display: block; }
-  .ms-search { padding: 6px 8px; }
-  .ms-search input { width: 100%; height: 28px; border: 1px solid #d9d9d9; border-radius: 4px; padding: 0 8px; font-size: 13px; outline: none; }
-  .ms-search input:focus { border-color: #4165EC; }
-  .ms-list { list-style: none; margin: 0; padding: 0; max-height: 220px; overflow: auto; }
-  .ms-li { padding: 7px 12px; cursor: pointer; font-size: 13px; color: #1f2329; display: flex; align-items: center; }
-  .ms-li:hover { background: #f5f7ff; }
-  .ms-li label { display: flex; align-items: center; gap: 8px; width: 100%; cursor: pointer; }
-  .ms-li input[type=checkbox] { accent-color: #4165EC; width: 14px; height: 14px; }
-  .ms-li-all { border-bottom: 1px solid #f0f0f0; margin-bottom: 2px; font-weight: 500; }
   .seg { display: inline-flex; border: 1px solid #d9d9d9; border-radius: 4px; overflow: hidden; }
   .seg span { padding: 0 12px; height: 32px; line-height: 32px; cursor: pointer; font-size: 13px; color: #4e5969; background: #fff; }
   .seg span.active { background: #4165EC; color: #fff; border-color: #4165EC; }
@@ -145,33 +123,6 @@
           <label data-page-node-id="jtvjOswM23jgebNw6qI4tc">日期范围</label>
           <input type="date" value="2025-10-01" id="dateStart" data-page-node-id="4u0ipYtHCkEf4DMpYXxHaJ"> <span class="tilde" data-page-node-id="FckElIDDpQaY7XFrIuvkDm">~</span> <input type="date" value="2026-09-30" id="dateEnd" data-page-node-id="rHJwcrcdy7kvfyMHeFGt49">
         </div>
-        <div class="filter-item" data-page-node-id="sFeazgnN75EvLvjlxJj2Ij">
-          <div class="ms" id="nameMs" data-page-node-id="CO9n7p6VDV9VBflOWdSta6">
-            <div class="ms-box" data-page-node-id="nmBox">
-              <span class="ms-placeholder" id="namePlaceholder" data-page-node-id="nmPh">全部工单名称</span>
-              <span class="ms-tags" id="nameTags" data-page-node-id="nmTags"></span>
-              <span class="ms-caret" data-page-node-id="nmCaret">▼</span>
-            </div>
-            <div class="ms-drop" data-page-node-id="AVOstex73ZLnPTb0L52rqV">
-              <div class="ms-search" data-page-node-id="pHAgwcm9hxQI29pvqwOGsj"><input type="text" placeholder="搜索工单名称" id="nameSearch" data-page-node-id="XsOVda7mLbTDCka1GGvaG4"></div>
-              <ul class="ms-list" data-page-node-id="HGcRzJfaLN2vwMFBo7RX7I">
-                <li class="ms-li ms-li-all" data-v="__all__" data-page-node-id="45Zzd1q4vvm4HZ9CFPGGP3"><label data-page-node-id="RmC3JQ1fPHlVwlHx3fXbEL"><input type="checkbox" data-page-node-id="NCsCkqeXRMcNqvGH1Px6zO"> 全部工单名称</label></li>
-                <li class="ms-li" data-v="水管漏水维修" data-page-node-id="nm1"><label data-page-node-id="nml1"><input type="checkbox" data-page-node-id="nmc1"> 水管漏水维修</label></li>
-                <li class="ms-li" data-v="电路故障检修" data-page-node-id="nm2"><label data-page-node-id="nml2"><input type="checkbox" data-page-node-id="nmc2"> 电路故障检修</label></li>
-                <li class="ms-li" data-v="空调不制冷" data-page-node-id="nm3"><label data-page-node-id="nml3"><input type="checkbox" data-page-node-id="nmc3"> 空调不制冷</label></li>
-                <li class="ms-li" data-v="门窗损坏维修" data-page-node-id="nm4"><label data-page-node-id="nml4"><input type="checkbox" data-page-node-id="nmc4"> 门窗损坏维修</label></li>
-                <li class="ms-li" data-v="照明灯更换" data-page-node-id="nm5"><label data-page-node-id="nml5"><input type="checkbox" data-page-node-id="nmc5"> 照明灯更换</label></li>
-                <li class="ms-li" data-v="网络故障处理" data-page-node-id="nm6"><label data-page-node-id="nml6"><input type="checkbox" data-page-node-id="nmc6"> 网络故障处理</label></li>
-                <li class="ms-li" data-v="电梯异常报修" data-page-node-id="nm7"><label data-page-node-id="nml7"><input type="checkbox" data-page-node-id="nmc7"> 电梯异常报修</label></li>
-                <li class="ms-li" data-v="卫生间堵塞" data-page-node-id="nm8"><label data-page-node-id="nml8"><input type="checkbox" data-page-node-id="nmc8"> 卫生间堵塞</label></li>
-                <li class="ms-li" data-v="墙面脱落修复" data-page-node-id="nm9"><label data-page-node-id="nml9"><input type="checkbox" data-page-node-id="nmc9"> 墙面脱落修复</label></li>
-                <li class="ms-li" data-v="消防设施检查" data-page-node-id="nm10"><label data-page-node-id="nml10"><input type="checkbox" data-page-node-id="nmc10"> 消防设施检查</label></li>
-                <li class="ms-li" data-v="门锁损坏维修" data-page-node-id="nm11"><label data-page-node-id="nml11"><input type="checkbox" data-page-node-id="nmc11"> 门锁损坏维修</label></li>
-                <li class="ms-li" data-v="地面破损修复" data-page-node-id="nm12"><label data-page-node-id="nml12"><input type="checkbox" data-page-node-id="nmc12"> 地面破损修复</label></li>
-              </ul>
-            </div>
-          </div>
-        </div>
         <button class="btn-primary" data-page-node-id="dKktqqeGDHeVlljx0pJ1Tl">查询</button>
         <button class="btn-default" id="resetBtn" data-page-node-id="RstBtn">重置</button>
       </div>
@@ -202,8 +153,8 @@
       <!-- 图表第二行 -->
       <div class="grid-2" style="margin-top:16px;" data-page-node-id="bBNqCwwgbWdBXtyKs9PokA">
         <div class="card" data-page-node-id="UqJQz6xNAvktBD7n1MOzYX">
-          <div class="card-title" data-page-node-id="q3vUVYPJc7LiWzKNYfjepC">处理人排行<span class="right" data-page-node-id="iDwPHEwdgYobNYrI7W5TIF">单位：单</span></div>
-          <div class="chart" id="performer" _echarts_instance_="ec_1791523994118" style="user-select: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); position: relative;" data-page-node-id="M3AedTHzoDxeb1rsZ4DIuD"><div style="position: relative; width: 464px; height: 320px; padding: 0px; margin: 0px; border-width: 0px;" data-page-node-id="niAh91aBcIwqO9hYxArMIW"><canvas data-zr-dom-id="zr_0" width="700" height="483" style="position: absolute; left: 0px; top: 0px; width: 464px; height: 320px; user-select: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); padding: 0px; margin: 0px; border-width: 0px;" data-page-node-id="hLk9xRUDUSzYKcxEJFEAHo"></canvas></div><div class="" data-page-node-id="7mjRSWf3UbhODmxdktBReW"></div></div>
+          <div class="card-title" data-page-node-id="q3vUVYPJc7LiWzKNYfjepC">区域故障排行<span class="right" data-page-node-id="iDwPHEwdgYobNYrI7W5TIF">单位：单</span></div>
+          <div class="chart" id="region" data-page-node-id="regChart01"></div>
         </div>
         <div class="card" data-page-node-id="T8Mb8iLZuVzxnXJVCj9jXw">
           <div class="card-title" data-page-node-id="hJOr1ry6SWUk7D7cN1xq0w">平均处理时长趋势<span class="right" data-page-node-id="aMSgAB9mV90ZALgdjSRPV4">单位：小时</span></div>
@@ -248,18 +199,18 @@ function initCharts(){
     }]
   });
 
-  // 处理人排行（按已办结＝审批通过＋审批不通过，后端两态合并展示）
-  var performer = echarts.init(document.getElementById('performer'));
-  var performerData = [
-    {name:'张伟', value:62},{name:'李强', value:55},{name:'王芳', value:51},
-    {name:'刘洋', value:47},{name:'陈静', value:41},{name:'赵磊', value:35}
+  // 区域故障排行（按工单总量＝范围内创建的工单按区域计数，六区合计＝326）
+  var region = echarts.init(document.getElementById('region'));
+  var regionData = [
+    {name:'地下区', value:20},{name:'公共区', value:26},{name:'能源区', value:34},
+    {name:'生活区', value:68},{name:'科研区', value:82},{name:'办公区', value:96}
   ];
-  performer.setOption({
+  region.setOption({
     tooltip: { trigger: 'axis', axisPointer:{type:'shadow'}, formatter: '{b}: {c} 单' },
-    grid: { left: 60, right: 40, top: 10, bottom: 20 },
+    grid: { left: 70, right: 40, top: 10, bottom: 20 },
     xAxis: { type: 'value', splitLine:{lineStyle:{color:'#f0f0f0'}}, axisLabel:{color:'#8c8c8c'} },
-    yAxis: { type: 'category', data: performerData.map(function(d){return d.name;}), axisLabel:{color:'#4e5969'} },
-    series: [{ type:'bar', data: performerData.map(function(d){return d.value;}), itemStyle:{color:'#4165EC', borderRadius:[0,4,4,0]}, barWidth:'55%', label:{show:true, position:'right', color:'#4e5969'} }]
+    yAxis: { type: 'category', data: regionData.map(function(d){return d.name;}), axisLabel:{color:'#4e5969'} },
+    series: [{ type:'bar', data: regionData.map(function(d){return d.value;}), itemStyle:{color:'#54a0ff', borderRadius:[0,4,4,0]}, barWidth:'55%', label:{show:true, position:'right', color:'#4e5969'} }]
   });
 
   // 平均处理时长趋势
@@ -273,96 +224,11 @@ function initCharts(){
   });
 
   window.addEventListener('resize', function(){
-    [trend,status,performer,duration].forEach(function(c){ c.resize(); });
+    [trend,status,region,duration].forEach(function(c){ c.resize(); });
   });
 }
 
 window.addEventListener('load', function(){ setTimeout(initCharts, 0); });
-
-// 工单名称下拉多选（支持模糊查询）
-(function(){
-  var ms = document.getElementById('nameMs');
-  if(!ms) return;
-  var box = ms.querySelector('.ms-box');
-  var tagsEl = document.getElementById('nameTags');
-  var placeholder = document.getElementById('namePlaceholder');
-  var list = ms.querySelectorAll('.ms-li');
-  var searchInput = document.getElementById('nameSearch');
-  var ALL = ['水管漏水维修','电路故障检修','空调不制冷','门窗损坏维修','照明灯更换','网络故障处理','电梯异常报修','卫生间堵塞','墙面脱落修复','消防设施检查','门锁损坏维修','地面破损修复'];
-  var selected = new Set(ALL); // 默认全选 = 不限制
-
-  function render(){
-    if(tagsEl) tagsEl.innerHTML = '';
-    if(selected.size === 0 || selected.size === ALL.length){
-      if(placeholder){ placeholder.style.display = ''; placeholder.textContent = '全部工单名称'; }
-    } else {
-      if(placeholder) placeholder.style.display = 'none';
-      selected.forEach(function(v){
-        var t = document.createElement('span');
-        t.className = 'ms-tag';
-        t.innerHTML = v + '<span class="x" data-v="'+v+'">×</span>';
-        if(tagsEl) tagsEl.appendChild(t);
-      });
-    }
-    list.forEach(function(li){
-      var v = li.getAttribute('data-v');
-      var cb = li.querySelector('input');
-      if(cb) cb.checked = (v === '__all__') ? (selected.size === ALL.length) : selected.has(v);
-    });
-  }
-
-  if(box){
-    box.addEventListener('click', function(e){
-      if(e.target.classList.contains('x')){
-        selected.delete(e.target.getAttribute('data-v'));
-        render();
-        e.stopPropagation();
-        return;
-      }
-      ms.classList.toggle('open');
-    });
-  }
-
-  list.forEach(function(li){
-    li.addEventListener('click', function(e){
-      e.stopPropagation();
-      var v = li.getAttribute('data-v');
-      var cb = li.querySelector('input');
-      if(v === '__all__'){
-        selected = cb.checked ? new Set(ALL) : new Set();
-      } else {
-        if(cb.checked){ selected.add(v); } else { selected.delete(v); }
-      }
-      render();
-    });
-  });
-
-  document.addEventListener('click', function(e){
-    if(ms && !ms.contains(e.target)){ ms.classList.remove('open'); }
-  });
-
-  if(searchInput){
-    searchInput.addEventListener('input', function(){
-      var q = this.value.trim();
-      list.forEach(function(li){
-        var v = li.getAttribute('data-v');
-        if(v === '__all__'){ li.style.display = ''; return; }
-        li.style.display = v.indexOf(q) >= 0 ? '' : 'none';
-      });
-    });
-  }
-
-  render();
-
-  // 暴露重置钩子：还原工单名称为「全部工单名称」（全选）
-  window.__resetNameSelect = function(){
-    selected = new Set(ALL);
-    if(searchInput) searchInput.value = '';
-    ms.classList.remove('open');
-    list.forEach(function(li){ li.style.display = ''; });
-    render();
-  };
-})();
 
 // 重置按钮：仅还原筛选控件为默认态（原型为静态演示，不触发后台筛选）
 (function(){
@@ -373,7 +239,6 @@ window.addEventListener('load', function(){ setTimeout(initCharts, 0); });
     var de = document.getElementById('dateEnd');
     if(ds) ds.value = '2025-10-01';
     if(de) de.value = '2026-09-30';
-    if(window.__resetNameSelect) window.__resetNameSelect();
   });
 })();
 </script>
