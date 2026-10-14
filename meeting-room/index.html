@@ -277,24 +277,16 @@ tr:hover td { background: #F7F7FA; }
 .end-card-value { font-size: 16px; font-weight: 600; color: #4165EC; margin-top: 2px; }
 .end-card-arrow { color: #B4B2A9; flex-shrink: 0; }
 .end-time-input { position: relative; margin-top: 2px; }
-.end-time-input input[type="time"] {
+/* 延后结束的时间控件：下拉，只列半小时刻度（与移动端一致） */
+.end-time-input select {
   width: 100%; height: 34px; padding: 0 32px 0 10px; background: #fff;
   border: 1px solid #D8D8D8; border-radius: 4px;
   font-size: 16px; font-weight: 600; color: #36373B;
-  -webkit-appearance: none; appearance: none;
+  -webkit-appearance: none; appearance: none; cursor: pointer;
 }
-.end-time-input input[type="time"]:focus { outline: none; border-color: #4165EC; box-shadow: 0 0 0 3px rgba(65,101,236,.12); }
-.end-time-input input[type="time"]::-webkit-calendar-picker-indicator {
-  position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
-  width: 18px; height: 18px; opacity: 0; cursor: pointer; margin: 0; padding: 0;
-}
-.end-time-input input[type="time"]::-webkit-datetime-edit { padding: 0; }
-.end-time-input input[type="time"]::-webkit-datetime-edit-fields-wrapper { padding: 0; }
-.end-time-input input[type="time"]::-webkit-datetime-edit-hour-field,
-.end-time-input input[type="time"]::-webkit-datetime-edit-minute-field,
-.end-time-input input[type="time"]::-webkit-datetime-edit-text { padding: 0; }
-.end-time-input .end-time-icon { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); color: #8F9098; pointer-events: none; }
-.end-time-input.error input[type="time"] { border-color: #ff4d4f; }
+.end-time-input select:focus { outline: none; border-color: #4165EC; box-shadow: 0 0 0 3px rgba(65,101,236,.12); }
+.end-time-input .end-time-icon { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); color: #4165EC; pointer-events: none; }
+.end-time-input.error select { border-color: #ff4d4f; }
 .end-hint { margin: 12px 0 0; font-size: 12px; color: #8F9098; line-height: 1.6; }
 .end-err { margin: 8px 0 0; font-size: 12px; color: #ff4d4f; line-height: 1.6; }
 .end-modal-footer { padding: 12px 20px 18px; }
@@ -1781,8 +1773,8 @@ tr:hover td { background: #F7F7FA; }
           <div id="mx-end-actualRow"><div class="end-card-value" id="mx-end-actual">12:30</div></div>
           <div id="mx-end-timeRow" style="display:none;">
             <div class="end-time-input" id="mx-end-timeBox">
-              <input type="time" id="mx-end-newTime" step="1800">
-              <svg class="end-time-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7.5V12l3 2"/></svg>
+              <select id="mx-end-newTime"></select>
+              <svg class="end-time-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
             </div>
           </div>
         </div>
@@ -4072,7 +4064,14 @@ function mxEndPostpone(key){
   document.getElementById('mx-end-orig').textContent = m.end;
   document.getElementById('mx-end-valLabel').textContent = '新的结束时间';
   document.getElementById('mx-end-actualRow').style.display = 'none';
-  document.getElementById('mx-end-newTime').value = m.end;
+  const sel = document.getElementById('mx-end-newTime');
+  const opts = [];
+  for (let h = 6; h <= 24; h++) {
+    const hh = ('0' + h).slice(-2);
+    if (h === 24) { if ('24:00' > m.end) opts.push('<option value="24:00">24:00</option>'); break; }
+    ['00', '30'].forEach(function (mm) { const t = hh + ':' + mm; if (t > m.end) opts.push('<option value="' + t + '">' + t + '</option>'); });
+  }
+  sel.innerHTML = opts.join('');
   document.getElementById('mx-end-timeRow').style.display = '';
   document.getElementById('mx-end-hint').textContent = '仅可延至空闲时段，最晚 24 点';
   mxEndClearErr();
