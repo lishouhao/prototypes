@@ -260,6 +260,44 @@ tr:hover td { background: #F7F7FA; }
    避免变更后打开发起表单被盖住；「我的会议」列表现为内联 Tab 面板，不遮挡弹框 */
 #mx-cancel-modal { z-index: 300; }
 #mx-end-modal { z-index: 300; }
+/* N5 弹框统一骨架：标题行(图标+标题+×) → 动作问句 → 关键值卡 → 后果行 → 取消·确认
+   注意：宽度与三处 padding 必须带 #mx-end-modal 前缀提升权重，否则被后面的 .modal/.modal-header/.modal-body/.modal-footer 同权重覆盖 */
+#mx-end-modal .modal.end-modal { width: 440px; }
+#mx-end-modal .end-modal-header { padding: 14px 20px; }
+#mx-end-modal .end-modal-body { padding: 20px; }
+#mx-end-modal .end-modal-footer { padding: 12px 20px 18px; }
+.end-modal-head { display: flex; align-items: center; gap: 8px; }
+.end-modal-icon { color: #4165EC; flex-shrink: 0; }
+#mx-end-modal.is-postpone .end-modal-icon { color: #FAAD14; }
+.end-q { margin: 0; font-size: 14px; color: #36373B; line-height: 1.7; }
+.end-card { display: flex; align-items: center; gap: 16px; background: #F7F7FA; border-radius: 8px; padding: 12px 16px; margin-top: 14px; }
+.end-card-cell { flex: 1; min-width: 0; }
+.end-card-label { font-size: 12px; color: #8F9098; }
+.end-card-orig { font-size: 16px; color: #8F9098; margin-top: 2px; }
+.end-card-value { font-size: 16px; font-weight: 600; color: #4165EC; margin-top: 2px; }
+.end-card-arrow { color: #B4B2A9; flex-shrink: 0; }
+.end-time-input { position: relative; margin-top: 2px; }
+.end-time-input input[type="time"] {
+  width: 100%; height: 34px; padding: 0 32px 0 10px; background: #fff;
+  border: 1px solid #D8D8D8; border-radius: 4px;
+  font-size: 16px; font-weight: 600; color: #36373B;
+  -webkit-appearance: none; appearance: none;
+}
+.end-time-input input[type="time"]:focus { outline: none; border-color: #4165EC; box-shadow: 0 0 0 3px rgba(65,101,236,.12); }
+.end-time-input input[type="time"]::-webkit-calendar-picker-indicator {
+  position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
+  width: 18px; height: 18px; opacity: 0; cursor: pointer; margin: 0; padding: 0;
+}
+.end-time-input input[type="time"]::-webkit-datetime-edit { padding: 0; }
+.end-time-input input[type="time"]::-webkit-datetime-edit-fields-wrapper { padding: 0; }
+.end-time-input input[type="time"]::-webkit-datetime-edit-hour-field,
+.end-time-input input[type="time"]::-webkit-datetime-edit-minute-field,
+.end-time-input input[type="time"]::-webkit-datetime-edit-text { padding: 0; }
+.end-time-input .end-time-icon { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); color: #8F9098; pointer-events: none; }
+.end-time-input.error input[type="time"] { border-color: #ff4d4f; }
+.end-hint { margin: 12px 0 0; font-size: 12px; color: #8F9098; line-height: 1.6; }
+.end-err { margin: 8px 0 0; font-size: 12px; color: #ff4d4f; line-height: 1.6; }
+.end-modal-footer { padding: 12px 20px 18px; }
 #yy-formModal { z-index: 200; }
 .modal {
   background: #fff; border-radius: 8px;
@@ -1722,30 +1760,39 @@ tr:hover td { background: #F7F7FA; }
 
 <!-- ========== N5：会中「提前结束 / 延后结束」弹框 ========== -->
 <div class="modal-overlay" id="mx-end-modal" onclick="mxEndClose(event)">
-  <div class="modal" style="width:480px;max-width:90%;" onclick="event.stopPropagation()">
-    <div class="modal-header">
-      <span id="mx-end-title">提前结束</span>
-      <button class="modal-close" onclick="mxEndClose()">&times;</button>
+  <div class="modal end-modal" role="dialog" aria-modal="true" aria-labelledby="mx-end-title" tabindex="-1" onclick="event.stopPropagation()">
+    <div class="modal-header end-modal-header">
+      <span class="end-modal-head">
+        <svg class="end-modal-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7.5V12l3 2"/></svg>
+        <span id="mx-end-title">提前结束</span>
+      </span>
+      <button class="modal-close" onclick="mxEndClose()" aria-label="关闭">&times;</button>
     </div>
-    <div class="modal-body" style="padding:24px;">
-      <div style="display:flex;align-items:flex-start;gap:12px;font-size:14px;color:#36373B;line-height:1.8;">
-        <span style="color:#faad14;font-size:22px;">&#x26A0;</span>
-        <span id="mx-end-text">确定提前结束该会议吗？</span>
+    <div class="modal-body end-modal-body">
+      <p class="end-q" id="mx-end-text">确定提前结束该会议吗？</p>
+      <div class="end-card">
+        <div class="end-card-cell">
+          <div class="end-card-label">原定结束</div>
+          <div class="end-card-orig" id="mx-end-orig">--:--</div>
+        </div>
+        <svg class="end-card-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6"/></svg>
+        <div class="end-card-cell">
+          <div class="end-card-label" id="mx-end-valLabel">实际结束时间</div>
+          <div id="mx-end-actualRow"><div class="end-card-value" id="mx-end-actual">12:30</div></div>
+          <div id="mx-end-timeRow" style="display:none;">
+            <div class="end-time-input" id="mx-end-timeBox">
+              <input type="time" id="mx-end-newTime" step="1800">
+              <svg class="end-time-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7.5V12l3 2"/></svg>
+            </div>
+          </div>
+        </div>
       </div>
-      <div class="form-row" id="mx-end-actualRow" style="display:none;margin:16px 0 0;">
-        <label>实际结束时间</label>
-        <div class="input-wrap" style="font-size:14px;color:#36373B;font-weight:600;" id="mx-end-actual">12:30</div>
-      </div>
-      <div class="form-row" id="mx-end-timeRow" style="display:none;margin:16px 0 0;">
-        <label>新的结束时间</label>
-        <div class="input-wrap"><input type="time" id="mx-end-newTime" step="1800" style="width:170px;"></div>
-      </div>
-      <div id="mx-end-hint" style="font-size:12px;color:#8F9098;margin-top:12px;line-height:1.6;"></div>
-      <div id="mx-end-err" style="display:none;color:#cf1322;font-size:12px;margin-top:8px;line-height:1.6;"></div>
+      <p class="end-hint" id="mx-end-hint"></p>
+      <p class="end-err" id="mx-end-err" style="display:none;" role="alert" aria-live="polite"></p>
     </div>
-    <div style="padding:12px 24px 24px;display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap;">
-      <button class="btn btn-ghost" style="height:32px;padding:0 16px;" onclick="mxEndClose()">取消</button>
-      <button id="mx-end-confirmBtn" class="btn btn-primary" style="height:32px;padding:0 16px;" onclick="mxEndConfirm()">确认</button>
+    <div class="modal-footer end-modal-footer">
+      <button class="btn btn-ghost" onclick="mxEndClose()">取消</button>
+      <button id="mx-end-confirmBtn" class="btn btn-primary" onclick="mxEndConfirm()">确认</button>
     </div>
   </div>
 </div>
@@ -3968,6 +4015,19 @@ function mxCancelConfirm(){
 /* ===== N5：会中「提前结束 / 延后结束」（仅「我发起的」、仅会中、不重走审批） ===== */
 let mxEndKey = null;    // 目标会议 key
 let mxEndMode = null;   // 'early' | 'postpone'
+/* 清空错误态：错误行隐藏 + 时间输入框去红描边 */
+function mxEndClearErr(){
+  const errEl = document.getElementById('mx-end-err');
+  if (errEl) { errEl.textContent = ''; errEl.style.display = 'none'; }
+  const box = document.getElementById('mx-end-timeBox');
+  if (box) box.classList.remove('error');
+}
+/* 键盘可达性：ESC 关闭 N5 弹框 */
+document.addEventListener('keydown', function (e) {
+  if (e.key !== 'Escape') return;
+  const em = document.getElementById('mx-end-modal');
+  if (em && em.classList.contains('show')) mxEndClose();
+});
 /* 会中判定：已通过 + 占用中 + 当前时间落在 [开始, 结束) 区间内 */
 function mxIsOngoing(b){
   if (!b) return false;
@@ -3987,38 +4047,53 @@ function mxEndEarly(key){
   const m = mxFindMatrix(key);
   if (!m) return;
   mxEndKey = key; mxEndMode = 'early';
+  const modal = document.getElementById('mx-end-modal');
+  modal.classList.remove('is-postpone');
   document.getElementById('mx-end-title').textContent = '提前结束';
   document.getElementById('mx-end-text').textContent = '确定提前结束「' + (m.title || '') + '」吗？';
+  document.getElementById('mx-end-orig').textContent = m.end;
+  document.getElementById('mx-end-valLabel').textContent = '实际结束时间';
   document.getElementById('mx-end-actual').textContent = mxHalfHourNow();
   document.getElementById('mx-end-actualRow').style.display = '';
   document.getElementById('mx-end-timeRow').style.display = 'none';
   document.getElementById('mx-end-hint').textContent = '剩余时段将释放，费用按实际时长计算';
-  document.getElementById('mx-end-err').style.display = 'none';
-  document.getElementById('mx-end-modal').classList.add('show');
+  mxEndClearErr();
+  modal.classList.add('show');
+  modal.focus();
 }
 function mxEndPostpone(key){
   const m = mxFindMatrix(key);
   if (!m) return;
   mxEndKey = key; mxEndMode = 'postpone';
+  const modal = document.getElementById('mx-end-modal');
+  modal.classList.add('is-postpone');
   document.getElementById('mx-end-title').textContent = '延后结束';
   document.getElementById('mx-end-text').textContent = '确定延后结束「' + (m.title || '') + '」吗？';
+  document.getElementById('mx-end-orig').textContent = m.end;
+  document.getElementById('mx-end-valLabel').textContent = '新的结束时间';
   document.getElementById('mx-end-actualRow').style.display = 'none';
   document.getElementById('mx-end-newTime').value = m.end;
   document.getElementById('mx-end-timeRow').style.display = '';
-  document.getElementById('mx-end-hint').textContent = '仅可延至空闲时段';
-  document.getElementById('mx-end-err').style.display = 'none';
-  document.getElementById('mx-end-modal').classList.add('show');
+  document.getElementById('mx-end-hint').textContent = '仅可延至空闲时段，最晚 24 点';
+  mxEndClearErr();
+  modal.classList.add('show');
+  modal.focus();
 }
 function mxEndClose(e){
   if (e && e.target && e.target.id !== 'mx-end-modal') return;
   mxEndKey = null; mxEndMode = null;
   document.getElementById('mx-end-modal').classList.remove('show');
+  mxEndClearErr();
 }
 function mxEndConfirm(){
   const m = mxFindMatrix(mxEndKey);
   if (!m) { mxEndClose(); return; }
   const errEl = document.getElementById('mx-end-err');
-  const fail = msg => { errEl.textContent = msg; errEl.style.display = ''; };
+  const fail = msg => {
+    errEl.textContent = msg; errEl.style.display = '';
+    const box = document.getElementById('mx-end-timeBox');
+    if (box) box.classList.add('error');
+  };
   if (mxEndMode === 'early') {
     const actual = mxHalfHourNow();                  // 实际结束时间按半点颗粒度记录（向下取整到 00 / 30）
     m.end = (actual > m.start) ? actual : m.start;   // 实际结束时间不早于开始时间
