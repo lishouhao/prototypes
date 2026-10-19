@@ -127,8 +127,8 @@
           <div class="seg" id="periodSeg" data-page-node-id="periodSeg01">
             <span data-period="day" data-page-node-id="periodToday">近一天</span>
             <span data-period="week" data-page-node-id="periodWeek">近一周</span>
-            <span data-period="month" class="active" data-page-node-id="periodMonth">近一个月</span>
-            <span data-period="year" data-page-node-id="periodYear">近一年</span>
+            <span data-period="month" data-page-node-id="periodMonth">近一个月</span>
+            <span data-period="year" class="active" data-page-node-id="periodYear">近一年</span>
           </div>
         </div>
         <button class="btn-default" id="resetBtn" data-page-node-id="RstBtn">重置</button>
@@ -439,7 +439,7 @@ function initCharts() {
   window.addEventListener('resize', function () {
     Object.keys(CH).forEach(function (k) { CH[k].resize(); });
   });
-  render('month');
+  render('year');
 }
 
 document.getElementById('periodSeg').addEventListener('click', function (e) {
@@ -447,7 +447,7 @@ document.getElementById('periodSeg').addEventListener('click', function (e) {
   if (!t) return;
   render(t.getAttribute('data-period'));
 });
-document.getElementById('resetBtn').addEventListener('click', function () { render('month'); });
+document.getElementById('resetBtn').addEventListener('click', function () { render('year'); });
 window.addEventListener('load', initCharts);
 
 </script>
