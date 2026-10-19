@@ -80,7 +80,6 @@
 
   /* 统计基准说明行 */
   .scope-note { font-size: 12px; color: #8c8c8c; margin: -4px 0 12px 2px; }
-  .scope-note .warn { color: #d46b08; margin-left: 8px; }
   /* 图表脚注 */
 </style>
 <style id="__dm_no_drag_style__">* { -webkit-user-drag: none !important; }</style><style id="__dm_bindable_badge_style__">[data-sp-bindable="database"]{outline:1px dashed #0088ff;outline-offset:2px;border-radius:4px;}[data-sp-bindable="database"] *{pointer-events:none !important;transition:none !important;animation:none !important;}[data-sp-bindable="database"]{transition:none !important;animation:none !important;}</style></head>
@@ -136,7 +135,7 @@
         <span class="range-hint" id="rangeHint" data-page-node-id="rangeHint01"></span>
       </div>
 
-      <div class="scope-note" data-page-node-id="scopeNote1">以下指标均按所选统计周期内创建的工单统计，统计截止到昨日 23:59:59<span id="sampleHint" class="warn" style="display:none;">当期样本较少，办结率与平均处理时长仅供参考</span></div>
+      <div class="scope-note" data-page-node-id="scopeNote1">以下指标均按所选统计周期内创建的工单统计</div>
 
       <!-- KPI 卡片 -->
       <div class="kpi-row" data-page-node-id="nSQ4jajEw76Mg0TwObN5eQ">
@@ -348,8 +347,6 @@ function render(period) {
 
   document.getElementById('rangeHint').textContent =
     '统计区间：' + fmtDT(d.range.start) + ' 至 ' + fmtDT(dispEnd) + ':59';
-  document.getElementById('sampleHint').style.display =
-    (period === 'day' || period === 'week') ? 'inline' : 'none';
 
   var labels = d.buckets.map(function (b) { return b.label; });
   var interval = labels.length > 12 ? 2 : 0;
