@@ -50,9 +50,12 @@
   .filter-item select:focus, .filter-item input:focus { border-color: #4165EC; }
   .filter-item .tilde { color: #c9cdd4; }
 
-  .seg { display: inline-flex; border: 1px solid #d9d9d9; border-radius: 4px; overflow: hidden; }
-  .seg span { padding: 0 12px; height: 32px; line-height: 32px; cursor: pointer; font-size: 13px; color: #4e5969; background: #fff; }
-  .seg span.active { background: #4165EC; color: #fff; border-color: #4165EC; }
+  .seg { display: inline-flex; border: 1px solid #d9d9d9; border-radius: 4px; overflow: hidden; background: #fff; }
+  .seg span { padding: 0 14px; height: 32px; line-height: 30px; cursor: pointer; font-size: 13px; color: #4e5969; background: #fff; border-left: 1px solid #d9d9d9; transition: all .15s; user-select: none; }
+  .seg span:first-child { border-left: none; }
+  .seg span:hover { color: #4165EC; background: #f5f8ff; }
+  .seg span.active { background: #4165EC; color: #fff; }
+  .range-hint { margin-left: auto; font-size: 12px; color: #8c8c8c; }
   .btn-primary { height: 32px; padding: 0 16px; background: #4165EC; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-size: 13px; }
   .btn-primary:hover { background: #3a5bd0; }
   .btn-default { height: 32px; padding: 0 16px; background: #fff; color: #4165EC; border: 1px solid #4165EC; border-radius: 4px; cursor: pointer; font-size: 13px; margin-left: 8px; }
@@ -77,6 +80,7 @@
 
   /* 统计基准说明行 */
   .scope-note { font-size: 12px; color: #8c8c8c; margin: -4px 0 12px 2px; }
+  .scope-note .warn { color: #d46b08; margin-left: 8px; }
   /* 图表脚注 */
 </style>
 <style id="__dm_no_drag_style__">* { -webkit-user-drag: none !important; }</style><style id="__dm_bindable_badge_style__">[data-sp-bindable="database"]{outline:1px dashed #0088ff;outline-offset:2px;border-radius:4px;}[data-sp-bindable="database"] *{pointer-events:none !important;transition:none !important;animation:none !important;}[data-sp-bindable="database"]{transition:none !important;animation:none !important;}</style></head>
@@ -120,28 +124,33 @@
       <!-- 筛选栏 -->
       <div class="filter-bar" data-page-node-id="KSlpFkBzgxd73WuTnFuA3w">
         <div class="filter-item" data-page-node-id="FwHHq70E9nj8CrpWJyOdgX">
-          <label data-page-node-id="jtvjOswM23jgebNw6qI4tc">日期范围</label>
-          <input type="date" value="2025-10-01" id="dateStart" data-page-node-id="4u0ipYtHCkEf4DMpYXxHaJ"> <span class="tilde" data-page-node-id="FckElIDDpQaY7XFrIuvkDm">~</span> <input type="date" value="2026-09-30" id="dateEnd" data-page-node-id="rHJwcrcdy7kvfyMHeFGt49">
+          <label data-page-node-id="jtvjOswM23jgebNw6qI4tc">统计周期</label>
+          <div class="seg" id="periodSeg" data-page-node-id="periodSeg01">
+            <span data-period="today" data-page-node-id="periodToday">今天</span>
+            <span data-period="week" data-page-node-id="periodWeek">近一周</span>
+            <span data-period="month" class="active" data-page-node-id="periodMonth">近一个月</span>
+            <span data-period="year" data-page-node-id="periodYear">近一年</span>
+          </div>
         </div>
-        <button class="btn-primary" data-page-node-id="dKktqqeGDHeVlljx0pJ1Tl">查询</button>
         <button class="btn-default" id="resetBtn" data-page-node-id="RstBtn">重置</button>
+        <span class="range-hint" id="rangeHint" data-page-node-id="rangeHint01"></span>
       </div>
 
-      <div class="scope-note" data-page-node-id="scopeNote1">以下指标均按所选范围内创建的工单统计，数据截至当前时刻</div>
+      <div class="scope-note" data-page-node-id="scopeNote1">以下指标均按所选统计周期内创建的工单统计，数据截至当前时刻<span id="sampleHint" class="warn" style="display:none;">当期样本较少，办结率与平均处理时长仅供参考</span></div>
 
       <!-- KPI 卡片 -->
       <div class="kpi-row" data-page-node-id="nSQ4jajEw76Mg0TwObN5eQ">
-        <div class="kpi" data-page-node-id="bX5vQXJqi4ARta623dHJoX"><div class="label" data-page-node-id="1PMkndzs6yh6RAd4e3LLhr">工单总量</div><div class="value" data-page-node-id="wXm4xKZ8z7Uq8FzTVDu2Rp">326<span class="unit" data-page-node-id="FABODl0SybvBL7EjnvH5C1">单</span></div></div>
-        <div class="kpi" data-page-node-id="3s9MLlTMMowX2WMAbdIcft"><div class="label" data-page-node-id="kz68JHI0tTBUVVmwiQBG0q">待处理</div><div class="value" data-page-node-id="viWsJd0DiLdMqYEOiQFnca">46<span class="unit" data-page-node-id="ZKJP4gXdhZnOrDjbe5Fqux">单</span></div></div>
-        <div class="kpi" data-page-node-id="9KHSCL1ykSYFe3yvMZVKJ1"><div class="label" data-page-node-id="KfYD7afqu6EtOYAx7BVBmv">已办结</div><div class="value" data-page-node-id="ifajAVmO2JfZep4RFJYCOi">272<span class="unit" data-page-node-id="EmmUxNw5BB6u6nNiWjr6qU">单</span></div></div>
-        <div class="kpi blue" data-page-node-id="md0e0adpRLy7dCZEKZswsG"><div class="label" data-page-node-id="5y1l8jCxxDGGyjC0FBosfJ">办结率</div><div class="value" data-page-node-id="EOr15HMU2ROF8AJVYCcXzC">85.5<span class="unit" data-page-node-id="ji50J7fE5KXIRbn2C3lRbV">%</span></div></div>
-        <div class="kpi blue" data-page-node-id="5h02oAnqfZFXvYZ6qhgitm"><div class="label" data-page-node-id="iUz3ITUvL4soMfeJcZmtcn">平均处理时长</div><div class="value" data-page-node-id="uiVGHt13uf2dj5PpO4hAOg">6.4<span class="unit" data-page-node-id="oSr8R3KRTOdF27DLEGxHP3">小时</span></div></div>
+        <div class="kpi" data-page-node-id="bX5vQXJqi4ARta623dHJoX"><div class="label" data-page-node-id="1PMkndzs6yh6RAd4e3LLhr">工单总量</div><div class="value" data-page-node-id="wXm4xKZ8z7Uq8FzTVDu2Rp"><span id="kpiTotal">326</span><span class="unit" data-page-node-id="FABODl0SybvBL7EjnvH5C1">单</span></div></div>
+        <div class="kpi" data-page-node-id="3s9MLlTMMowX2WMAbdIcft"><div class="label" data-page-node-id="kz68JHI0tTBUVVmwiQBG0q">待处理</div><div class="value" data-page-node-id="viWsJd0DiLdMqYEOiQFnca"><span id="kpiPending">46</span><span class="unit" data-page-node-id="ZKJP4gXdhZnOrDjbe5Fqux">单</span></div></div>
+        <div class="kpi" data-page-node-id="9KHSCL1ykSYFe3yvMZVKJ1"><div class="label" data-page-node-id="KfYD7afqu6EtOYAx7BVBmv">已办结</div><div class="value" data-page-node-id="ifajAVmO2JfZep4RFJYCOi"><span id="kpiClosed">272</span><span class="unit" data-page-node-id="EmmUxNw5BB6u6nNiWjr6qU">单</span></div></div>
+        <div class="kpi blue" data-page-node-id="md0e0adpRLy7dCZEKZswsG"><div class="label" data-page-node-id="5y1l8jCxxDGGyjC0FBosfJ">办结率</div><div class="value" data-page-node-id="EOr15HMU2ROF8AJVYCcXzC"><span id="kpiRate">85.5</span><span class="unit" data-page-node-id="ji50J7fE5KXIRbn2C3lRbV">%</span></div></div>
+        <div class="kpi blue" data-page-node-id="5h02oAnqfZFXvYZ6qhgitm"><div class="label" data-page-node-id="iUz3ITUvL4soMfeJcZmtcn">平均处理时长</div><div class="value" data-page-node-id="uiVGHt13uf2dj5PpO4hAOg"><span id="kpiDuration">6.4</span><span class="unit" data-page-node-id="oSr8R3KRTOdF27DLEGxHP3">小时</span></div></div>
       </div>
 
       <!-- 图表第一行 -->
       <div class="grid-2" data-page-node-id="txByU9N1BapQUjOkvj5bIW">
         <div class="card" data-page-node-id="kssEfFO7Ko9u2xDjKdqHIC">
-          <div class="card-title" data-page-node-id="tMc4P96fB9ZK3mFyOVsk5C" style="">工单量趋势<span class="right" data-page-node-id="EwZzvqegDLDcVFDGw2UTDE">单位：单</span></div>
+          <div class="card-title" data-page-node-id="tMc4P96fB9ZK3mFyOVsk5C" style="">工单量趋势<span class="right" id="trendUnit" data-page-node-id="EwZzvqegDLDcVFDGw2UTDE">单位：单</span></div>
           <div class="chart" id="trend" _echarts_instance_="ec_1791523994116" style="user-select: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); position: relative;" data-page-node-id="fdbYqQa17ic5uDO5IaBW0o"><div style="position: relative; width: 464px; height: 320px; padding: 0px; margin: 0px; border-width: 0px; cursor: default;" data-page-node-id="jWZ3GcxrdgYGeUkd2kQN5s"><canvas data-zr-dom-id="zr_0" width="700" height="483" style="position: absolute; left: 0px; top: 0px; width: 464px; height: 320px; user-select: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); padding: 0px; margin: 0px; border-width: 0px;" data-page-node-id="e5srL74lSzxAaQf1dYYlIz"></canvas></div><div class="" data-page-node-id="Q4H6s2TQUvWM9iePcFLsV9"></div></div>
         </div>
         <div class="card" data-page-node-id="lltBe5sU29dfqHTeC8btc1">
@@ -157,7 +166,7 @@
           <div class="chart" id="region" data-page-node-id="regChart01"></div>
         </div>
         <div class="card" data-page-node-id="T8Mb8iLZuVzxnXJVCj9jXw">
-          <div class="card-title" data-page-node-id="hJOr1ry6SWUk7D7cN1xq0w">平均处理时长趋势<span class="right" data-page-node-id="aMSgAB9mV90ZALgdjSRPV4">单位：小时</span></div>
+          <div class="card-title" data-page-node-id="hJOr1ry6SWUk7D7cN1xq0w">平均处理时长趋势<span class="right" id="durationUnit" data-page-node-id="aMSgAB9mV90ZALgdjSRPV4">单位：小时</span></div>
           <div class="chart" id="duration" _echarts_instance_="ec_1791523994119" style="user-select: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); position: relative;" data-page-node-id="Yj1iHTsDD9ufcUbMNVh3QV"><div style="position: relative; width: 464px; height: 320px; padding: 0px; margin: 0px; border-width: 0px;" data-page-node-id="iZq8QbZBzmJHyfHQWCl2gb"><canvas data-zr-dom-id="zr_0" width="700" height="483" style="position: absolute; left: 0px; top: 0px; width: 464px; height: 320px; user-select: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); padding: 0px; margin: 0px; border-width: 0px;" data-page-node-id="OQHwkyqrrpnAbJXoW3Tm5d"></canvas></div><div class="" data-page-node-id="0mNVxJIy7ueDZemYculX8e"></div></div>
         </div>
       </div>
@@ -167,80 +176,284 @@
 </div>
 
 <script data-page-node-id="aSxqic3bGgtJf2JPywB2Bj">
-function initCharts(){
-  // 工单量趋势
-  var trend = echarts.init(document.getElementById('trend'));
-  trend.setOption({
-    tooltip: { trigger: 'axis' },
-    legend: { data: ['发起量','办结量'], top: 0, right: 0, textStyle:{color:'#8c8c8c'} },
-    grid: { left: 40, right: 20, top: 40, bottom: 30 },
-    xAxis: { type: 'category', data: ['2025-10','2025-11','2025-12','2026-01','2026-02','2026-03','2026-04','2026-05','2026-06','2026-07','2026-08','2026-09'], axisLine:{lineStyle:{color:'#e5e6eb'}}, axisLabel:{color:'#8c8c8c'} },
-    yAxis: { type: 'value', splitLine:{lineStyle:{color:'#f0f0f0'}}, axisLabel:{color:'#8c8c8c'} },
-    series: [
-      { name:'发起量', type:'line', smooth:true, data:[18,22,25,20,15,28,31,30,29,34,32,42], itemStyle:{color:'#4165EC'}, areaStyle:{color:'rgba(65,101,236,0.08)'} },
-      { name:'办结量', type:'line', smooth:true, data:[17,21,24,19,14,27,30,28,27,31,20,14], itemStyle:{color:'#5ad8a6'} }
-    ]
-  });
+/* ============ 演示数据：单一数据集驱动四个档位 ============ */
+var DEMO_NOW = new Date(2026, 9, 19, 14, 30, 0); // 固定演示时刻：2026-10-19 14:30
+var REGIONS = [
+  { name: '办公区', w: 96 }, { name: '科研区', w: 82 }, { name: '生活区', w: 68 },
+  { name: '能源区', w: 34 }, { name: '公共区', w: 26 }, { name: '地下区', w: 20 }
+];
 
-  // 状态分布
-  var status = echarts.init(document.getElementById('status'));
-  status.setOption({
+function mulberry32(a) {
+  return function () {
+    a |= 0; a = a + 0x6D2B79F5 | 0;
+    var t = Math.imul(a ^ a >>> 15, 1 | a);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+function pad2(n) { return (n < 10 ? '0' : '') + n; }
+function fmtDT(d) {
+  return d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate()) +
+    ' ' + pad2(d.getHours()) + ':' + pad2(d.getMinutes());
+}
+function pickRegion(rand) {
+  var sum = REGIONS.reduce(function (a, r) { return a + r.w; }, 0);
+  var x = rand() * sum;
+  for (var i = 0; i < REGIONS.length; i++) { x -= REGIONS[i].w; if (x <= 0) return REGIONS[i].name; }
+  return REGIONS[REGIONS.length - 1].name;
+}
+function pickStatus(rand, ageDays) {
+  var p;
+  if (ageDays < 1) p = [0.12, 0.02, 0.03, 0.83];
+  else if (ageDays < 7) p = [0.30, 0.05, 0.04, 0.61];
+  else if (ageDays < 30) p = [0.58, 0.06, 0.05, 0.31];
+  else p = [0.84, 0.07, 0.05, 0.04];
+  var r = rand();
+  if (r < p[0]) return '审批通过';
+  if (r < p[0] + p[1]) return '审批不通过';
+  if (r < p[0] + p[1] + p[2]) return '已取消';
+  return '审批中';
+}
+
+var TOTAL = 1200; // 演示量级：1,200 单/年（约 3.3 单/天），支撑日/小时粒度
+var ORDERS = (function () {
+  var rand = mulberry32(20261019);
+  var DAY = 86400000;
+  var start = new Date(DEMO_NOW); start.setHours(0, 0, 0, 0); start.setFullYear(start.getFullYear() - 1);
+  var days = [];
+  for (var t = start.getTime(); t <= DEMO_NOW.getTime(); t += DAY) days.push(new Date(t));
+  var weights = days.map(function (d, i) {
+    var dow = d.getDay();
+    var wk = (dow === 0 || dow === 6) ? 0.62 : 1;
+    var growth = 0.55 + 0.45 * (i / (days.length - 1));
+    return wk * growth * (0.75 + rand() * 0.5);
+  });
+  var sumW = weights.reduce(function (a, b) { return a + b; }, 0);
+  var raw = weights.map(function (x) { return x / sumW * TOTAL; });
+  var counts = raw.map(Math.floor);
+  var rem = TOTAL - counts.reduce(function (a, b) { return a + b; }, 0);
+  var frac = raw.map(function (x, i) { return { i: i, f: x - Math.floor(x) }; })
+    .sort(function (a, b) { return b.f - a.f; });
+  for (var k = 0; k < rem; k++) counts[frac[k].i]++;
+  // 保证今天至少 1 单，避免「今天」档位空页
+  var last = counts.length - 1;
+  if (counts[last] === 0) {
+    var maxI = 0;
+    for (var j = 0; j < last; j++) if (counts[j] > counts[maxI]) maxI = j;
+    if (counts[maxI] > 1) { counts[maxI]--; counts[last]++; }
+  }
+  var orders = [];
+  days.forEach(function (d, i) {
+    for (var n = 0; n < counts[i]; n++) {
+      var created = new Date(d);
+      var isToday = d.toDateString() === DEMO_NOW.toDateString();
+      var maxHour = isToday ? DEMO_NOW.getHours() : 18;
+      created.setHours(8 + Math.floor(rand() * (maxHour - 8 + 1)),
+        Math.floor(rand() * 60), Math.floor(rand() * 60), 0);
+      if (created > DEMO_NOW) created = new Date(DEMO_NOW.getTime() - Math.floor(rand() * 3600000));
+      var ageDays = (DEMO_NOW - created) / DAY;
+      var status = pickStatus(rand, ageDays);
+      var durationH = null;
+      if (status === '审批通过' || status === '审批不通过') {
+        durationH = 0.5 + Math.pow(rand(), 2.2) * 20;
+        var maxH = (DEMO_NOW - created) / 3600000 * 0.92;
+        if (durationH > maxH) durationH = Math.max(0.2, maxH);
+      }
+      orders.push({ created: created, region: pickRegion(rand), status: status, durationH: durationH });
+    }
+  });
+  return orders;
+})();
+
+function rangeOf(period) {
+  var end = new Date(DEMO_NOW);
+  var start = new Date(DEMO_NOW); start.setHours(0, 0, 0, 0);
+  if (period === 'week') start.setDate(start.getDate() - 6);
+  else if (period === 'month') start.setMonth(start.getMonth() - 1);
+  else if (period === 'year') start.setFullYear(start.getFullYear() - 1);
+  return { start: start, end: end };
+}
+
+function buildBuckets(period, range) {
+  var list = [], cur, s, e, i;
+  if (period === 'today') {
+    var h = DEMO_NOW.getHours();
+    for (i = 0; i <= h; i++) {
+      s = new Date(range.start); s.setHours(i, 0, 0, 0);
+      e = new Date(s); e.setHours(i + 1, 0, 0, 0);
+      list.push({ label: pad2(i) + ':00', start: s, end: e });
+    }
+  } else if (period === 'year') {
+    cur = new Date(range.start.getFullYear(), range.start.getMonth(), 1);
+    while (cur <= range.end) {
+      s = new Date(cur);
+      e = new Date(cur.getFullYear(), cur.getMonth() + 1, 1);
+      list.push({ label: s.getFullYear() + '-' + pad2(s.getMonth() + 1), start: s, end: e });
+      cur = e;
+    }
+  } else {
+    cur = new Date(range.start); cur.setHours(0, 0, 0, 0);
+    while (cur <= range.end) {
+      s = new Date(cur);
+      e = new Date(cur.getFullYear(), cur.getMonth(), cur.getDate() + 1);
+      list.push({ label: pad2(s.getMonth() + 1) + '-' + pad2(s.getDate()), start: s, end: e });
+      cur = e;
+    }
+  }
+  return list;
+}
+
+function compute(period) {
+  var range = rangeOf(period);
+  var list = ORDERS.filter(function (o) { return o.created >= range.start && o.created <= range.end; });
+  var total = list.length, pending = 0, closed = 0, cancelled = 0, sumH = 0, nH = 0;
+  list.forEach(function (o) {
+    if (o.status === '审批中') pending++;
+    else if (o.status === '已取消') cancelled++;
+    else { closed++; if (o.durationH != null) { sumH += o.durationH; nH++; } }
+  });
+  var denom = total - cancelled;
+  var rate = denom > 0 ? closed / denom * 100 : null;
+  var avgH = nH > 0 ? sumH / nH : null;
+  var regionMap = {};
+  REGIONS.forEach(function (r) { regionMap[r.name] = 0; });
+  list.forEach(function (o) { regionMap[o.region]++; });
+  var buckets = buildBuckets(period, range);
+  var launch = [], done = [], dur = [];
+  buckets.forEach(function (b) {
+    var os = list.filter(function (o) { return o.created >= b.start && o.created < b.end; });
+    launch.push(os.length);
+    done.push(os.filter(function (o) { return o.status === '审批通过' || o.status === '审批不通过'; }).length);
+    var cs = os.filter(function (o) { return o.durationH != null; });
+    var s = cs.reduce(function (a, o) { return a + o.durationH; }, 0);
+    dur.push(cs.length ? +(s / cs.length).toFixed(1) : null);
+  });
+  return {
+    range: range, total: total, pending: pending, closed: closed, cancelled: cancelled,
+    rate: rate, avgH: avgH, regionMap: regionMap, buckets: buckets,
+    launch: launch, done: done, dur: dur
+  };
+}
+
+/* ============ 渲染 ============ */
+var CH = {};
+
+function render(period) {
+  var d = compute(period);
+
+  document.getElementById('kpiTotal').textContent = d.total;
+  document.getElementById('kpiPending').textContent = d.pending;
+  document.getElementById('kpiClosed').textContent = d.closed;
+  document.getElementById('kpiRate').textContent = d.rate == null ? '—' : d.rate.toFixed(1);
+  document.getElementById('kpiDuration').textContent = d.avgH == null ? '—' : d.avgH.toFixed(1);
+
+  document.getElementById('rangeHint').textContent =
+    '统计区间：' + fmtDT(d.range.start) + ' 至 ' + fmtDT(d.range.end);
+  document.getElementById('sampleHint').style.display =
+    (period === 'today' || period === 'week') ? 'inline' : 'none';
+
+  var labels = d.buckets.map(function (b) { return b.label; });
+  var interval = labels.length > 12 ? 2 : 0;
+  var gran = period === 'today' ? '按小时' : (period === 'year' ? '按月' : '按天');
+  document.getElementById('trendUnit').textContent = '单位：单 · ' + gran;
+  document.getElementById('durationUnit').textContent = '单位：小时 · ' + gran;
+
+  CH.trend.setOption({
+    tooltip: { trigger: 'axis' },
+    legend: { data: ['发起量', '办结量'], top: 0, right: 0, textStyle: { color: '#8c8c8c' } },
+    grid: { left: 40, right: 20, top: 40, bottom: 30 },
+    xAxis: {
+      type: 'category', data: labels,
+      axisLine: { lineStyle: { color: '#e5e6eb' } },
+      axisLabel: { color: '#8c8c8c', interval: interval }
+    },
+    yAxis: {
+      type: 'value', minInterval: 1,
+      splitLine: { lineStyle: { color: '#f0f0f0' } },
+      axisLabel: { color: '#8c8c8c' }
+    },
+    series: [
+      { name: '发起量', type: 'line', smooth: period === 'year', data: d.launch, itemStyle: { color: '#4165EC' }, areaStyle: { color: 'rgba(65,101,236,0.08)' } },
+      { name: '办结量', type: 'line', smooth: period === 'year', data: d.done, itemStyle: { color: '#5ad8a6' } }
+    ]
+  }, true);
+
+  CH.status.setOption({
     tooltip: { trigger: 'item', formatter: '{b}: {c} ({d}%)' },
-    legend: { orient:'vertical', right: 20, top: 'center', textStyle:{color:'#4e5969'} },
+    legend: { orient: 'vertical', right: 20, top: 'center', textStyle: { color: '#4e5969' } },
     series: [{
-      type: 'pie', radius: ['40%','65%'], center:['40%','50%'],
-      label: { show: true, formatter:'{d}%', color:'#4e5969' },
+      type: 'pie', radius: ['40%', '65%'], center: ['40%', '50%'],
+      label: { show: true, formatter: '{d}%', color: '#4e5969' },
       labelLine: { show: true },
       data: [
-        { value: 46, name:'待处理', itemStyle:{color:'#4165EC'} },
-        { value: 272, name:'已办结', itemStyle:{color:'#5ad8a6'} },
-        { value: 8, name:'已取消', itemStyle:{color:'#c9cdd4'} }
+        { value: d.pending, name: '待处理', itemStyle: { color: '#4165EC' } },
+        { value: d.closed, name: '已办结', itemStyle: { color: '#5ad8a6' } },
+        { value: d.cancelled, name: '已取消', itemStyle: { color: '#c9cdd4' } }
       ]
     }]
-  });
+  }, true);
 
-  // 区域故障排行（按工单总量＝范围内创建的工单按区域计数，六区合计＝326）
-  var region = echarts.init(document.getElementById('region'));
-  var regionData = [
-    {name:'地下区', value:20},{name:'公共区', value:26},{name:'能源区', value:34},
-    {name:'生活区', value:68},{name:'科研区', value:82},{name:'办公区', value:96}
-  ];
-  region.setOption({
-    tooltip: { trigger: 'axis', axisPointer:{type:'shadow'}, formatter: '{b}: {c} 单' },
+  var regionData = REGIONS.map(function (r) { return { name: r.name, value: d.regionMap[r.name] }; })
+    .sort(function (a, b) { return a.value - b.value; });
+  CH.region.setOption({
+    tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' }, formatter: '{b}: {c} 单' },
     grid: { left: 70, right: 40, top: 10, bottom: 20 },
-    xAxis: { type: 'value', splitLine:{lineStyle:{color:'#f0f0f0'}}, axisLabel:{color:'#8c8c8c'} },
-    yAxis: { type: 'category', data: regionData.map(function(d){return d.name;}), axisLabel:{color:'#4e5969'} },
-    series: [{ type:'bar', data: regionData.map(function(d){return d.value;}), itemStyle:{color:'#54a0ff', borderRadius:[0,4,4,0]}, barWidth:'55%', label:{show:true, position:'right', color:'#4e5969'} }]
-  });
+    xAxis: { type: 'value', minInterval: 1, splitLine: { lineStyle: { color: '#f0f0f0' } }, axisLabel: { color: '#8c8c8c' } },
+    yAxis: { type: 'category', data: regionData.map(function (x) { return x.name; }), axisLabel: { color: '#4e5969' } },
+    series: [{
+      type: 'bar', data: regionData.map(function (x) { return x.value; }),
+      itemStyle: { color: '#54a0ff', borderRadius: [0, 4, 4, 0] }, barWidth: '55%',
+      label: { show: true, position: 'right', color: '#4e5969' }
+    }]
+  }, true);
 
-  // 平均处理时长趋势
-  var duration = echarts.init(document.getElementById('duration'));
-  duration.setOption({
-    tooltip: { trigger: 'axis' },
+  CH.duration.setOption({
+    tooltip: {
+      trigger: 'axis',
+      formatter: function (ps) {
+        var p = ps[0];
+        return p.axisValue + '<br/>平均处理时长：' + (p.value == null ? '—' : p.value + ' 小时');
+      }
+    },
     grid: { left: 40, right: 20, top: 20, bottom: 30 },
-    xAxis: { type: 'category', data: ['2025-10','2025-11','2025-12','2026-01','2026-02','2026-03','2026-04','2026-05','2026-06','2026-07','2026-08','2026-09'], axisLine:{lineStyle:{color:'#e5e6eb'}}, axisLabel:{color:'#8c8c8c'} },
-    yAxis: { type: 'value', splitLine:{lineStyle:{color:'#f0f0f0'}}, axisLabel:{color:'#8c8c8c'} },
-    series: [{ type:'line', smooth:true, data:[7.9,7.5,7.2,6.9,6.8,6.6,6.5,6.4,6.3,6.2,6.2,6.1], itemStyle:{color:'#4165EC'}, areaStyle:{color:'rgba(65,101,236,0.08)'} }]
-  });
+    xAxis: {
+      type: 'category', data: labels,
+      axisLine: { lineStyle: { color: '#e5e6eb' } },
+      axisLabel: { color: '#8c8c8c', interval: interval }
+    },
+    yAxis: { type: 'value', splitLine: { lineStyle: { color: '#f0f0f0' } }, axisLabel: { color: '#8c8c8c' } },
+    series: [{
+      type: 'line', smooth: period === 'year', connectNulls: false, data: d.dur,
+      itemStyle: { color: '#4165EC' }, areaStyle: { color: 'rgba(65,101,236,0.08)' }, symbolSize: 6
+    }]
+  }, true);
 
-  window.addEventListener('resize', function(){
-    [trend,status,region,duration].forEach(function(c){ c.resize(); });
+  Array.prototype.forEach.call(document.getElementById('periodSeg').children, function (s) {
+    s.classList.toggle('active', s.getAttribute('data-period') === period);
   });
 }
 
-window.addEventListener('load', function(){ setTimeout(initCharts, 0); });
-
-// 重置按钮：仅还原筛选控件为默认态（原型为静态演示，不触发后台筛选）
-(function(){
-  var btn = document.getElementById('resetBtn');
-  if(!btn) return;
-  btn.addEventListener('click', function(){
-    var ds = document.getElementById('dateStart');
-    var de = document.getElementById('dateEnd');
-    if(ds) ds.value = '2025-10-01';
-    if(de) de.value = '2026-09-30';
+function initCharts() {
+  ['trend', 'status', 'region', 'duration'].forEach(function (id) {
+    var el = document.getElementById(id);
+    el.innerHTML = '';
+    el.removeAttribute('_echarts_instance_');
+    CH[id] = echarts.init(el);
   });
-})();
+  window.addEventListener('resize', function () {
+    Object.keys(CH).forEach(function (k) { CH[k].resize(); });
+  });
+  render('month');
+}
+
+document.getElementById('periodSeg').addEventListener('click', function (e) {
+  var t = e.target.closest('[data-period]');
+  if (!t) return;
+  render(t.getAttribute('data-period'));
+});
+document.getElementById('resetBtn').addEventListener('click', function () { render('month'); });
+window.addEventListener('load', initCharts);
+
 </script>
 
 
